@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.components
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,7 +74,7 @@ fun LingTextField(
 /** 确认对话框（统一配色、圆角）。 */
 @Composable
 fun LingConfirm(
-    title: String, text: String, confirm: String = "确定", dismiss: String = "取消", danger: Boolean = false,
+    title: String, text: String, confirm: String = tr(R.string.sheets_001), dismiss: String = tr(R.string.sheets_002), danger: Boolean = false,
     onDismiss: () -> Unit, onConfirm: () -> Unit, extra: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val c = Ling.colors

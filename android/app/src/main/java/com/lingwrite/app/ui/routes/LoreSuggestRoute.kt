@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.itemsIndexed
 import com.lingwrite.app.ui.components.enterStagger
@@ -40,12 +44,12 @@ fun LoreSuggestRoute(bookId: Long, nav: NavHostController) {
 
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
         LingTopBar(
-            "设定整理建议",
-            "来自第 $chapterNo 章 · ${pending.size} 条",
+            tr(R.string.lore_suggest_001),
+            tr(R.string.lore_suggest_002, chapterNo, pending.size),
             onBack = { nav.popBackStack() },
         ) {
             if (pending.isNotEmpty()) {
-                LingButton("全部采纳", BtnKind.Text, height = 36.dp) {
+                LingButton(tr(R.string.draft_pane_007), BtnKind.Text, height = 36.dp) {
                     scope.launch {
                         com.lingwrite.app.data.LoreSuggest.adoptAll(bookId)
                     }
@@ -54,7 +58,7 @@ fun LoreSuggestRoute(bookId: Long, nav: NavHostController) {
         }
         if (pending.isEmpty()) {
             Text(
-                "没有待处理的建议。写完一章（开着自动检查）或点「AI 整理本章」，AI 会从正文里整理出新人物、状态变化、别名和关系变化。",
+                tr(R.string.lore_suggest_003),
                 style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp),
             )
         } else LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -70,10 +74,10 @@ private fun SuggestionCardRow(s: LoreSuggestionEntity) {
     val scope = rememberCoroutineScope()
     val o = remember(s.payload) { runCatching { kotlinx.serialization.json.Json.parseToJsonElement(s.payload).jsonObject }.getOrNull() }
     val kind = when (s.kind) {
-        "new_card" -> Triple("新人物", PillKind.Amber, LingIcons.PersonAdd)
-        "state" -> Triple("状态变化", PillKind.Primary, LingIcons.TrendUp)
-        "alias" -> Triple("新别名", PillKind.Neutral, LingIcons.Label)
-        else -> Triple("关系", PillKind.Primary, LingIcons.Group)
+        "new_card" -> Triple(tr(R.string.lore_suggest_004), PillKind.Amber, LingIcons.PersonAdd)
+        "state" -> Triple(tr(R.string.lore_suggest_005), PillKind.Primary, LingIcons.TrendUp)
+        "alias" -> Triple(tr(R.string.lore_suggest_006), PillKind.Neutral, LingIcons.Label)
+        else -> Triple(tr(R.string.ask_panel_002), PillKind.Primary, LingIcons.Group)
     }
     var adopting by remember { mutableStateOf(false) }
     LingCard(Modifier.fillMaxWidth()) {
@@ -81,30 +85,30 @@ private fun SuggestionCardRow(s: LoreSuggestionEntity) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Pill(kind.first, kind.second, kind.third)
                 Spacer(Modifier.width(8.dp))
-                Text("第 ${s.number} 章", style = Ling.type.caption, color = c.onSurfaceVariant)
+                Text(tr(R.string.breakdown_015, s.number), style = Ling.type.caption, color = c.onSurfaceVariant)
             }
             Spacer(Modifier.height(8.dp))
             when (s.kind) {
                 "new_card" -> Text(
-                    "新${o?.let { it.str("type") } ?: "设定"}：${o?.let { it.str("name") } ?: ""}",
+                    tr(R.string.lore_suggest_007, o?.let { it.str("type") } ?: tr(R.string.lore_007), o?.let { it.str("name") } ?: ""),
                     style = Ling.type.bodyLarge, color = c.onSurface,
                 )
                 "state" -> {
-                    val old = o?.let { it.str("value") }?.let { "（第 ${s.number} 章起变为）" }
-                    Text("${o?.str("field") ?: "状态"}：→ ${o?.str("value") ?: ""}$old", style = Ling.type.bodyLarge, color = c.onSurface)
+                    val old = o?.let { it.str("value") }?.let { tr(R.string.lore_suggest_008, s.number) }
+                    Text(tr(R.string.lore_suggest_009, o?.str("field") ?: tr(R.string.check_030), o?.str("value") ?: "", old), style = Ling.type.bodyLarge, color = c.onSurface)
                 }
-                "alias" -> Text("别名：${o?.str("value") ?: o?.str("name") ?: ""}", style = Ling.type.bodyLarge, color = c.onSurface)
-                else -> Text("关系：${o?.str("target") ?: ""} — ${o?.str("label") ?: "关联"}", style = Ling.type.bodyLarge, color = c.onSurface)
+                "alias" -> Text(tr(R.string.lore_suggest_010, o?.str("value") ?: o?.str("name") ?: ""), style = Ling.type.bodyLarge, color = c.onSurface)
+                else -> Text(tr(R.string.lore_suggest_012, o?.str("target") ?: "", o?.str("label") ?: tr(R.string.lore_suggest_011)), style = Ling.type.bodyLarge, color = c.onSurface)
             }
             if (s.quote.isNotBlank()) {
-                Text("原文依据：「${s.quote}」", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                Text(tr(R.string.lore_suggest_013, s.quote), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
             }
             o?.str("why")?.takeIf { it.isNotBlank() }?.let {
                 Text(it, style = Ling.type.caption, color = c.primary, modifier = Modifier.padding(top = 4.dp))
             }
             Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LingButton(
-                    if (adopting) "采纳中…" else "✓ 已采纳", BtnKind.Text, height = 34.dp,
+                    if (adopting) tr(R.string.lore_suggest_014) else tr(R.string.lore_suggest_015), BtnKind.Text, height = 34.dp,
                     enabled = !adopting, onClick = {
                         adopting = true
                         scope.launch {
@@ -112,7 +116,7 @@ private fun SuggestionCardRow(s: LoreSuggestionEntity) {
                         }
                     },
                 )
-                LingButton("忽略", BtnKind.Text, height = 34.dp) {
+                LingButton(tr(R.string.check_066), BtnKind.Text, height = 34.dp) {
                     scope.launch { com.lingwrite.app.data.LoreSuggest.ignore(s.id) }
                 }
             }

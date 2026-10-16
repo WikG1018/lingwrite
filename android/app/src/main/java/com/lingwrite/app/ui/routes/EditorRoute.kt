@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -211,7 +216,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         delay(1200)
         try { repo.saveContent(chapterId, text, marks, revision = revision); saveError = null; saving = false }
         catch (e: kotlinx.coroutines.CancellationException) { throw e }
-        catch (e: Exception) { saveError = "保存失败，请保留页面并重试：${e.message}"; saving = false }
+        catch (e: Exception) { saveError = tr(R.string.editor_001, e.message); saving = false }
     }
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
     DisposableEffect(chapterId, lifecycle) {
@@ -234,7 +239,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     if (!imeVisible && p != null && !p.modeTipShown && st.value.text.isBlank()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(12.dp)).background(Ling.colors.surfaceContainer).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(if (mode == WriteMode.Assist) ModeCopy.ASSIST_TIP else ModeCopy.GENERATE_TIP, style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
-            LingButton("知道了", BtnKind.Text, height = 32.dp) { scope.launch { AppGraph.prefs.update { it.copy(modeTipShown = true) } } }
+            LingButton(tr(R.string.editor_002), BtnKind.Text, height = 32.dp) { scope.launch { AppGraph.prefs.update { it.copy(modeTipShown = true) } } }
         }
     }
 
@@ -244,9 +249,9 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp).clip(RoundedCornerShape(12.dp)).background(Ling.colors.surfaceContainer).padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("卡住了？试试卡文急救，3 步给方向。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
-            LingButton("去看看", BtnKind.Tonal, height = 32.dp) { stuckHintClosed = true; stuck = true }
-            LingButton("不用了", BtnKind.Text, height = 32.dp) { stuckHintClosed = true }
+            Text(tr(R.string.editor_003), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
+            LingButton(tr(R.string.editor_004), BtnKind.Tonal, height = 32.dp) { stuckHintClosed = true; stuck = true }
+            LingButton(tr(R.string.editor_005), BtnKind.Text, height = 32.dp) { stuckHintClosed = true }
         }
     }
 
@@ -258,30 +263,30 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
-                Text("待确认改法（来自一致性检查）", style = Ling.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = Ling.colors.onSurface)
-                Text("原文：${pf.before.take(50)}", style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text("改后：${pf.after.take(50)}", style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.primary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(tr(R.string.editor_006), style = Ling.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = Ling.colors.onSurface)
+                Text(tr(R.string.editor_007, pf.before.take(50)), style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(tr(R.string.editor_008, pf.after.take(50)), style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.primary, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
-            LingButton("应用", BtnKind.Tonal, height = 32.dp) {
+            LingButton(tr(R.string.about_001), BtnKind.Tonal, height = 32.dp) {
                 scope.launch {
                     val at = st.value.text.indexOf(pf.before)
                     if (at >= 0) {
                         repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
-                        repo.snapshot(chapterId, "ai", "改法应用前")
+                        repo.snapshot(chapterId, "ai", tr(R.string.editor_009))
                         st.replace(at, at + pf.before.length, pf.after, "edited")
                     }
                     pf.clear()
                 }
             }
-            LingButton("忽略", BtnKind.Text, height = 32.dp) { pf.clear() }
+            LingButton(tr(R.string.check_066), BtnKind.Text, height = 32.dp) { pf.clear() }
         }
     }
 
         },
         title = ChapterLabel.full(ch.number, live?.title ?: ch.title),
-        subtitle = saveError ?: if (saving) "正在保存… · ${Words.grouped(words)} 字" else "已自动保存 · ${Words.grouped(words)} 字",
+        subtitle = saveError ?: if (saving) tr(R.string.editor_010, Words.grouped(words)) else tr(R.string.editor_011, Words.grouped(words)),
         value = st.value, onValueChange = st::edit, marks = st.marks, names = names,
-        todayDelta = "今日 +${Words.grouped(today)}", canUndo = st.canUndo, canRedo = st.canRedo,
+        todayDelta = tr(R.string.editor_012, Words.grouped(today)), canUndo = st.canUndo, canRedo = st.canRedo,
         mode = mode, notesUnread = notesUnread,
         beats = beats, onBeatToggle = onBeatToggle,
         proofRanges = proofRanges,
@@ -335,9 +340,9 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             scope.launch {
                 aiSession.draftOpen = true
                 aiSession.draftStreaming = 0
-                val prompt = "按这个方向写 1200 字正文，前 500 字有钩子。【方向】${w.title}：${w.how}"
+                val prompt = trZh(R.string.editor_013, w.title, w.how)
                 AppGraph.ai.stream("draft", com.lingwrite.app.data.ai.Slot.Writing,
-                    com.lingwrite.app.data.ai.Prompts.BASE, listOf(com.lingwrite.app.data.ai.ChatMessage("user", prompt)), 1200, ch.bookId, chapterId, scope = "卡文起草")
+                    com.lingwrite.app.data.ai.Prompts.BASE, listOf(com.lingwrite.app.data.ai.ChatMessage("user", prompt)), 1200, ch.bookId, chapterId, scope = tr(R.string.editor_014))
                     .collect { e ->
                         val t = (e as? com.lingwrite.app.data.ai.AiStream.Partial)?.text
                             ?: (e as? com.lingwrite.app.data.ai.AiStream.Finished)?.text
@@ -352,31 +357,31 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
 
     if (modeSheet) {
         var applyAll by remember { mutableStateOf(false) }
-        LingSheet({ modeSheet = false }, "切换写作模式") {
-            Text("本书写作模式：跟随全局 / 辅助 / 生成。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
-            SheetAction(LingIcons.Draw, "辅助 · ${ModeCopy.ASSIST_ONE_LINER}", sub = ModeCopy.ASSIST_RESULT) { switchMode(WriteMode.Assist, applyAll); modeSheet = false }
-            SheetAction(LingIcons.SparkleFilled, "生成 · ${ModeCopy.GENERATE_ONE_LINER}", sub = ModeCopy.GENERATE_RESULT) { switchMode(WriteMode.Generate, applyAll); modeSheet = false }
+        LingSheet({ modeSheet = false }, tr(R.string.editor_015)) {
+            Text(tr(R.string.editor_016), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+            SheetAction(LingIcons.Draw, tr(R.string.editor_017, ModeCopy.ASSIST_ONE_LINER), sub = ModeCopy.ASSIST_RESULT) { switchMode(WriteMode.Assist, applyAll); modeSheet = false }
+            SheetAction(LingIcons.SparkleFilled, tr(R.string.editor_018, ModeCopy.GENERATE_ONE_LINER), sub = ModeCopy.GENERATE_RESULT) { switchMode(WriteMode.Generate, applyAll); modeSheet = false }
             Row(Modifier.padding(horizontal = 24.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 androidx.compose.material3.Checkbox(applyAll, { applyAll = it })
-                Text("应用到所有作品", style = Ling.type.body, color = Ling.colors.onSurface)
+                Text(tr(R.string.editor_019), style = Ling.type.body, color = Ling.colors.onSurface)
             }
         }
     }
 
     if (more) LingSheet({ more = false }) {
-        SheetAction(LingIcons.Help, "写作指南", sub = "打开当前章节的写作与修订说明") {
+        SheetAction(LingIcons.Help, tr(R.string.editor_020), sub = tr(R.string.editor_021)) {
             scope.launch {
                 AppGraph.prefs.update { it.copy(authorGuide = true, authorGuideStep = 5, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION) }
                 AuthorGuideUi.openEpoch++
             }
             more = false
         }
-        SheetAction(LingIcons.History, "历史版本", sub = "自动保留最近 ${BookRepository.KEEP_AUTO} 个，手动快照永久保留") { history = true; more = false }
-        SheetAction(LingIcons.BookmarkAdd, "保存快照") { scope.launch { repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks)); repo.snapshot(chapterId) }; more = false }
-        SheetAction(LingIcons.EditOutline, "重命名本章") { renaming = true; more = false }
-        SheetAction(LingIcons.Book, "设定库", sub = "人物、势力、地点、物品、力量、概念") { nav.navigate(Routes.lore(ch.bookId, 0)); more = false }
+        SheetAction(LingIcons.History, tr(R.string.editor_022), sub = tr(R.string.editor_023, BookRepository.KEEP_AUTO)) { history = true; more = false }
+        SheetAction(LingIcons.BookmarkAdd, tr(R.string.editor_024)) { scope.launch { repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks)); repo.snapshot(chapterId) }; more = false }
+        SheetAction(LingIcons.EditOutline, tr(R.string.editor_025)) { renaming = true; more = false }
+        SheetAction(LingIcons.Book, tr(R.string.ask_panel_005), sub = tr(R.string.editor_026)) { nav.navigate(Routes.lore(ch.bookId, 0)); more = false }
         val done = live?.state == "done"
-        SheetAction(LingIcons.Check, if (done) "改回草稿" else "完成本章", sub = if (done) null else "完成后会自动做摘要和一致性检查（可在设置里关闭）") {
+        SheetAction(LingIcons.Check, if (done) tr(R.string.editor_027) else tr(R.string.editor_028), sub = if (done) null else tr(R.string.editor_029)) {
             scope.launch {
                 repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
                 repo.setChapterState(chapterId, if (done) "draft" else "done")
@@ -384,18 +389,18 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             }
             more = false
         }
-        SheetAction(LingIcons.Add, "写下一章", sub = "接在本章所在卷") { scope.launch { val n = repo.nextChapter(ch.bookId, afterChapterId = ch.id); nav.navigate(Routes.editor(n)) { popUpTo(Routes.Editor) { inclusive = true } } }; more = false }
-        SheetAction(LingIcons.FactCheck, "校对本章", sub = "只改错字和标点，不改文风") {
+        SheetAction(LingIcons.Add, tr(R.string.editor_030), sub = tr(R.string.editor_031)) { scope.launch { val n = repo.nextChapter(ch.bookId, afterChapterId = ch.id); nav.navigate(Routes.editor(n)) { popUpTo(Routes.Editor) { inclusive = true } } }; more = false }
+        SheetAction(LingIcons.FactCheck, tr(R.string.editor_ai_046), sub = tr(R.string.editor_032)) {
             more = false; runProof()
         }
-        SheetAction(LingIcons.Help, "卡文急救", sub = "卡住了就走 3 步：选卡点、澄清、给方向") { more = false; stuck = true }
+        SheetAction(LingIcons.Help, tr(R.string.editor_ai_045), sub = tr(R.string.editor_033)) { more = false; stuck = true }
         // A16 读者试读：模拟反馈，仅供参考（ai-features §16）
-        SheetAction(LingIcons.FactCheck, "读者试读", sub = "模拟读者读完本章的追读意愿和弃书点") { more = false; nav.navigate(com.lingwrite.app.ui.Routes.reader(ch.bookId, ch.number)) }
+        SheetAction(LingIcons.FactCheck, tr(R.string.editor_034), sub = tr(R.string.editor_035)) { more = false; nav.navigate(com.lingwrite.app.ui.Routes.reader(ch.bookId, ch.number)) }
         EditorHooks.moreItems(this, st, { more = false }, nav)
     }
     if (renaming) {
         var t by remember { mutableStateOf(live?.title ?: ch.title) }
-        LingConfirm("章节标题", "", onDismiss = { renaming = false }, onConfirm = { scope.launch { repo.renameChapter(chapterId, t) }; renaming = false }, extra = {
+        LingConfirm(tr(R.string.editor_036), "", onDismiss = { renaming = false }, onConfirm = { scope.launch { repo.renameChapter(chapterId, t) }; renaming = false }, extra = {
             LingTextField(t, { t = it }, Modifier.padding(top = 4.dp))
         })
     }
@@ -409,15 +414,15 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     }
 }
 
-private fun kindLabel(k: String) = when (k) { "manual" -> "手动快照"; "rollback" -> "回滚前"; "ai" -> "AI 采纳前"; else -> "自动保存" }
+private fun kindLabel(k: String) = when (k) { "manual" -> tr(R.string.editor_037); "rollback" -> tr(R.string.editor_038); "ai" -> tr(R.string.editor_ai_032); else -> tr(R.string.editor_039) }
 
 @Composable
 fun HistorySheet(chapterId: Long, current: String, onDismiss: () -> Unit, onRollback: (ChapterVersionEntity) -> Unit) {
     val c = Ling.colors
     val versions by remember(chapterId) { AppGraph.books.versions(chapterId) }.collectAsState(emptyList())
     var open by remember { mutableStateOf<ChapterVersionEntity?>(null) }
-    LingSheet(onDismiss, "历史版本", layout = SheetLayout.Viewport) {
-        if (versions.isEmpty()) Text("还没有历史版本。写作时会自动保存版本。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+    LingSheet(onDismiss, tr(R.string.editor_022), layout = SheetLayout.Viewport) {
+        if (versions.isEmpty()) Text(tr(R.string.editor_040), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
         LazyColumn(Modifier.heightIn(max = 520.dp)) {
             items(versions, key = { it.id }) { v ->
                 val delta = Words.count(current) - v.wordCount
@@ -431,8 +436,8 @@ fun HistorySheet(chapterId: Long, current: String, onDismiss: () -> Unit, onRoll
                         Text(v.content.trim().take(40).replace("\n", " "), style = Ling.type.caption, color = c.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("${Words.grouped(v.wordCount)} 字", style = Ling.type.caption, color = c.onSurfaceVariant)
-                        if (delta != 0) Text(if (delta > 0) "当前多 $delta" else "当前少 ${-delta}", style = Ling.type.micro, color = if (delta > 0) c.good else c.tertiary)
+                        Text(tr(R.string.editor_041, Words.grouped(v.wordCount)), style = Ling.type.caption, color = c.onSurfaceVariant)
+                        if (delta != 0) Text(if (delta > 0) tr(R.string.editor_042, delta) else tr(R.string.editor_043, -delta), style = Ling.type.micro, color = if (delta > 0) c.good else c.tertiary)
                     }
                 }
             }
@@ -447,7 +452,7 @@ private fun VersionCompare(v: ChapterVersionEntity, current: String, onDismiss: 
     val diff = remember(v.id, current) { ParaDiff.diff(v.content, current) }
     LingSheet(onDismiss, "${TimeFmt.clock(v.createdAt)} · ${kindLabel(v.kind)}", layout = SheetLayout.Viewport) {
         Row(Modifier.padding(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Legend(c.errorContainer, "仅在该版本"); Legend(c.goodContainer, "仅在当前")
+            Legend(c.errorContainer, tr(R.string.editor_044)); Legend(c.goodContainer, tr(R.string.editor_045))
         }
         Column(Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             diff.forEach { l ->
@@ -457,8 +462,8 @@ private fun VersionCompare(v: ChapterVersionEntity, current: String, onDismiss: 
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(bg).padding(horizontal = 10.dp, vertical = 6.dp))
             }
         }
-        LingButton("回滚到这个版本", modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), height = 50.dp, onClick = onRollback)
-        Text("回滚前会把当前内容另存为一个版本，随时可以再换回来。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+        LingButton(tr(R.string.editor_046), modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), height = 50.dp, onClick = onRollback)
+        Text(tr(R.string.editor_047), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
     }
 }
 

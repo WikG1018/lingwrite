@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -17,7 +21,7 @@ import com.lingwrite.app.ui.theme.Ling
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-val Genres = listOf("仙侠", "玄幻", "都市", "言情", "悬疑", "科幻", "历史", "游戏", "其他")
+val Genres get() = listOf(tr(R.string.shelf_001), tr(R.string.shelf_002), tr(R.string.shelf_003), tr(R.string.shelf_004), tr(R.string.shelf_005), tr(R.string.shelf_006), tr(R.string.shelf_007), tr(R.string.shelf_008), tr(R.string.lore_055))
 
 @Composable
 fun ShelfRoute(onOpenBook: (Long) -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onWizard: (Long) -> Unit) {
@@ -46,19 +50,19 @@ fun ShelfRoute(onOpenBook: (Long) -> Unit, onOpenChapter: (Long) -> Unit, onSear
     }
     menuFor?.let { b ->
         LingSheet({ menuFor = null }, b.title) {
-            SheetAction(LingIcons.EditOutline, "重命名") { renameFor = b; menuFor = null }
-            SheetAction(LingIcons.Check, "标记为已完结") { scope.launch { repo.setStatus(b.id, "done") }; menuFor = null }
-            SheetAction(LingIcons.Delete, "删除作品", danger = true, sub = "章节、设定和历史版本会一并删除") { confirmDelete = b; menuFor = null }
+            SheetAction(LingIcons.EditOutline, tr(R.string.shelf_009)) { renameFor = b; menuFor = null }
+            SheetAction(LingIcons.Check, tr(R.string.shelf_010)) { scope.launch { repo.setStatus(b.id, "done") }; menuFor = null }
+            SheetAction(LingIcons.Delete, tr(R.string.shelf_011), danger = true, sub = tr(R.string.shelf_012)) { confirmDelete = b; menuFor = null }
         }
     }
     renameFor?.let { b ->
         var t by remember(b) { mutableStateOf(b.title) }
-        LingConfirm("重命名", "", onDismiss = { renameFor = null }, onConfirm = { scope.launch { repo.rename(b.id, t) }; renameFor = null }, extra = {
+        LingConfirm(tr(R.string.shelf_009), "", onDismiss = { renameFor = null }, onConfirm = { scope.launch { repo.rename(b.id, t) }; renameFor = null }, extra = {
             LingTextField(t, { t = it }, Modifier.padding(top = 4.dp))
         })
     }
     confirmDelete?.let { b ->
-        LingConfirm("删除《${b.title}》？", "删除后无法恢复。建议先在设置里做一次备份。", confirm = "删除", danger = true,
+        LingConfirm(tr(R.string.shelf_013, b.title), tr(R.string.shelf_014), confirm = tr(R.string.check_044), danger = true,
             onDismiss = { confirmDelete = null }, onConfirm = { scope.launch { repo.deleteBook(b.id) }; confirmDelete = null })
     }
 }
@@ -68,24 +72,24 @@ fun NewBookSheet(onDismiss: () -> Unit, onWizard: () -> Unit, onCreate: (String,
     val c = Ling.colors
     var title by remember { mutableStateOf("") }
     var genre by remember { mutableStateOf("") }
-    LingSheet(onDismiss, "新建作品") {
+    LingSheet(onDismiss, tr(R.string.shelf_015)) {
         LingCard(Modifier.padding(horizontal = 20.dp).fillMaxWidth(), color = c.primaryContainer) {
             Row(Modifier.fillMaxWidth().rowClick(onWizard).padding(16.dp)) {
                 Tile(LingIcons.SparkleFilled, c.primary, c.onPrimary)
                 Spacer(Modifier.width(14.dp))
                 Column {
-                    Text("用创作向导开书", style = Ling.type.subhead, color = c.onPrimaryContainer)
-                    Text("8 步搭好灵感、人物、世界观、大纲和前三章章纲，每步都能让 AI 帮忙", style = Ling.type.caption, color = c.onPrimaryContainer.copy(alpha = 0.8f))
+                    Text(tr(R.string.shelf_016), style = Ling.type.subhead, color = c.onPrimaryContainer)
+                    Text(tr(R.string.shelf_017), style = Ling.type.caption, color = c.onPrimaryContainer.copy(alpha = 0.8f))
                 }
             }
         }
-        Text("或者直接建一本空白书", style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 24.dp, top = 20.dp, bottom = 8.dp))
-        LingTextField(title, { title = it }, Modifier.padding(horizontal = 20.dp), placeholder = "书名（之后可改）")
+        Text(tr(R.string.shelf_018), style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 24.dp, top = 20.dp, bottom = 8.dp))
+        LingTextField(title, { title = it }, Modifier.padding(horizontal = 20.dp), placeholder = tr(R.string.shelf_019))
         LazyRow(contentPadding = PaddingValues(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 12.dp)) {
             items(Genres) { g ->
                 LingChip(g == genre, { genre = if (genre == g) "" else g }, g)
             }
         }
-        LingButton("创建", modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp).fillMaxWidth(), height = 50.dp, enabled = title.isNotBlank()) { onCreate(title.trim(), genre) }
+        LingButton(tr(R.string.shelf_020), modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp).fillMaxWidth(), height = 50.dp, enabled = title.isNotBlank()) { onCreate(title.trim(), genre) }
     }
 }

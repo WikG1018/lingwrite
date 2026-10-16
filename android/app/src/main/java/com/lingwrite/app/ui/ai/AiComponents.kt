@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.ai
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
@@ -86,7 +92,7 @@ fun ModeBadge(mode: WriteMode, modifier: Modifier = Modifier, onClick: () -> Uni
         horizontalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         Icon(icon, null, tint = fg, modifier = Modifier.size(15.dp))
-        Text(mode.label, style = Ling.type.micro.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold), color = fg)
+        Text(trText(mode.label), style = Ling.type.micro.copy(fontSize = 12.sp, fontWeight = FontWeight.SemiBold), color = fg)
     }
 }
 
@@ -95,7 +101,7 @@ fun ModeBadge(mode: WriteMode, modifier: Modifier = Modifier, onClick: () -> Uni
 fun AiMainButton(mode: WriteMode, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     val c = Ling.colors
     val i = remember { MutableInteractionSource() }
-    val (label, icon) = if (mode == WriteMode.Assist) "灵感" to LingIcons.IdeaFilled else "AI 起草" to LingIcons.SparkleFilled
+    val (label, icon) = if (mode == WriteMode.Assist) tr(R.string.ai_components_001) to LingIcons.IdeaFilled else tr(R.string.ai_components_002) to LingIcons.SparkleFilled
     val shape = RoundedCornerShape(19.dp)
     Row(
         modifier
@@ -188,9 +194,9 @@ fun AiNoteCard(
         }
         Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton(if (busy) "生成中…" else "再来一次", BtnKind.Text, height = 36.dp, enabled = !busy, onClick = onAnother)
-            onCopy?.let { LingButton("复制", BtnKind.Outlined, height = 36.dp, onClick = it) }
-            onNote?.let { LingButton("存到便签", BtnKind.Tonal, height = 36.dp, onClick = it) }
+            LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.ai_components_004), BtnKind.Text, height = 36.dp, enabled = !busy, onClick = onAnother)
+            onCopy?.let { LingButton(tr(R.string.ai_components_005), BtnKind.Outlined, height = 36.dp, onClick = it) }
+            onNote?.let { LingButton(tr(R.string.ai_components_006), BtnKind.Tonal, height = 36.dp, onClick = it) }
         }
     }
 }
@@ -231,7 +237,7 @@ fun AiCandidateCard(
     onRegenerate: () -> Unit = {},
     onTweak: () -> Unit = {},
     onAccept: () -> Unit = {},
-    acceptLabel: String = "采纳",
+    acceptLabel: String = tr(R.string.ai_components_007),
 ) {
     val c = Ling.colors
     val reduced = Motion.reduced()
@@ -308,15 +314,15 @@ fun AiCandidateCard(
                 exit = fadeOut(tween(Motion.Short)),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingButton("换一批", BtnKind.Text, height = 36.dp, onClick = regenerate)
-                    LingButton("微调", BtnKind.Outlined, height = 36.dp, onClick = onTweak)
+                    LingButton(tr(R.string.ai_components_008), BtnKind.Text, height = 36.dp, onClick = regenerate)
+                    LingButton(tr(R.string.ai_components_009), BtnKind.Outlined, height = 36.dp, onClick = onTweak)
                     LingButton(acceptLabel, BtnKind.Tonal, height = 36.dp, onClick = onAccept)
                 }
             }
             if (streaming) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingButton("生成中…", BtnKind.Text, height = 36.dp, enabled = false)
-                    LingButton("微调", BtnKind.Outlined, height = 36.dp, enabled = false)
+                    LingButton(tr(R.string.ai_components_003), BtnKind.Text, height = 36.dp, enabled = false)
+                    LingButton(tr(R.string.ai_components_009), BtnKind.Outlined, height = 36.dp, enabled = false)
                     LingButton(acceptLabel, BtnKind.Tonal, height = 36.dp, enabled = false)
                 }
             }
@@ -346,7 +352,7 @@ fun AiThinking(text: String, modifier: Modifier = Modifier) {
                 Box(Modifier.size(6.dp).graphicsLayer { translationY = dy }.clip(CircleShape).background(c.amber))
             }
             Spacer(Modifier.width(8.dp))
-            Text(if (reduced) "思考中：$text" else text, style = Ling.type.body.copy(fontSize = 13.sp), color = c.onSurfaceVariant)
+            Text(if (reduced) tr(R.string.ai_components_010, text) else text, style = Ling.type.body.copy(fontSize = 13.sp), color = c.onSurfaceVariant)
         }
         Spacer(Modifier.height(10.dp))
         Skeleton(0.9f)
@@ -364,13 +370,13 @@ fun AiErrorCard(message: String, retries: Int = 0, modifier: Modifier = Modifier
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 ToneIcon(LingIcons.ErrorOutline, CardTone.Error)
-                Text("没拿到结果：$message", style = Ling.type.body, color = c.onSurface, modifier = Modifier.weight(1f))
+                Text(tr(R.string.ai_components_011, message), style = Ling.type.body, color = c.onSurface, modifier = Modifier.weight(1f))
             }
-            if (retries > 0) Text("已重试 $retries 次", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 32.dp, top = 2.dp))
+            if (retries > 0) Text(tr(R.string.ai_components_012, retries), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 32.dp, top = 2.dp))
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                onChangeModel?.let { LingButton("换个模型", BtnKind.Text, height = 36.dp, onClick = it) }
-                onRetry?.let { LingButton("重试", BtnKind.Outlined, height = 36.dp, onClick = it) }
+                onChangeModel?.let { LingButton(tr(R.string.ai_components_013), BtnKind.Text, height = 36.dp, onClick = it) }
+                onRetry?.let { LingButton(tr(R.string.ai_components_014), BtnKind.Outlined, height = 36.dp, onClick = it) }
             }
         }
     }
@@ -423,7 +429,7 @@ fun ContextChips(chips: List<String>, modifier: Modifier = Modifier, onRemove: (
                 horizontalArrangement = Arrangement.spacedBy(3.dp),
             ) {
                 Text(chip, style = Ling.type.micro, color = Ling.colors.onSurfaceVariant)
-                Icon(LingIcons.Close, "移除$chip", tint = Ling.colors.onSurfaceVariant, modifier = Modifier.size(12.dp))
+                Icon(LingIcons.Close, tr(R.string.ai_components_015, chip), tint = Ling.colors.onSurfaceVariant, modifier = Modifier.size(12.dp))
             }
         }
     }
@@ -439,16 +445,16 @@ fun AiTweakSheet(
 ) {
     val c = Ling.colors
     var t by remember { mutableStateOf(initial) }
-    LingSheet(onDismiss, "微调后采纳") {
+    LingSheet(onDismiss, tr(R.string.ai_components_016)) {
         Column(Modifier.padding(horizontal = 20.dp)) {
-            Text("原文", style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
+            Text(tr(R.string.ai_components_017), style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
             Box(Modifier.fillMaxWidth().padding(top = 6.dp).clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp)) {
                 Text(original.take(600) + if (original.length > 600) "…" else "", style = Ling.type.body.copy(lineHeight = 22.sp), color = c.onSurfaceVariant, maxLines = 4)
             }
             Spacer(Modifier.height(14.dp))
             LingTextField(t, { t = it }, Modifier.fillMaxWidth(), singleLine = false, minLines = 5, maxLines = 12)
-            Text("改过的内容会标记为“AI 建议 + 人工修改”。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+            Text(tr(R.string.ai_components_018), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
         }
-        LingButton("用这个版本", modifier = Modifier.padding(20.dp).fillMaxWidth(), height = 50.dp, enabled = t.isNotBlank()) { onAccept(t.trim()) }
+        LingButton(tr(R.string.ai_components_019), modifier = Modifier.padding(20.dp).fillMaxWidth(), height = 50.dp, enabled = t.isNotBlank()) { onAccept(t.trim()) }
     }
 }

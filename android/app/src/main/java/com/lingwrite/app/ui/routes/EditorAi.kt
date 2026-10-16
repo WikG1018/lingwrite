@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -116,17 +123,17 @@ object EditorAi {
         EditorHooks.moreItems = { st, close, nav ->
             prevMore(this, st, close, nav)
             val s = sessionFor(st.chapter.id)
-            SheetAction(LingIcons.Help, "随手问", sub = "问设定、问前情、问现实知识；回答不进正文") { s.ask = true; close() }
-            SheetAction(LingIcons.SparkleFilled, "本章 AI 使用记录", sub = "调用类型、范围、是否采纳（不作为平台认可的证明）") { s.logs = true; close() }
+            SheetAction(LingIcons.Help, tr(R.string.ask_panel_018), sub = tr(R.string.editor_ai_001)) { s.ask = true; close() }
+            SheetAction(LingIcons.SparkleFilled, tr(R.string.editor_ai_002), sub = tr(R.string.editor_ai_003)) { s.logs = true; close() }
         }
     }
 }
 
-private fun outcomeLabel(o: String) = when (o) { "accepted" -> "原样采纳"; "edited" -> "修改后采纳"; "rejected" -> "未采纳"; "failed" -> "失败"; "noted" -> "存便签"; "auto" -> "自动任务"; else -> "未处理" }
+private fun outcomeLabel(o: String) = when (o) { "accepted" -> tr(R.string.editor_ai_004); "edited" -> tr(R.string.editor_ai_005); "rejected" -> tr(R.string.editor_ai_006); "failed" -> tr(R.string.editor_ai_007); "noted" -> tr(R.string.editor_ai_008); "auto" -> tr(R.string.editor_ai_009); else -> tr(R.string.editor_ai_010) }
 private fun taskLabel(t: String) = when (t) {
-    "continue" -> "续写"; "directions" -> "给方向"; "rewrite" -> "改写"; "expand" -> "扩写"; "polish" -> "润色"; "deai" -> "去 AI 腔"; "dialog" -> "对话"
-    "describe" -> "描写"; "shorten" -> "缩写"; "annotate" -> "批注修改"; "summary" -> "摘要"; "check" -> "一致性检查"; "extract" -> "设定提取"; "foreshadow" -> "伏笔建议"
-    "wizard" -> "创作向导"; "style" -> "文风学习"; "aitaste" -> "AI 味检查"; "ask" -> "随手问"; else -> t
+    "continue" -> tr(R.string.editor_ai_011); "directions" -> tr(R.string.editor_ai_012); "rewrite" -> tr(R.string.editor_ai_013); "expand" -> tr(R.string.editor_ai_014); "polish" -> tr(R.string.editor_ai_015); "deai" -> tr(R.string.editor_ai_016); "dialog" -> tr(R.string.editor_ai_017)
+    "describe" -> tr(R.string.editor_ai_018); "shorten" -> tr(R.string.editor_ai_019); "annotate" -> tr(R.string.editor_ai_020); "summary" -> tr(R.string.editor_ai_021); "check" -> tr(R.string.check_003); "extract" -> tr(R.string.editor_ai_022); "foreshadow" -> tr(R.string.editor_ai_023)
+    "wizard" -> tr(R.string.editor_ai_024); "style" -> tr(R.string.editor_ai_025); "aitaste" -> tr(R.string.editor_ai_026); "ask" -> tr(R.string.ask_panel_018); else -> t
 }
 
 @Composable
@@ -152,9 +159,9 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         s.job = scope.launch {
             val ctx = PromptHooks.context(st.chapter.bookId, st.chapter.id, cursor, text)
             val system = Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p)
-            val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + "【任务】" + task.instruction(quote, p)
+            val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + trZh(R.string.editor_ai_027) + task.instruction(quote, p)
             AppGraph.ai.streamMany(task.id, Slot.Writing, system, listOf(ChatMessage("user", user)), n, task.maxTokens, st.chapter.bookId, st.chapter.id,
-                scope = if (quote.isNotEmpty()) "选中 ${quote.length} 字" else "光标处").collect { e ->
+                scope = if (quote.isNotEmpty()) tr(R.string.editor_ai_028, quote.length) else tr(R.string.editor_ai_029)).collect { e ->
                 when (e) {
                     is AiService.AiMulti.Partial -> {
                         if (e.index < s.cands.size) s.cands[e.index] = s.cands[e.index].copy(text = e.text)
@@ -183,7 +190,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             val plan = AppGraph.db.plan().chapterOnce(st.chapter.id)
             val beats = com.lingwrite.app.data.parseBeats(plan?.beats ?: "[]")
             if (beats.isEmpty()) {
-                s.error = "还没有本章节拍。先点「起草本章」旁的节拍生成，或去总纲工作台第 ⑥ 步。"
+                s.error = tr(R.string.editor_ai_030)
                 return@launch
             }
             s.draftTotal = beats.size.coerceIn(2, 3).let { beats.size }
@@ -199,7 +206,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                     partBeats, style, i + 1, n, done,
                 )
                 var seg = ""
-                AppGraph.ai.stream("draft", Slot.Writing, com.lingwrite.app.data.ai.Prompts.BASE, listOf(ChatMessage("user", user)), 1600, st.chapter.bookId, st.chapter.id, scope = "起草本章").collect { e ->
+                AppGraph.ai.stream("draft", Slot.Writing, com.lingwrite.app.data.ai.Prompts.BASE, listOf(ChatMessage("user", user)), 1600, st.chapter.bookId, st.chapter.id, scope = trZh(R.string.editor_ai_031)).collect { e ->
                     when (e) {
                         is AiStream.Partial -> { seg = e.text; if (s.draftSegs.size <= i) s.draftSegs += e.text else s.draftSegs[i] = e.text }
                         is AiStream.Finished -> { seg = e.text; if (s.draftSegs.size <= i) s.draftSegs += e.text else s.draftSegs[i] = e.text }
@@ -230,9 +237,9 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         s.job = scope.launch {
             val ctx = PromptHooks.context(st.chapter.bookId, st.chapter.id, cursor, text)
             val system = Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p)
-            val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + "【任务】" + task.instruction(quote, p)
+            val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + trZh(R.string.editor_ai_027) + task.instruction(quote, p)
             AppGraph.ai.stream(task.id, Slot.Writing, system, listOf(ChatMessage("user", user)), task.maxTokens, st.chapter.bookId, st.chapter.id,
-                scope = if (quote.isNotEmpty()) "选中 ${quote.length} 字" else "光标处").collect { e ->
+                scope = if (quote.isNotEmpty()) tr(R.string.editor_ai_028, quote.length) else tr(R.string.editor_ai_029)).collect { e ->
                 when (e) {
                     is AiStream.Partial -> { s.text = e.text; s.run.stream(e.text) }
                     is AiStream.Finished -> { s.text = e.text; s.logId = e.logId; s.streaming = false; s.run.ready(listOf(Candidate(e.text, null, e.logId))) }
@@ -257,10 +264,10 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             val to = AiAdopt.adoptTo(s.tool?.id ?: "", s.target != null)
             if (to == AdoptTo.Note) { saveNote("direction", text); return@launch }
             AppGraph.books.saveContent(st.chapter.id, st.value.text)
-            AppGraph.books.snapshot(st.chapter.id, "ai", "AI 采纳前")
+            AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
             val r = s.target
             val cur = st.value.text
-            if (r != null && s.anchor?.valid(cur) != true) { s.error = "正文已修改，这份建议对应旧选区。请重新选中并生成，原稿未改动。"; return@launch }
+            if (r != null && s.anchor?.valid(cur) != true) { s.error = tr(R.string.editor_ai_033); return@launch }
             // 辅助模式改选中的句子：改的是作者自己写的字，按“AI 建议 + 人工修改”计
             val kind = if (s.mode == WriteMode.Assist && r != null) "edited" else if (edited) "edited" else "gen"
             if (r != null && r.last < cur.length) st.replace(r.first, r.last + 1, text, kind)
@@ -279,10 +286,10 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         val cand = s.cands.getOrNull(s.selected) ?: return
         scope.launch {
             AppGraph.books.saveContent(st.chapter.id, st.value.text)
-            AppGraph.books.snapshot(st.chapter.id, "ai", "AI 采纳前")
+            AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
             val r = s.target
             val cur = st.value.text
-            if (r != null && s.anchor?.valid(cur) != true) { s.error = "正文已修改，这份建议对应旧选区。请重新选中并生成，原稿未改动。"; return@launch }
+            if (r != null && s.anchor?.valid(cur) != true) { s.error = tr(R.string.editor_ai_033); return@launch }
             val kind = if (cand.edited != null) "edited" else "gen"
             if (r != null && r.last < cur.length) st.replace(r.first, r.last + 1, cand.display, kind)
             else {
@@ -309,7 +316,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                 streamingIndex = s.draftStreaming,
                 onAdopt = { i ->
                     scope.launch {
-                        AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", "草稿采纳前")
+                        AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_034))
                         val at = st.value.selection.end.coerceIn(0, st.value.text.length)
                         val sep = if (at > 0 && !st.value.text.endsWith(System.lineSeparator())) System.lineSeparator() else ""
                         st.replace(at, at, sep + s.draftSegs.getOrNull(i).orEmpty(), "gen")
@@ -320,7 +327,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                 onReroll = { s.draftSegs.removeAt(it); s.draftStreaming = it; scope.launch { s.job = launch { runDraftLocal(st, s, p) } } },
                 onAdoptAll = {
                     scope.launch {
-                        AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", "草稿采纳前")
+                        AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_034))
                         val at = st.value.selection.end.coerceIn(0, st.value.text.length)
                         st.replace(at, at, System.lineSeparator() + s.draftSegs.joinToString(System.lineSeparator()), "gen")
                         s.clearDraft()
@@ -331,8 +338,8 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             val t = s.tool
             if (t != null && s.error == null) {
                 val header = buildString {
-                    append(if (t.id == "directions") "写作方向" else "${t.label}${if (s.multi) " · ${s.candCount} 个候选" else "建议"}")
-                    if (s.round > 1) append(" · 第 ${s.round} 次")
+                    append(if (t.id == "directions") tr(R.string.editor_ai_035) else "${trText(t.label)}${if (s.multi) tr(R.string.editor_ai_036, s.candCount) else tr(R.string.editor_ai_037)}")
+                    if (s.round > 1) append(tr(R.string.editor_ai_038, s.round))
                 }
                 when {
                     // 辅助模式的给方向：便签卡，绝不进正文
@@ -354,7 +361,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                         },
                         onTweak = { s.tweak = true },
                         onAccept = { acceptCandidate() },
-                        acceptLabel = if (s.target != null) "替换" else "采纳",
+                        acceptLabel = if (s.target != null) tr(R.string.editor_ai_039) else tr(R.string.ai_components_007),
                     )
                     // 辅助模式改写选中句：并排对比，采纳按“人工修改”计
                     s.mode == WriteMode.Assist && s.target != null -> AssistCompareCard(
@@ -371,8 +378,8 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                         onAnother = { s.logId?.let { id -> scope.launch { AppGraph.ai.setOutcome(id, "rejected") } }; run(t) },
                         onEdit = { s.tweak = true },
                         onAccept = { accept(s.text, false) },
-                        acceptLabel = if (s.target != null) "替换" else "采纳",
-                        editLabel = "微调",
+                        acceptLabel = if (s.target != null) tr(R.string.editor_ai_039) else tr(R.string.ai_components_007),
+                        editLabel = tr(R.string.ai_components_009),
                     )
                 }
             } else if (t != null && s.error != null) {
@@ -382,11 +389,11 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             val adoptedState = s.run.state
             if (adoptedState is AiRunState.Adopted) {
                 val label = when (adoptedState.target) {
-                    AdoptTarget.Body -> "已采纳到正文"
-                    AdoptTarget.Note -> "已存进本章便签"
-                    AdoptTarget.Lore -> "已存进设定库"
-                    AdoptTarget.Foreshadow -> "已登记伏笔"
-                    AdoptTarget.Outline -> "已写进章纲"
+                    AdoptTarget.Body -> tr(R.string.editor_ai_040)
+                    AdoptTarget.Note -> tr(R.string.editor_ai_041)
+                    AdoptTarget.Lore -> tr(R.string.editor_ai_042)
+                    AdoptTarget.Foreshadow -> tr(R.string.editor_ai_043)
+                    AdoptTarget.Outline -> tr(R.string.editor_ai_044)
                 }
                 Row(
                     Modifier.padding(horizontal = 16.dp).padding(top = 8.dp).fillMaxWidth()
@@ -404,7 +411,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             }
             // 工具条胶囊（modes.md §5）：辅助模式常驻「卡文急救」；「校对本章」两种模式都有
             val chips = buildList {
-                addAll(tools.map { it.label })
+                addAll(tools.map { trText(it.label) })
                 add("随手问")
                 if (s.mode == WriteMode.Assist) add("卡文急救")
                 add("校对本章")
@@ -430,25 +437,25 @@ private fun AssistCompareCard(header: String, original: String, revised: String,
     val c = Ling.colors
     com.lingwrite.app.ui.ai.ToneCard(
         com.lingwrite.app.ui.ai.CardTone.Primary, header, LingIcons.EditNote, Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-        trailing = { LingIconButton(LingIcons.Close, "关闭", tint = c.onSurfaceVariant, onClick = onClose) },
+        trailing = { LingIconButton(LingIcons.Close, tr(R.string.editor_ai_048), tint = c.onSurfaceVariant, onClick = onClose) },
     ) {
         Column {
             Spacer(Modifier.height(8.dp))
-            Text("原文", style = Ling.type.micro, color = c.onSurfaceVariant)
+            Text(tr(R.string.ai_components_017), style = Ling.type.micro, color = c.onSurfaceVariant)
             Text(original, style = Ling.type.body.copy(lineHeight = 22.sp, textDecoration = TextDecoration.LineThrough), color = c.onSurfaceVariant, maxLines = 4, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(8.dp))
-            Text("改后", style = Ling.type.micro, color = c.primary)
+            Text(tr(R.string.editor_ai_049), style = Ling.type.micro, color = c.primary)
             Row(verticalAlignment = Alignment.Top) {
                 Text(revised, style = Ling.type.bodyLarge.copy(lineHeight = 24.sp), color = c.onSurface, modifier = Modifier.weight(1f, fill = false))
                 if (streaming) com.lingwrite.app.ui.ai.AiStreamCursor(Modifier.padding(top = 3.dp))
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LingButton(if (streaming) "生成中…" else "再来一次", BtnKind.Text, height = 36.dp, enabled = !streaming, onClick = onAnother)
-                LingButton("微调", BtnKind.Outlined, height = 36.dp, enabled = !streaming, onClick = onTweak)
-                LingButton("替换选中", BtnKind.Tonal, height = 36.dp, enabled = !streaming, onClick = onAccept)
+                LingButton(if (streaming) tr(R.string.ai_components_003) else tr(R.string.ai_components_004), BtnKind.Text, height = 36.dp, enabled = !streaming, onClick = onAnother)
+                LingButton(tr(R.string.ai_components_009), BtnKind.Outlined, height = 36.dp, enabled = !streaming, onClick = onTweak)
+                LingButton(tr(R.string.editor_ai_050), BtnKind.Tonal, height = 36.dp, enabled = !streaming, onClick = onAccept)
             }
-            Text("辅助模式下只替换你选中的句子，标记为“AI 建议 + 人工修改”。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
+            Text(tr(R.string.editor_ai_051), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
         }
     }
 }
@@ -463,7 +470,7 @@ private fun sendAnnotations(st: EditorState, s: AiSession, scope: kotlinx.corout
         s.annotating = false
         r.onSuccess { raw ->
             val arr = runCatching { LingJson.parseToJsonElement(raw.substring(raw.indexOf('['), raw.lastIndexOf(']') + 1)).jsonArray }.getOrNull()
-            if (arr == null) { s.error = "模型没有按格式返回，换个模型或重试"; s.tool = Prompts.rewrite; return@onSuccess }
+            if (arr == null) { s.error = tr(R.string.editor_ai_052); s.tool = Prompts.rewrite; return@onSuccess }
             s.revisions = items.mapIndexed { i, a ->
                 val rev = arr.firstOrNull { it.jsonObject["id"]?.jsonPrimitive?.intOrNull == i + 1 }?.jsonObject?.get("revised")?.jsonPrimitive?.contentOrNull
                 Revision(a, rev ?: a.quote, rev != null)
@@ -479,9 +486,9 @@ private fun AnnotationBar(n: Int, busy: Boolean, onClear: () -> Unit, onSend: ()
         verticalAlignment = Alignment.CenterVertically) {
         androidx.compose.material3.Icon(LingIcons.EditNote, null, tint = c.onTertiaryContainer)
         Spacer(Modifier.width(8.dp))
-        Text("已攒 $n 条批注", style = Ling.type.label, color = c.onTertiaryContainer, modifier = Modifier.weight(1f))
-        LingButton("清空", BtnKind.Text, height = 34.dp, onClick = onClear)
-        LingButton(if (busy) "修改中…" else "一起发给 AI", height = 34.dp, enabled = !busy, onClick = onSend)
+        Text(tr(R.string.editor_ai_053, n), style = Ling.type.label, color = c.onTertiaryContainer, modifier = Modifier.weight(1f))
+        LingButton(tr(R.string.editor_ai_054), BtnKind.Text, height = 34.dp, onClick = onClear)
+        LingButton(if (busy) tr(R.string.editor_ai_055) else tr(R.string.editor_ai_056), height = 34.dp, enabled = !busy, onClick = onSend)
     }
 }
 
@@ -497,8 +504,8 @@ private fun AiOverlays(st: EditorState, nav: NavHostController) {
             // 问出来的东西想留下：进设定库待确认区（A2），作者看过才算数
             scope.launch {
                 AppGraph.db.lore().insertCard(com.lingwrite.app.data.db.LoreCardEntity(
-                    bookId = st.chapter.bookId, type = "term", name = qsn.take(10).ifBlank { "新设定" },
-                    fields = com.lingwrite.app.data.encodeFields(listOf(com.lingwrite.app.data.Field("说明", ans.take(300)))),
+                    bookId = st.chapter.bookId, type = "term", name = qsn.take(10).ifBlank { tr(R.string.context_031) },
+                    fields = com.lingwrite.app.data.encodeFields(listOf(com.lingwrite.app.data.Field(tr(R.string.context_032), ans.take(300)))),
                     pending = true,
                 ))
             }
@@ -530,9 +537,9 @@ private fun AiOverlays(st: EditorState, nav: NavHostController) {
                         s.clear()
                         return@launch
                     }
-                    AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", "AI 采纳前")
+                    AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
                     val r = s.target
-                    if (r != null && s.anchor?.valid(st.value.text) != true) { s.error = "正文已修改，请重新生成后采纳。原稿未改动。"; s.tweak = false; return@launch }
+                    if (r != null && s.anchor?.valid(st.value.text) != true) { s.error = tr(R.string.editor_ai_057); s.tweak = false; return@launch }
                     val kind = if (s.mode == WriteMode.Assist && r != null) "edited" else if (edited) "edited" else "gen"
                     if (r != null && r.last < st.value.text.length) st.replace(r.first, r.last + 1, t, kind)
                     else st.replace(st.value.selection.end, st.value.selection.end, t, kind)
@@ -544,40 +551,40 @@ private fun AiOverlays(st: EditorState, nav: NavHostController) {
     }
     s.noteFor?.let { q ->
         var note by remember(q) { mutableStateOf("") }
-        LingSheet({ s.noteFor = null }, "添加批注") {
-            Text("「${q.take(80)}${if (q.length > 80) "…" else ""}」", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
-            LingTextField(note, { note = it }, Modifier.padding(horizontal = 20.dp, vertical = 12.dp), placeholder = "这里想怎么改？比如：节奏太慢，删掉一半", singleLine = false, minLines = 2)
-            Text("可以先攒多条，再一次发给 AI。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
-            LingButton("加入批注", modifier = Modifier.padding(20.dp).fillMaxWidth(), height = 50.dp, enabled = note.isNotBlank()) { s.annotations += Annotation(q, note.trim(), s.noteAnchor); s.noteFor = null; s.noteAnchor = null }
+        LingSheet({ s.noteFor = null }, tr(R.string.editor_ai_058)) {
+            Text(tr(R.string.editor_ai_059, q.take(80), if (q.length > 80) "…" else ""), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
+            LingTextField(note, { note = it }, Modifier.padding(horizontal = 20.dp, vertical = 12.dp), placeholder = tr(R.string.editor_ai_060), singleLine = false, minLines = 2)
+            Text(tr(R.string.editor_ai_061), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
+            LingButton(tr(R.string.editor_ai_062), modifier = Modifier.padding(20.dp).fillMaxWidth(), height = 50.dp, enabled = note.isNotBlank()) { s.annotations += Annotation(q, note.trim(), s.noteAnchor); s.noteFor = null; s.noteAnchor = null }
         }
     }
     s.revisions?.let { revs ->
         val local = remember(revs) { revs.map { mutableStateOf(it.revised) to mutableStateOf(it.accepted) } }
-        LingSheet({ s.revisions = null }, "批注修改结果", layout = SheetLayout.Viewport) {
+        LingSheet({ s.revisions = null }, tr(R.string.editor_ai_063), layout = SheetLayout.Viewport) {
             s.error?.let { Text(it, color = c.error, modifier = Modifier.padding(20.dp)) }
             LazyColumn(Modifier.heightIn(max = 520.dp)) {
                 items(revs.indices.toList()) { i ->
                     val r = revs[i]
                     Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                        Text("批注 ${i + 1}：${r.a.note}", style = Ling.type.label, color = c.tertiary)
+                        Text(tr(R.string.editor_ai_064, i + 1, r.a.note), style = Ling.type.label, color = c.tertiary)
                         Text(r.a.quote, style = Ling.type.caption.copy(textDecoration = TextDecoration.LineThrough), color = c.onSurfaceVariant, modifier = Modifier.padding(vertical = 4.dp), maxLines = 3, overflow = TextOverflow.Ellipsis)
                         LingTextField(local[i].first.value, { local[i].first.value = it }, singleLine = false, minLines = 2, maxLines = 8)
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
                             androidx.compose.material3.Checkbox(local[i].second.value, { local[i].second.value = it })
-                            Text("采纳这一条", style = Ling.type.body, color = c.onSurface)
+                            Text(tr(R.string.editor_ai_065), style = Ling.type.body, color = c.onSurface)
                         }
                     }
                 }
             }
-            LingButton("应用选中的修改", modifier = Modifier.padding(20.dp).fillMaxWidth(), height = 50.dp) {
+            LingButton(tr(R.string.editor_ai_066), modifier = Modifier.padding(20.dp).fillMaxWidth(), height = 50.dp) {
                 scope.launch {
                     val selected = revs.indices.filter { local[it].second.value }
                     val original = st.value.text
                     if (selected.any { revs[it].a.anchor?.valid(original) != true }) {
-                        s.error = "正文已修改或批注位置失效，请重新选择原文并生成。未应用任何修改。"; return@launch
+                        s.error = tr(R.string.editor_ai_067); return@launch
                     }
-                    AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", "批注修改前")
-                    if (st.value.text != original) { s.error = "正文在保存期间已修改，请重新生成。"; return@launch }
+                    AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_068))
+                    if (st.value.text != original) { s.error = tr(R.string.editor_ai_069); return@launch }
                     var anyEdited = false
                     selected.sortedByDescending { revs[it].a.anchor!!.start }.forEach { i ->
                         val q = revs[i].a.quote; val at = revs[i].a.anchor!!.start
@@ -595,10 +602,10 @@ private fun AiOverlays(st: EditorState, nav: NavHostController) {
     }
     if (s.logs) {
         val logs by remember(st.chapter.id) { AppGraph.db.ai().chapterLogs(st.chapter.id) }.collectAsState(emptyList())
-        LingSheet({ s.logs = false }, "本章 AI 使用记录", layout = SheetLayout.Viewport) {
-            if (logs.isEmpty()) Text("本章还没有调用过 AI。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+        LingSheet({ s.logs = false }, tr(R.string.editor_ai_002), layout = SheetLayout.Viewport) {
+            if (logs.isEmpty()) Text(tr(R.string.editor_ai_070), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
             LazyColumn(Modifier.heightIn(max = 520.dp)) { items(logs, key = { it.id }) { LogRow(it) } }
-            Text("记录只存在本机，可在导出时一并导出；它不是平台认可的证明。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+            Text(tr(R.string.editor_ai_071), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
         }
     }
 }
@@ -609,7 +616,7 @@ fun LogRow(l: CallLogEntity) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text("${taskLabel(l.task)} · ${l.model}", style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.onSurface)
-            Text("${TimeFmt.clock(l.time)} · ${l.scope.ifBlank { l.provider }} · ${l.inputTokens + l.outputTokens} tokens${if (l.estimated) "（估算）" else ""}", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text("${TimeFmt.clock(l.time)} · ${l.scope.ifBlank { l.provider }} · ${l.inputTokens + l.outputTokens} tokens${if (l.estimated) tr(R.string.editor_ai_072) else ""}", style = Ling.type.caption, color = c.onSurfaceVariant)
         }
         Pill(outcomeLabel(l.outcome), when (l.outcome) { "accepted" -> PillKind.Primary; "edited", "noted" -> PillKind.Amber; "failed" -> PillKind.Error; else -> PillKind.Neutral })
     }

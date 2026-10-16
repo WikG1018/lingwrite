@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.components
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -61,11 +65,13 @@ import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeChild
 import dev.chrisbanes.haze.haze
 
-enum class DockTab(val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
-    Shelf("书架", LingIcons.Shelf, LingIcons.ShelfFilled),
-    Ideas("灵感", LingIcons.Idea, LingIcons.IdeaFilled),
-    Stats("统计", LingIcons.Stats, LingIcons.Stats),
-    Settings("设置", LingIcons.Settings, LingIcons.SettingsFilled),
+enum class DockTab(@androidx.annotation.StringRes val labelRes: Int, val icon: ImageVector, val selectedIcon: ImageVector) {
+    Shelf(R.string.dock_001, LingIcons.Shelf, LingIcons.ShelfFilled),
+    Ideas(R.string.ai_components_001, LingIcons.Idea, LingIcons.IdeaFilled),
+    Stats(R.string.dock_002, LingIcons.Stats, LingIcons.Stats),
+    Settings(R.string.dock_003, LingIcons.Settings, LingIcons.SettingsFilled);
+
+    val label: String get() = tr(labelRes)
 }
 
 private val DockShape = RoundedCornerShape(32.dp)

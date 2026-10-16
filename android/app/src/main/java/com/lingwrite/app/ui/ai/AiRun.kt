@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.ai
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -58,7 +62,7 @@ class AiRun {
     }
 
     fun ready(candidates: List<Candidate>) {
-        state = if (candidates.isEmpty()) AiRunState.Error("模型没有返回内容", retryable = true)
+        state = if (candidates.isEmpty()) AiRunState.Error(tr(R.string.ai_run_001), retryable = true)
         else AiRunState.Ready(candidates)
     }
 

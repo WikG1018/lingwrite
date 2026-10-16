@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,18 +44,18 @@ fun EditorDirectory(st: EditorState, nav: NavHostController) {
     val scope = rememberCoroutineScope()
     var error by remember { mutableStateOf<String?>(null) }
     LazyColumn(Modifier.fillMaxSize().background(Ling.colors.surface), contentPadding = WindowInsets.statusBars.asPaddingValues().let { PaddingValues(top = it.calculateTopPadding() + 12.dp, start = 12.dp, end = 12.dp, bottom = 12.dp) }) {
-        item { Text("作品目录", style = Ling.type.titleSmall, color = Ling.colors.onSurface, modifier = Modifier.padding(vertical = 12.dp)) }
+        item { Text(tr(R.string.tablet_workspace_001), style = Ling.type.titleSmall, color = Ling.colors.onSurface, modifier = Modifier.padding(vertical = 12.dp)) }
         item {
-            LingButton("章节管理", BtnKind.Text) {
+            LingButton(tr(R.string.tablet_workspace_002), BtnKind.Text) {
                 AppGraph.books.queueSave(ch.id, st.value.text, encodeMarks(st.marks)); nav.navigate(Routes.work(ch.bookId))
             }
-            LingButton("写下一章", BtnKind.Tonal) { scope.launch {
+            LingButton(tr(R.string.editor_030), BtnKind.Tonal) { scope.launch {
                 try {
                     AppGraph.books.saveContent(ch.id, st.value.text, encodeMarks(st.marks))
                     val id = AppGraph.books.nextChapter(ch.bookId, afterChapterId = ch.id)
                     withContext(Dispatchers.Main.immediate) { nav.navigate(Routes.editor(id)) { popUpTo(Routes.editor(ch.id)) { inclusive = true } } }
                 } catch (e: CancellationException) { throw e }
-                catch (e: Exception) { error = "操作未完成，请查看目录后重试：${e.message}" }
+                catch (e: Exception) { error = tr(R.string.tablet_workspace_003, e.message) }
             } }
             error?.let { Text(it, style = Ling.type.caption, color = Ling.colors.error) }
         }
@@ -94,7 +98,7 @@ fun LoreWorkspace(bookId: Long, nav: NavHostController, type: String = "", modif
         detail = {
             BackHandler(LocalNarrowDetail.current) { selected = null }
             selected?.let { id -> key(id) { LoreDetailRoute(id, nav, atChapter) { selected = null } } }
-                ?: Text("选择一张设定卡，在这里查看和编辑。", style = Ling.type.body, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+                ?: Text(tr(R.string.tablet_workspace_004), style = Ling.type.body, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(24.dp))
         })
 }
 
@@ -109,16 +113,16 @@ fun ForeshadowWorkspace(bookId: Long, nav: NavHostController, chapterId: Long? =
     val number = chapterNumber ?: currentChapter(chapters)
     AdaptiveMasterDetail(selected != null, Modifier.fillMaxSize(), master = {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-            LingButton("一致性检查", BtnKind.Text, modifier = Modifier.padding(12.dp)) { nav.navigate("issues/$bookId") }
+            LingButton(tr(R.string.check_003), BtnKind.Text, modifier = Modifier.padding(12.dp)) { nav.navigate("issues/$bookId") }
             ForeshadowList(fs, number, cards.associate { it.id to it.name }, filter, { filter = it },
                 onOpen = { selected = FsDraft(bookId, it.chapterId, it.plantNumber, it.quote, it.quoteStart, it) },
                 onAdopt = { f -> scope.launch { AppGraph.db.checks().updateForeshadow(f.copy(pending = false)) } },
                 onDismiss = { f -> scope.launch { AppGraph.db.checks().deleteForeshadow(f.id) } })
-            LingButton("登记伏笔", BtnKind.Tonal, modifier = Modifier.padding(16.dp)) { selected = FsDraft(bookId, chapterId, number, "", -1) }
+            LingButton(tr(R.string.check_006), BtnKind.Tonal, modifier = Modifier.padding(16.dp)) { selected = FsDraft(bookId, chapterId, number, "", -1) }
         }
     }, detail = {
         BackHandler(LocalNarrowDetail.current) { selected = null }
         selected?.let { d -> key(d.edit?.id, d.chapterId) { ForeshadowSheet(d, inline = true) { selected = null } } }
-            ?: Text("选择伏笔，编辑回收计划和关联设定。", style = Ling.type.body, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+            ?: Text(tr(R.string.tablet_workspace_005), style = Ling.type.body, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(24.dp))
     })
 }

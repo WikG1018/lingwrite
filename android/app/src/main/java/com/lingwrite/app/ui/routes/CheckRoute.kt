@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import com.lingwrite.app.ui.components.enterStagger
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -93,7 +97,7 @@ object CheckModule {
         }
         SettingsRegistry.extra += { p, _ ->
             val scope = rememberCoroutineScope()
-            "写作" to SettingRow(LingIcons.FactCheck, "写完一章自动检查", "摘要、章纲落实、一致性、伏笔建议（用自动任务模型）", switch = p.autoCheck, tone = Tone.Good,
+            tr(R.string.author_guide_017) to SettingRow(LingIcons.FactCheck, tr(R.string.check_001), tr(R.string.check_002), switch = p.autoCheck, tone = Tone.Good,
                 onSwitch = { v -> scope.launch { AppGraph.prefs.update { it.copy(autoCheck = v) } } })
         }
     }
@@ -118,8 +122,8 @@ fun ForeshadowTab(bookId: Long, nav: NavHostController) {
                 val open = issues.count { it.status == "open" }
                 Tile(LingIcons.FactCheck, if (open > 0) c.errorContainer else c.goodContainer, if (open > 0) c.onErrorContainer else c.good)
                 Column(Modifier.padding(start = 14.dp).weight(1f)) {
-                    Text("一致性检查", style = Ling.type.titleSmall, color = c.onSurface)
-                    Text(if (open > 0) "$open 条待处理 · 人设、实力、时间线、关系" else "没有待处理的问题", style = Ling.type.caption, color = c.onSurfaceVariant)
+                    Text(tr(R.string.check_003), style = Ling.type.titleSmall, color = c.onSurface)
+                    Text(if (open > 0) tr(R.string.check_004, open) else tr(R.string.check_005), style = Ling.type.caption, color = c.onSurfaceVariant)
                 }
                 androidx.compose.material3.Icon(LingIcons.Chevron, null, tint = c.onSurfaceVariant)
             }
@@ -128,7 +132,7 @@ fun ForeshadowTab(bookId: Long, nav: NavHostController) {
             onOpen = { f -> scope.launch { CheckModule.fsDraft = FsDraft(bookId, f.chapterId, f.plantNumber, f.quote, f.quoteStart, f) } },
             onAdopt = { f -> scope.launch { dao.updateForeshadow(f.copy(pending = false)) } },
             onDismiss = { f -> scope.launch { dao.deleteForeshadow(f.id) } })
-        LingButton("登记伏笔", BtnKind.Tonal, icon = LingIcons.BookmarkAdd, modifier = Modifier.padding(16.dp)) { CheckModule.fsDraft = FsDraft(bookId, null, cur, "", -1) }
+        LingButton(tr(R.string.check_006), BtnKind.Tonal, icon = LingIcons.BookmarkAdd, modifier = Modifier.padding(16.dp)) { CheckModule.fsDraft = FsDraft(bookId, null, cur, "", -1) }
     }
     CheckModule.fsDraft?.let { d -> if (d.bookId == bookId && d.chapterId.let { id -> id == null || d.edit != null }) ForeshadowSheet(d) { CheckModule.fsDraft = null } }
 }
@@ -139,7 +143,7 @@ fun ForeshadowList(fs: List<ForeshadowEntity>, cur: Int, cardNames: Map<Long, St
     val c = Ling.colors
     val pending = fs.filter { it.pending }
     val real = fs.filter { !it.pending }
-    val labels = listOf("未回收", "已回收", "放弃")
+    val labels = listOf(tr(R.string.check_007), tr(R.string.check_008), tr(R.string.check_009))
     Row(Modifier.padding(horizontal = 16.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         labels.forEachIndexed { i, l ->
             val n = real.count { it.status == listOf("open", "paid", "dropped")[i] }
@@ -147,17 +151,17 @@ fun ForeshadowList(fs: List<ForeshadowEntity>, cur: Int, cardNames: Map<Long, St
         }
     }
     if (pending.isNotEmpty()) {
-        SectionLabel("AI 建议的伏笔 · 确认后才进台账")
+        SectionLabel(tr(R.string.check_010))
         LingCard(Modifier.padding(horizontal = 16.dp).fillMaxWidth(), color = c.tertiaryContainer.copy(alpha = .45f)) {
             pending.forEachIndexed { i, f ->
                 if (i > 0) InsetDivider(16.dp)
                 Column(Modifier.padding(14.dp)) {
                     Text(f.content, style = Ling.type.body, color = c.onSurface)
-                    if (f.quote.isNotBlank()) Text("第 ${f.plantNumber} 章：「${f.quote}」", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                    if (f.quote.isNotBlank()) Text(tr(R.string.check_011, f.plantNumber, f.quote), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
                     Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LingButton("不是伏笔", BtnKind.Text, height = 34.dp) { onDismiss(f) }
-                        LingButton("微调", BtnKind.Tonal, height = 34.dp) { onOpen(f) }
-                        LingButton("确认", height = 34.dp) { onAdopt(f) }
+                        LingButton(tr(R.string.check_012), BtnKind.Text, height = 34.dp) { onDismiss(f) }
+                        LingButton(tr(R.string.ai_components_009), BtnKind.Tonal, height = 34.dp) { onOpen(f) }
+                        LingButton(tr(R.string.check_013), height = 34.dp) { onAdopt(f) }
                     }
                 }
             }
@@ -166,7 +170,7 @@ fun ForeshadowList(fs: List<ForeshadowEntity>, cur: Int, cardNames: Map<Long, St
     val shown = real.filter { it.status == listOf("open", "paid", "dropped")[filter] }
         .sortedWith(compareBy({ fsState(it, cur).ordinal }, { it.payoff ?: Int.MAX_VALUE }))
     Spacer(Modifier.height(8.dp))
-    if (shown.isEmpty()) Text(if (filter == 0) "还没有未回收的伏笔。在正文选中一段，点“登记伏笔”。" else "这里还是空的。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 28.dp, vertical = 12.dp))
+    if (shown.isEmpty()) Text(if (filter == 0) tr(R.string.check_014) else tr(R.string.check_015), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 28.dp, vertical = 12.dp))
     else LingCard(Modifier.padding(horizontal = 16.dp)) {
         shown.forEachIndexed { i, f ->
             if (i > 0) InsetDivider(16.dp)
@@ -176,16 +180,16 @@ fun ForeshadowList(fs: List<ForeshadowEntity>, cur: Int, cardNames: Map<Long, St
                 Column(Modifier.padding(start = 12.dp).weight(1f)) {
                     Text(f.content, style = Ling.type.bodyLarge.copy(fontSize = 15.sp), color = c.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     val meta = buildList {
-                        add("第 ${f.plantNumber} 章埋")
-                        f.payoff?.let { add(if (f.status == "paid") "第 ${f.paidAt ?: it} 章回收" else "计划第 $it 章回收") }
-                        f.cardId?.let { cardNames[it] }?.let { add("关联 $it") }
+                        add(tr(R.string.check_016, f.plantNumber))
+                        f.payoff?.let { add(if (f.status == "paid") tr(R.string.check_017, f.paidAt ?: it) else tr(R.string.check_018, it)) }
+                        f.cardId?.let { cardNames[it] }?.let { add(tr(R.string.check_019, it)) }
                     }.joinToString(" · ")
                     Text(meta, style = Ling.type.caption, color = if (st == FsState.Overdue) c.error else c.onSurfaceVariant)
-                    if (f.quote.isNotBlank()) Text("「${f.quote}」", style = Ling.type.caption, color = c.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (f.quote.isNotBlank()) Text(tr(R.string.check_020, f.quote), style = Ling.type.caption, color = c.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 when (st) {
-                    FsState.Overdue -> Pill("超期 ${cur - (f.payoff ?: cur)} 章", PillKind.Error)
-                    FsState.Due -> Pill("临近", PillKind.Amber)
+                    FsState.Overdue -> Pill(tr(R.string.check_021, cur - (f.payoff ?: cur)), PillKind.Error)
+                    FsState.Due -> Pill(tr(R.string.check_022), PillKind.Amber)
                     else -> {}
                 }
             }
@@ -204,21 +208,21 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
     var payoff by rememberSaveable(d.edit?.id, d.chapterId) { mutableStateOf(e?.payoff?.toString().orEmpty()) }
     var card by rememberSaveable(d.edit?.id, d.chapterId) { mutableStateOf(e?.cardId) }
     var status by rememberSaveable(d.edit?.id, d.chapterId) { mutableStateOf(e?.status ?: "open") }
-    DetailHost(inline, if (e == null) "登记伏笔" else if (e.pending) "确认伏笔" else "伏笔", onDismiss) {
+    DetailHost(inline, if (e == null) tr(R.string.check_006) else if (e.pending) tr(R.string.check_023) else tr(R.string.check_024), onDismiss) {
         Column(Modifier.padding(horizontal = 20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            LingTextField(content, { content = it }, label = "伏笔内容", placeholder = "埋了什么、打算怎么回收", singleLine = false, minLines = 2)
-            LingTextField(quote, { quote = it }, label = "埋设原文（第 ${d.number} 章）", singleLine = false)
-            LingTextField(payoff, { payoff = it.filter(Char::isDigit) }, label = "计划回收章（可空）", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+            LingTextField(content, { content = it }, label = tr(R.string.check_025), placeholder = tr(R.string.check_026), singleLine = false, minLines = 2)
+            LingTextField(quote, { quote = it }, label = tr(R.string.check_027, d.number), singleLine = false)
+            LingTextField(payoff, { payoff = it.filter(Char::isDigit) }, label = tr(R.string.check_028), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
             val chars = cards.filter { !it.pending }
             if (chars.isNotEmpty()) {
-                Text("关联设定卡（提到它时自动带入上下文）", style = Ling.type.caption, color = c.onSurfaceVariant)
+                Text(tr(R.string.check_029), style = Ling.type.caption, color = c.onSurfaceVariant)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     chars.forEach { k -> LingChip(card == k.id, { card = if (card == k.id) null else k.id }, k.name) }
                 }
             }
             if (e != null && !e.pending) {
-                Text("状态", style = Ling.type.caption, color = c.onSurfaceVariant)
-                Segmented(listOf("未回收", "已回收", "放弃"), listOf("open", "paid", "dropped").indexOf(status)) { status = listOf("open", "paid", "dropped")[it] }
+                Text(tr(R.string.check_030), style = Ling.type.caption, color = c.onSurfaceVariant)
+                Segmented(listOf(tr(R.string.check_007), tr(R.string.check_008), tr(R.string.check_009)), listOf("open", "paid", "dropped").indexOf(status)) { status = listOf("open", "paid", "dropped")[it] }
             }
             // A8 回收建议：3 种收法（在哪章、怎么收、需要提前铺垫）
             if (e != null) {
@@ -229,10 +233,10 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                 var applyBefore by remember { mutableStateOf("") }
                 var appliedUndo by remember { mutableStateOf<Triple<Long, String, String>?>(null) }
                 var undoMessage by remember { mutableStateOf<String?>(null) }
-                Text("怎么收", style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
-                if (ideasBusy) com.lingwrite.app.ui.ai.AiThinking("正在想收法…", Modifier.padding(vertical = 6.dp))
+                Text(tr(R.string.check_031), style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
+                if (ideasBusy) com.lingwrite.app.ui.ai.AiThinking(tr(R.string.check_032), Modifier.padding(vertical = 6.dp))
                 if (ideas.isEmpty()) {
-                    LingButton(if (ideasBusy) "正在想收法…" else "AI 给 3 种收法", BtnKind.Tonal, icon = LingIcons.Sparkle, height = 36.dp, enabled = !ideasBusy) {
+                    LingButton(if (ideasBusy) tr(R.string.check_032) else tr(R.string.check_033), BtnKind.Tonal, icon = LingIcons.Sparkle, height = 36.dp, enabled = !ideasBusy) {
                         ideasBusy = true
                         scope.launch {
                             runCatching { PayoffIdeas.generate(e) }.onSuccess { ideas = it }.onFailure { ideas = emptyList() }
@@ -243,13 +247,13 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                     ideas.forEach { idea ->
                         Column(Modifier.padding(top = 6.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Pill("第 ${idea.chapter} 章", PillKind.Amber)
+                                Pill(tr(R.string.breakdown_015, idea.chapter), PillKind.Amber)
                                 Spacer(Modifier.width(8.dp))
                                 Text(idea.how, style = Ling.type.body, color = c.onSurface, modifier = Modifier.weight(1f))
                             }
-                            if (idea.setup.isNotBlank()) Text("需要铺垫：${idea.setup}", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                            if (idea.setup.isNotBlank()) Text(tr(R.string.check_034, idea.setup), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
                             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                LingButton("写进第 ${idea.chapter} 章章纲备注", BtnKind.Tonal, height = 32.dp) {
+                                LingButton(tr(R.string.check_035, idea.chapter), BtnKind.Tonal, height = 32.dp) {
                                     scope.launch {
                                         val chs = AppGraph.db.chapters().chaptersOnce(d.bookId).sortedBy { it.number }
                                         val target = chs.firstOrNull { it.number == idea.chapter }
@@ -259,7 +263,7 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                                         }
                                     }
                                 }
-                                LingButton("改计划回收章", BtnKind.Text, height = 32.dp) {
+                                LingButton(tr(R.string.check_036), BtnKind.Text, height = 32.dp) {
                                     payoff = idea.chapter.toString()
                                 }
                             }
@@ -268,9 +272,9 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                 }
                 // diff 确认：确认前不改库
                 applyIdea?.let { idea ->
-                    val added = "【伏笔回收】${idea.how}"
+                    val added = tr(R.string.check_037, idea.how)
                     LingConfirm(
-                        "写进第 ${idea.chapter} 章章纲备注", "确认后追加到该章章纲备注（可以撤销）。",
+                        tr(R.string.check_035, idea.chapter), tr(R.string.check_038),
                         onDismiss = { applyIdea = null },
                         onConfirm = {
                             scope.launch {
@@ -286,8 +290,8 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                             }
                         },
                         extra = {
-                            if (applyBefore.isNotBlank()) Text("原备注：${applyBefore.take(80)}", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
-                            Text("追加：$added", style = Ling.type.caption, color = Ling.colors.primary, modifier = Modifier.padding(top = 6.dp))
+                            if (applyBefore.isNotBlank()) Text(tr(R.string.check_039, applyBefore.take(80)), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+                            Text(tr(R.string.check_040, added), style = Ling.type.caption, color = Ling.colors.primary, modifier = Modifier.padding(top = 6.dp))
                         },
                     )
                 }
@@ -297,11 +301,11 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                         Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("已写进章纲备注", style = Ling.type.caption, color = c.onSurface, modifier = Modifier.weight(1f))
-                        LingButton("撤销", BtnKind.Text, height = 30.dp) {
+                        Text(tr(R.string.check_041), style = Ling.type.caption, color = c.onSurface, modifier = Modifier.weight(1f))
+                        LingButton(tr(R.string.check_042), BtnKind.Text, height = 30.dp) {
                             scope.launch {
                                 if (AppGraph.db.plan().restoreNoteIfUnchanged(chId, after, before) == 0)
-                                    undoMessage = "章纲备注后来已修改，未撤销以保护你的编辑。可手动删除追加段。"
+                                    undoMessage = tr(R.string.check_043)
                                 appliedUndo = null
                             }
                         }
@@ -309,9 +313,9 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(vertical = 12.dp)) {
-                if (e != null) LingButton("删除", BtnKind.Text) { scope.launch { AppGraph.db.checks().deleteForeshadow(e.id); onDismiss() } }
+                if (e != null) LingButton(tr(R.string.check_044), BtnKind.Text) { scope.launch { AppGraph.db.checks().deleteForeshadow(e.id); onDismiss() } }
                 Spacer(Modifier.weight(1f))
-                LingButton(if (e?.pending == true) "确认进台账" else "保存", enabled = content.isNotBlank()) {
+                LingButton(if (e?.pending == true) tr(R.string.check_045) else tr(R.string.check_046), enabled = content.isNotBlank()) {
                     scope.launch {
                         val cur = currentChapter(AppGraph.db.chapters().chaptersOnce(d.bookId))
                         val f = (e ?: ForeshadowEntity(bookId = d.bookId, content = "", chapterId = d.chapterId, plantNumber = d.number, quoteStart = d.start)).copy(
@@ -340,56 +344,56 @@ fun IssueCard(i: IssueEntity, onJump: (() -> Unit)?, onIntended: (String) -> Uni
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Pill(kindLabel(i.kind), if (i.status == "open") PillKind.Error else PillKind.Neutral)
-                Text("第 ${i.number} 章", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 8.dp).weight(1f))
-                if (i.status == "intended") Pill("故意为之", PillKind.Neutral) else if (i.status == "ignored") Pill("已忽略", PillKind.Neutral)
-                if (i.status == "fixed") Pill("已修", PillKind.Good)
+                Text(tr(R.string.breakdown_015, i.number), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 8.dp).weight(1f))
+                if (i.status == "intended") Pill(tr(R.string.check_047), PillKind.Neutral) else if (i.status == "ignored") Pill(tr(R.string.check_048), PillKind.Neutral)
+                if (i.status == "fixed") Pill(tr(R.string.check_049), PillKind.Good)
             }
             Text(i.explain, style = Ling.type.bodyLarge.copy(fontSize = 15.sp, fontWeight = FontWeight.Medium), color = c.onSurface)
-            if (i.quote.isNotBlank()) Text("原文：「${i.quote}」", style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurface)
-            if (i.basis.isNotBlank()) Text("依据：${i.basis}", style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant)
-            if (i.note.isNotBlank()) Text("说明：${i.note}", style = Ling.type.caption, color = c.onSurfaceVariant)
+            if (i.quote.isNotBlank()) Text(tr(R.string.check_050, i.quote), style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurface)
+            if (i.basis.isNotBlank()) Text(tr(R.string.check_051, i.basis), style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant)
+            if (i.note.isNotBlank()) Text(tr(R.string.check_052, i.note), style = Ling.type.caption, color = c.onSurfaceVariant)
             // A6 改法区（ui-spec §10）
             if (fixes.isNotEmpty()) {
                 fixes.forEach { fx ->
-                    val label = when (fx.type) { "text" -> "改正文"; "lore" -> "改设定"; else -> "补一句解释" }
+                    val label = when (fx.type) { "text" -> tr(R.string.check_053); "lore" -> tr(R.string.check_054); else -> tr(R.string.check_055) }
                     Column(Modifier.padding(top = 6.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp)) {
                         Pill(label, if (fx.type == "text") PillKind.Primary else PillKind.Amber)
                         if (fx.before.isNotBlank()) Text(fx.before, style = Ling.type.body.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough), color = c.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
                         if (fx.after.isNotBlank()) Text(fx.after, style = Ling.type.body.copy(fontWeight = FontWeight.Medium), color = c.good, modifier = Modifier.padding(top = 2.dp))
                         if (fx.why.isNotBlank()) Text(fx.why, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 2.dp))
                         Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            if (onFix != null) LingButton(if (fx.type == "text") "去原文应用" else if (fx.type == "lore") "去改设定" else "采纳这句", BtnKind.Tonal, height = 32.dp) {
+                            if (onFix != null) LingButton(if (fx.type == "text") tr(R.string.check_056) else if (fx.type == "lore") tr(R.string.check_057) else tr(R.string.check_058), BtnKind.Tonal, height = 32.dp) {
                                 onFix(fx.type, fx.after)
                             }
-                            LingButton("存到便签", BtnKind.Text, height = 32.dp) {
+                            LingButton(tr(R.string.ai_components_006), BtnKind.Text, height = 32.dp) {
                                 scope.launch {
-                                    AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = i.chapterId, kind = "fix", text = "【${label}】${fx.after}（${fx.why}）"))
+                                    AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = i.chapterId, kind = "fix", text = tr(R.string.check_059, label, fx.after, fx.why)))
                                 }
                             }
                         }
                     }
                 }
             }
-            if (fixErr != null) Text("没拿到改法：$fixErr", style = Ling.type.caption, color = c.error)
+            if (fixErr != null) Text(tr(R.string.check_060, fixErr), style = Ling.type.caption, color = c.error)
             if (i.status == "open") {
                 if (noting) {
-                    LingTextField(note, { note = it }, placeholder = "一句说明（可空），例如：他在说谎")
+                    LingTextField(note, { note = it }, placeholder = tr(R.string.check_061))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LingButton("取消", BtnKind.Text, height = 34.dp) { noting = false }
-                        LingButton("以后不再提醒", height = 34.dp) { onIntended(note.trim()) }
+                        LingButton(tr(R.string.sheets_002), BtnKind.Text, height = 34.dp) { noting = false }
+                        LingButton(tr(R.string.check_062), height = 34.dp) { onIntended(note.trim()) }
                     }
                 } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (!fixing && fixes.isEmpty()) LingButton("给改法", BtnKind.Text, height = 34.dp, icon = LingIcons.Sparkle) {
+                    if (!fixing && fixes.isEmpty()) LingButton(tr(R.string.check_063), BtnKind.Text, height = 34.dp, icon = LingIcons.Sparkle) {
                         fixing = true
                         scope.launch {
                             val r = runCatching { com.lingwrite.app.data.IssueFixes.generate(i) }
                             r.onSuccess { fixes = it; fixing = false }.onFailure { fixErr = it.message; fixing = false }
                         }
                     }
-                    if (fixing) com.lingwrite.app.ui.ai.AiThinking("正在想改法…", Modifier.padding(vertical = 6.dp))
-                    if (onJump != null) LingButton("去原文", height = 34.dp, icon = LingIcons.EditOutline) { onJump() }
-                    LingButton("故意为之", BtnKind.Tonal, height = 34.dp) { noting = true }
-                    LingButton("忽略", BtnKind.Text, height = 34.dp) { onIgnore() }
+                    if (fixing) com.lingwrite.app.ui.ai.AiThinking(tr(R.string.check_064), Modifier.padding(vertical = 6.dp))
+                    if (onJump != null) LingButton(tr(R.string.check_065), height = 34.dp, icon = LingIcons.EditOutline) { onJump() }
+                    LingButton(tr(R.string.check_047), BtnKind.Tonal, height = 34.dp) { noting = true }
+                    LingButton(tr(R.string.check_066), BtnKind.Text, height = 34.dp) { onIgnore() }
                 }
             }
         }
@@ -405,9 +409,9 @@ private fun ChapterCheckSheet(chapterId: Long, onJump: (IssueEntity) -> Unit, on
     var msg by remember { mutableStateOf<String?>(null) }
     var mode by remember { mutableStateOf(WriteMode.Assist) }
     LaunchedEffect(chapterId) { mode = modeFor(AppGraph.db.chapters().get(chapterId)?.bookId ?: 0) }
-    LingSheet(onDismiss, "一致性检查", layout = SheetLayout.Viewport) {
+    LingSheet(onDismiss, tr(R.string.check_003), layout = SheetLayout.Viewport) {
         Column(Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("对照设定库（按章生效的状态）、关系、前情摘要和相关旧片段找矛盾。结果都是候选，由你判断。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 8.dp))
+            Text(tr(R.string.check_067), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 8.dp))
             // 修好的问题留在组合里淡出，不直接跳掉（A6）
             list.forEachIndexed { li, i ->
                 AnimatedVisibility(
@@ -426,10 +430,10 @@ private fun ChapterCheckSheet(chapterId: Long, onJump: (IssueEntity) -> Unit, on
                 }
             }
             msg?.let { Text(it, style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 8.dp)) }
-            LingButton(if (busy) "检查中…（分两步：抽取事实 → 比对）" else "检查本章", icon = LingIcons.FactCheck, enabled = !busy, height = 50.dp, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+            LingButton(if (busy) tr(R.string.check_068) else tr(R.string.check_069), icon = LingIcons.FactCheck, enabled = !busy, height = 50.dp, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 busy = true; msg = null
                 scope.launch {
-                    msg = runCatching { Consistency.check(chapterId) }.fold({ if (it == 0) "没有发现矛盾。" else "发现 $it 条可能的矛盾。" }, { it.message })
+                    msg = runCatching { Consistency.check(chapterId) }.fold({ if (it == 0) tr(R.string.check_070) else tr(R.string.check_071, it) }, { it.message })
                     busy = false
                 }
             }
@@ -449,19 +453,19 @@ fun IssuesRoute(bookId: Long, nav: NavHostController) {
     var from by remember { mutableStateOf("") }; var to by remember { mutableStateOf("") }
     var progress by remember { mutableStateOf<String?>(null) }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("一致性检查", "${list.count { it.status == "open" }} 条待处理", onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.check_003), tr(R.string.check_072, list.count { it.status == "open" }), onBack = { nav.popBackStack() })
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             LingCard {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("手动检查指定范围", style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface)
+                    Text(tr(R.string.check_073), style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface)
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LingTextField(from, { from = it.filter(Char::isDigit) }, Modifier.weight(1f), placeholder = "从第几章", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-                        LingTextField(to, { to = it.filter(Char::isDigit) }, Modifier.weight(1f), placeholder = "到第几章", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-                        LingButton("检查", enabled = progress == null && from.isNotBlank()) {
+                        LingTextField(from, { from = it.filter(Char::isDigit) }, Modifier.weight(1f), placeholder = tr(R.string.check_074), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                        LingTextField(to, { to = it.filter(Char::isDigit) }, Modifier.weight(1f), placeholder = tr(R.string.check_075), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                        LingButton(tr(R.string.check_076), enabled = progress == null && from.isNotBlank()) {
                             scope.launch {
                                 val a = from.toInt(); val b = to.toIntOrNull() ?: a
                                 val targets = chs.filter { it.number in a..b && it.wordCount > 0 }.sortedBy { it.number }
-                                targets.forEachIndexed { k, ch -> progress = "正在检查第 ${ch.number} 章（${k + 1}/${targets.size}）"; runCatching { Consistency.check(ch.id) }.onFailure { progress = it.message } }
+                                targets.forEachIndexed { k, ch -> progress = tr(R.string.check_077, ch.number, k + 1, targets.size); runCatching { Consistency.check(ch.id) }.onFailure { progress = it.message } }
                                 progress = null
                             }
                         }
@@ -470,10 +474,10 @@ fun IssuesRoute(bookId: Long, nav: NavHostController) {
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(if (showAll) "全部结果" else "待处理", style = Ling.type.label, color = c.primary, modifier = Modifier.weight(1f).padding(start = 8.dp))
-                LingButton(if (showAll) "只看待处理" else "含已处理", BtnKind.Text, height = 34.dp) { showAll = !showAll }
+                Text(if (showAll) tr(R.string.check_078) else tr(R.string.check_079), style = Ling.type.label, color = c.primary, modifier = Modifier.weight(1f).padding(start = 8.dp))
+                LingButton(if (showAll) tr(R.string.check_080) else tr(R.string.check_081), BtnKind.Text, height = 34.dp) { showAll = !showAll }
             }
-            if (list.none { showAll || it.status == "open" }) Text("没有待处理的问题。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(8.dp))
+            if (list.none { showAll || it.status == "open" }) Text(tr(R.string.check_082), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(8.dp))
             // 采纳改法后问题变 fixed：待处理列表里淡出（A6）
             list.forEach { i ->
                 AnimatedVisibility(

@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.screens
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -88,7 +93,7 @@ fun WorkScreen(
                 }
             }
         }
-        if (tab == 0) LingFab("写下一章", LingIcons.EditOutline, Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 16.dp, bottom = 88.dp), onClick = onNextChapter)
+        if (tab == 0) LingFab(tr(R.string.editor_030), LingIcons.EditOutline, Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 16.dp, bottom = 88.dp), onClick = onNextChapter)
     }
     }
 }
@@ -106,9 +111,9 @@ private fun WorkMasthead(
 ) {
     val c = Ling.colors
     LingTopBar(onBack = onBack) {
-        LingIconButton(LingIcons.Search, "搜索", onClick = onSearch)
-        LingIconButton(LingIcons.Share, "导出", onClick = onExport)
-        LingIconButton(LingIcons.More, "更多", onClick = onMore)
+        LingIconButton(LingIcons.Search, tr(R.string.shelf_025), onClick = onSearch)
+        LingIconButton(LingIcons.Share, tr(R.string.data_006), onClick = onExport)
+        LingIconButton(LingIcons.More, tr(R.string.editor_059), onClick = onMore)
     }
     Row(Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 14.dp).enterStagger(0), verticalAlignment = Alignment.CenterVertically) {
         BookCover(header.short, header.cover, 58.dp, 78.dp, Modifier.shadow(10.dp, RoundedCornerShape(9.dp), ambientColor = Color(0x401E3250), spotColor = Color(0x401E3250)), header.id)
@@ -121,7 +126,7 @@ private fun WorkMasthead(
     }
     LingCard(Modifier.padding(horizontal = 16.dp).enterStagger(1)) {
         Row(Modifier.padding(vertical = 12.dp).height(IntrinsicSize.Min)) {
-            listOf(Triple(header.words, "总字数", c.onSurface), Triple("${header.chapters}", "章节", c.onSurface), Triple("${header.lore}", "设定卡", c.onSurface), Triple("${header.overdue}", "伏笔超期", if (header.overdue > 0) c.error else c.onSurface))
+            listOf(Triple(header.words, tr(R.string.work_040), c.onSurface), Triple("${header.chapters}", tr(R.string.work_041), c.onSurface), Triple("${header.lore}", tr(R.string.ideas_020), c.onSurface), Triple("${header.overdue}", tr(R.string.work_042), if (header.overdue > 0) c.error else c.onSurface))
                 .forEachIndexed { i, (n, l, col) ->
                     if (i > 0) Box(Modifier.width(1.dp).fillMaxHeight().background(c.outlineVariant))
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -154,7 +159,7 @@ private fun VolumeHeader(v: com.lingwrite.app.data.Volume, index: Int, onLongPre
 @Composable
 private fun WorkTabs(selected: Int, foreshadow: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
     val c = Ling.colors
-    val tabs = listOf("章节" to null, "大纲" to null, "设定库" to null, "伏笔" to (if (foreshadow > 0) "$foreshadow" else null), "统计" to null)
+    val tabs = listOf(tr(R.string.work_041) to null, tr(R.string.work_001) to null, tr(R.string.ask_panel_005) to null, tr(R.string.work_045) to (if (foreshadow > 0) "$foreshadow" else null), tr(R.string.dock_002) to null)
     val density = LocalDensity.current
     val centers = remember { mutableStateMapOf<Int, Dp>() }
     Box(modifier.fillMaxWidth().height(46.dp)) {
@@ -183,16 +188,16 @@ private fun WorkTabs(selected: Int, foreshadow: Int, onSelect: (Int) -> Unit, mo
 private fun ChapterRow(ch: Chapter, onLong: () -> Unit, onClick: () -> Unit) {
     val c = Ling.colors
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).combinedClickable(onLongClick = onLong, onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(ChapterLabel.short(ch.no), Modifier.width(64.dp), style = Ling.type.label.copy(fontFeatureSettings = "tnum"), color = c.onSurfaceVariant)
+        Text(ChapterLabel.compact(ch.no), Modifier.width(64.dp), style = Ling.type.label.copy(fontFeatureSettings = "tnum"), color = c.onSurfaceVariant)
         Column(Modifier.weight(1f)) {
-            if (ch.title.isBlank()) Text("未命名", style = Ling.type.bodyLarge.copy(lineHeight = 21.sp), color = c.onSurfaceVariant, maxLines = 1)
+            if (ch.title.isBlank()) Text(tr(R.string.book_ai_010), style = Ling.type.bodyLarge.copy(lineHeight = 21.sp), color = c.onSurfaceVariant, maxLines = 1)
             else Text(ch.title, style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium, lineHeight = 21.sp), color = c.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(ch.state, style = Ling.type.caption.copy(fontSize = 12.sp, lineHeight = 17.sp), color = c.onSurfaceVariant)
         }
-        if (ch.titleIdeas > 0) Pill("${ch.titleIdeas} 个标题建议", PillKind.Amber)
+        if (ch.titleIdeas > 0) Pill(tr(R.string.work_043, ch.titleIdeas), PillKind.Amber)
         if (ch.draft) Box(Modifier.size(8.dp).clip(RoundedCornerShape(4.dp)).background(c.amber))
         if (ch.aiShare != null) Pill("AI ${ch.aiShare}%", PillKind.Amber, LingIcons.SparkleFilled)
-        if (ch.checked) Pill("一致性", PillKind.Good, LingIcons.Check)
+        if (ch.checked) Pill(tr(R.string.work_044), PillKind.Good, LingIcons.Check)
         Text(ch.words, Modifier.width(40.dp), style = Ling.type.caption, color = c.onSurfaceVariant, textAlign = TextAlign.End)
     }
 }

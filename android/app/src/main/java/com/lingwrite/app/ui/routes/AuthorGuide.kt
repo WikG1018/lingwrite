@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,15 +36,15 @@ const val AUTHOR_GUIDE_REVISION = 1
 object AuthorGuideUi { var openEpoch by mutableIntStateOf(0) }
 
 data class GuideStep(val title: String, val instruction: String)
-val authorGuideSteps = listOf(
-    GuideStep("建一本书", "去书架点新建，直接创建空白书，或选择 8 步创作向导。这里不会代你创建作品。"),
-    GuideStep("人物与世界观", "在设定库新建人物、势力、地点等卡片；人物状态与关系可以指定从哪章生效。先留少量关键设定即可。"),
-    GuideStep("全书总纲", "打开总纲工作台第 ③ 步，写主线、阶段目标与结局。AI 可选；候选只有你确认后才采纳。"),
-    GuideStep("分卷与卷纲", "在工作台第 ④ 步设置每卷目标与高潮。局部采纳时核对卷序号；覆盖卷纲保留已有正文。"),
-    GuideStep("每章章纲", "第 ⑤ 步先选卷，再写或生成本卷章纲。事件、开篇钩子、章尾悬念与节拍为正文提供方向。"),
-    GuideStep("写正文与修订", "编辑器会自动保存；撤销与重做在右上角。AI 建议需确认，等待时改过正文会提示旧结果冲突。键盘打开时指导收起。"),
-    GuideStep("埋设与回收伏笔", "作品的伏笔页可登记线索、关联人物与埋设章、设置回收章。写到回收处后手动标记已回收；检查遗漏提醒。"),
-    GuideStep("版本、导出与备份", "编辑器更多菜单查看历史并比较回滚；作品菜单恢复误删章节。最后导出成稿，并在设置的数据页备份。")
+val authorGuideSteps get() = listOf(
+    GuideStep(tr(R.string.author_guide_001), tr(R.string.author_guide_002)),
+    GuideStep(tr(R.string.author_guide_003), tr(R.string.author_guide_004)),
+    GuideStep(tr(R.string.author_guide_005), tr(R.string.author_guide_006)),
+    GuideStep(tr(R.string.author_guide_007), tr(R.string.author_guide_008)),
+    GuideStep(tr(R.string.author_guide_009), tr(R.string.author_guide_010)),
+    GuideStep(tr(R.string.author_guide_011), tr(R.string.author_guide_012)),
+    GuideStep(tr(R.string.author_guide_013), tr(R.string.author_guide_014)),
+    GuideStep(tr(R.string.author_guide_015), tr(R.string.author_guide_016))
 )
 
 object AuthorGuideModule {
@@ -48,7 +52,7 @@ object AuthorGuideModule {
         AppOverlays.list += { nav -> AuthorGuide(nav) }
         SettingsRegistry.extra += { prefs, nav ->
             val scope = rememberCoroutineScope()
-            "写作" to SettingRow(LingIcons.Help, "作者写作指导", "可继续或从头重看；不会自动创建或修改稿件", onClick = {
+            tr(R.string.author_guide_017) to SettingRow(LingIcons.Help, tr(R.string.author_guide_018), tr(R.string.author_guide_019), onClick = {
                 scope.launch { AppGraph.prefs.update { it.copy(authorGuide = true, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION, authorGuideStep = if (prefs.authorGuideStep >= authorGuideSteps.size) 0 else prefs.authorGuideStep) }; AuthorGuideUi.openEpoch++; nav.navigate(Routes.Shelf) }
             })
         }
@@ -64,11 +68,11 @@ object AuthorGuideModule {
     val keyboard = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     fun acknowledge(start: Boolean) { scope.launch { AppGraph.prefs.update { it.copy(authorGuideInviteRevision = AUTHOR_GUIDE_REVISION, authorGuide = start, authorGuideStep = if (start && it.authorGuideStep >= authorGuideSteps.size) 0 else it.authorGuideStep) } } }
     if (!p.authorGuide) {
-        if (p.authorGuideInviteRevision < AUTHOR_GUIDE_REVISION && !keyboard) LingSheet({ acknowledge(false) }, "写作指导已上线") {
-            Text("按真实入口梳理建书、章纲、正文、伏笔和备份。可随时跳过，在设置中继续或重看。", style = Ling.type.body, color = Ling.colors.onSurface, modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
+        if (p.authorGuideInviteRevision < AUTHOR_GUIDE_REVISION && !keyboard) LingSheet({ acknowledge(false) }, tr(R.string.author_guide_020)) {
+            Text(tr(R.string.author_guide_021), style = Ling.type.body, color = Ling.colors.onSurface, modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
             Row(Modifier.padding(24.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LingButton("稍后", BtnKind.Text) { acknowledge(false) }
-                LingButton("开始指导") { acknowledge(true) }
+                LingButton(tr(R.string.author_guide_022), BtnKind.Text) { acknowledge(false) }
+                LingButton(tr(R.string.author_guide_023)) { acknowledge(true) }
             }
         }
         return
@@ -107,22 +111,22 @@ object AuthorGuideModule {
             }
         }
     }
-    if (expanded && !keyboard) LingSheet({ expanded = false }, "作者写作指导", layout = SheetLayout.Viewport) {
+    if (expanded && !keyboard) LingSheet({ expanded = false }, tr(R.string.author_guide_018), layout = SheetLayout.Viewport) {
         AnimatedContent(step, transitionSpec = { (if (reduced) fadeIn() else fadeIn() + slideInVertically { it / 8 }) togetherWith fadeOut() }, label = "authorGuide") { n ->
             Column(Modifier.fillMaxWidth().heightIn(max = 520.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("${n + 1}/8 · ${authorGuideSteps[n].title}", style = Ling.type.titleSmall, color = Ling.colors.primary)
                 Text(authorGuideSteps[n].instruction, style = Ling.type.body, color = Ling.colors.onSurface)
-                if (n in 1..6 && bookId == null) Text("先创建作品，再进入这个步骤。", style = Ling.type.caption)
-                LingButton("打开实际入口", enabled = n !in 1..6 || bookId != null, modifier = Modifier.fillMaxWidth(), onClick = ::openTarget)
+                if (n in 1..6 && bookId == null) Text(tr(R.string.author_guide_024), style = Ling.type.caption)
+                LingButton(tr(R.string.author_guide_025), enabled = n !in 1..6 || bookId != null, modifier = Modifier.fillMaxWidth(), onClick = ::openTarget)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingButton("上一步", BtnKind.Text, enabled = n > 0) { setStep(n - 1) }
-                    LingButton(if (n == 7) "完成指导" else "下一步", BtnKind.Tonal) { setStep(n + 1) }
+                    LingButton(tr(R.string.author_guide_026), BtnKind.Text, enabled = n > 0) { setStep(n - 1) }
+                    LingButton(if (n == 7) tr(R.string.author_guide_027) else tr(R.string.author_guide_028), BtnKind.Tonal) { setStep(n + 1) }
                 }
                 Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    LingButton("稍后继续 / 跳过", BtnKind.Text, modifier = Modifier.fillMaxWidth()) { scope.launch { AppGraph.prefs.update { it.copy(authorGuide = false, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION) } } }
-                    LingButton("从头重看", BtnKind.Text, modifier = Modifier.fillMaxWidth()) { setStep(0) }
+                    LingButton(tr(R.string.author_guide_029), BtnKind.Text, modifier = Modifier.fillMaxWidth()) { scope.launch { AppGraph.prefs.update { it.copy(authorGuide = false, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION) } } }
+                    LingButton(tr(R.string.author_guide_030), BtnKind.Text, modifier = Modifier.fillMaxWidth()) { setStep(0) }
                 }
-                Text("AI 配置可跳过；设置 → 作者写作指导可继续或重看。", style = Ling.type.caption)
+                Text(tr(R.string.author_guide_031), style = Ling.type.caption)
             }
         }
     }
@@ -138,8 +142,8 @@ internal fun guideReplacesDestination(currentRoute: String?, target: String): Bo
 /** Occupies a layout row so the guide never floats over the author's content. */
 @Composable fun AuthorGuideBar(step: Int, onPause: () -> Unit) {
     Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("写作指导 ${step + 1}/8", style = Ling.type.label, color = Ling.colors.primary, modifier = Modifier.weight(1f))
-        LingButton("继续指导", BtnKind.Tonal, height = 36.dp) { AuthorGuideUi.openEpoch++ }
-        LingIconButton(LingIcons.Close, "暂停写作指导", onClick = onPause)
+        Text(tr(R.string.author_guide_032, step + 1), style = Ling.type.label, color = Ling.colors.primary, modifier = Modifier.weight(1f))
+        LingButton(tr(R.string.author_guide_033), BtnKind.Tonal, height = 36.dp) { AuthorGuideUi.openEpoch++ }
+        LingIconButton(LingIcons.Close, tr(R.string.author_guide_034), onClick = onPause)
     }
 }

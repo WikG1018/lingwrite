@@ -1,0 +1,7173 @@
+{
+ "entries": {
+  "about_001": [
+   "应用",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_002": [
+   "通知",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_003": [
+   "后台任务、伏笔提醒、新版本",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_004": [
+   "已开启",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_005": [
+   "已关闭",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_006": [
+   "关于灵写",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_007": [
+   "版本 v%1$s",
+   1,
+   "AboutRoute.kt"
+  ],
+  "about_008": [
+   "灵写 v%1$s 可以更新了",
+   1,
+   "AboutRoute.kt"
+  ],
+  "about_009": [
+   "打开查看更新说明，下载后会先校验签名再安装。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_010": [
+   "%1$s检查完成",
+   1,
+   "AboutRoute.kt"
+  ],
+  "about_011": [
+   "发现 %1$s 处可能与设定不一致，点开查看。",
+   1,
+   "AboutRoute.kt"
+  ],
+  "about_012": [
+   "摘要已更新，没有发现与设定冲突的地方。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_013": [
+   "灵写 v%1$s (%2$s)\n%3$s %4$s · Android %5$s (API %6$s)",
+   6,
+   "AboutRoute.kt"
+  ],
+  "about_014": [
+   "灵写 LingWrite",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_015": [
+   "GNU AGPL-3.0 · 源代码 github.com/WikG1018/lingwrite",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_016": [
+   "界面字体：MiSans",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_017": [
+   "© 小米科技有限责任公司，依《MiSans 字体知识产权许可协议》使用，未修改；字体不适用 AGPL · hyperos.mi.com/font",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_018": [
+   "数据只在这台手机上",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_019": [
+   "作品、设定、大纲和备份都存在本机，灵写没有服务器，也不收集统计数据。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_020": [
+   "Key 加密保存",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_021": [
+   "API Key 用系统密钥库加密，不会写进备份文件，也不会离开这台设备。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_022": [
+   "只发给你选的模型",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_023": [
+   "调用 AI 时，相关正文和设定只发给你配置的服务商；检查更新只访问 GitHub 或你选的镜像。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_024": [
+   "关于",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_025": [
+   "检查更新",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_026": [
+   "有新版本 v%1$s",
+   1,
+   "AboutRoute.kt"
+  ],
+  "about_027": [
+   "更新日志",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_028": [
+   "每个版本改了什么",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_029": [
+   "开源许可",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_030": [
+   "界面字体：MiSans，© 小米",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_031": [
+   "隐私说明",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_032": [
+   "数据存在哪里、发给谁",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_033": [
+   "GitHub 主页",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_034": [
+   "问题反馈",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_035": [
+   "提交 Issue，会附上版本与设备信息",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_036": [
+   "灵写版本",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_037": [
+   "灵写",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_038": [
+   "已复制版本与设备信息",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_039": [
+   "v%1$s · 长按复制版本信息",
+   1,
+   "AboutRoute.kt"
+  ],
+  "about_040": [
+   "灵写 · 给写长篇的人",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_041": [
+   "正在加载…",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_042": [
+   "允许通知",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_043": [
+   "关闭后灵写不会发出任何通知",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_044": [
+   "分类",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_045": [
+   "每天最多汇总提醒一次",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_046": [
+   "点通知会直接打开对应页面：检查结果、作品伏笔或更新说明。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_047": [
+   "需要通知权限",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_048": [
+   "灵写只在三种情况下提醒你：后台检查跑完了、伏笔快到或已过回收章节、有新版本。不会推送营销消息，每类都可以单独关掉。",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_049": [
+   "开启通知",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_050": [
+   "系统已关闭灵写的通知，下面的开关暂时不起作用",
+   0,
+   "AboutRoute.kt"
+  ],
+  "about_051": [
+   "去设置",
+   0,
+   "AboutRoute.kt"
+  ],
+  "adaptive_workspace_001": [
+   "返回列表",
+   0,
+   "AdaptiveWorkspace.kt"
+  ],
+  "ai_components_001": [
+   "灵感",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_002": [
+   "AI 起草",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_003": [
+   "生成中…",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_004": [
+   "再来一次",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_005": [
+   "复制",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_006": [
+   "存到便签",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_007": [
+   "采纳",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_008": [
+   "换一批",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_009": [
+   "微调",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_010": [
+   "思考中：%1$s",
+   1,
+   "AiComponents.kt"
+  ],
+  "ai_components_011": [
+   "没拿到结果：%1$s",
+   1,
+   "AiComponents.kt"
+  ],
+  "ai_components_012": [
+   "已重试 %1$s 次",
+   1,
+   "AiComponents.kt"
+  ],
+  "ai_components_013": [
+   "换个模型",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_014": [
+   "重试",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_015": [
+   "移除%1$s",
+   1,
+   "AiComponents.kt"
+  ],
+  "ai_components_016": [
+   "微调后采纳",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_017": [
+   "原文",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_018": [
+   "改过的内容会标记为“AI 建议 + 人工修改”。",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_components_019": [
+   "用这个版本",
+   0,
+   "AiComponents.kt"
+  ],
+  "ai_run_001": [
+   "模型没有返回内容",
+   0,
+   "AiRun.kt"
+  ],
+  "ask_panel_001": [
+   "按章状态",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_002": [
+   "关系",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_003": [
+   "检索结果",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_004": [
+   "本章",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_005": [
+   "设定库",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_006": [
+   "前情",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_007": [
+   "· %1$s：",
+   1,
+   "AskPanel.kt"
+  ],
+  "ask_panel_008": [
+   "；",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_009": [
+   "（第 %1$s 章起）",
+   1,
+   "AskPanel.kt"
+  ],
+  "ask_panel_010": [
+   "%1$s—%2$s：%3$s",
+   3,
+   "AskPanel.kt"
+  ],
+  "ask_panel_011": [
+   "【设定（以第 %1$s 章时为准）】\n%2$s",
+   2,
+   "AskPanel.kt"
+  ],
+  "ask_panel_012": [
+   "【关系】\n%1$s",
+   1,
+   "AskPanel.kt"
+  ],
+  "ask_panel_013": [
+   "【检索片段】\n",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_014": [
+   "（第 %1$s 章）%2$s",
+   2,
+   "AskPanel.kt"
+  ],
+  "ask_panel_015": [
+   "（未带入任何上下文）",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_016": [
+   "\n回答必须给出处；没有出处的推断要注明“（推断）”。",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_017": [
+   "问设定",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_018": [
+   "随手问",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_019": [
+   "回答不进正文",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_020": [
+   "可以问书里的设定，也可以问现实知识。",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_021": [
+   "这个朝代的官职怎么称呼",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_022": [
+   "沈砚现在是什么境界",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_023": [
+   "这章节奏是不是太慢",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_024": [
+   "问：%1$s\n%2$s",
+   2,
+   "AskPanel.kt"
+  ],
+  "ask_panel_025": [
+   "正在翻设定和前情…",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_026": [
+   "选中：「%1$s…」",
+   1,
+   "AskPanel.kt"
+  ],
+  "ask_panel_027": [
+   "问点什么…",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_028": [
+   "发送",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_029": [
+   "存到本章便签",
+   0,
+   "AskPanel.kt"
+  ],
+  "ask_panel_030": [
+   "转设定卡",
+   0,
+   "AskPanel.kt"
+  ],
+  "author_guide_001": [
+   "建一本书",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_002": [
+   "去书架点新建，直接创建空白书，或选择 8 步创作向导。这里不会代你创建作品。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_003": [
+   "人物与世界观",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_004": [
+   "在设定库新建人物、势力、地点等卡片；人物状态与关系可以指定从哪章生效。先留少量关键设定即可。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_005": [
+   "全书总纲",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_006": [
+   "打开总纲工作台第 ③ 步，写主线、阶段目标与结局。AI 可选；候选只有你确认后才采纳。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_007": [
+   "分卷与卷纲",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_008": [
+   "在工作台第 ④ 步设置每卷目标与高潮。局部采纳时核对卷序号；覆盖卷纲保留已有正文。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_009": [
+   "每章章纲",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_010": [
+   "第 ⑤ 步先选卷，再写或生成本卷章纲。事件、开篇钩子、章尾悬念与节拍为正文提供方向。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_011": [
+   "写正文与修订",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_012": [
+   "编辑器会自动保存；撤销与重做在右上角。AI 建议需确认，等待时改过正文会提示旧结果冲突。键盘打开时指导收起。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_013": [
+   "埋设与回收伏笔",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_014": [
+   "作品的伏笔页可登记线索、关联人物与埋设章、设置回收章。写到回收处后手动标记已回收；检查遗漏提醒。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_015": [
+   "版本、导出与备份",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_016": [
+   "编辑器更多菜单查看历史并比较回滚；作品菜单恢复误删章节。最后导出成稿，并在设置的数据页备份。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_017": [
+   "写作",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_018": [
+   "作者写作指导",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_019": [
+   "可继续或从头重看；不会自动创建或修改稿件",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_020": [
+   "写作指导已上线",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_021": [
+   "按真实入口梳理建书、章纲、正文、伏笔和备份。可随时跳过，在设置中继续或重看。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_022": [
+   "稍后",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_023": [
+   "开始指导",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_024": [
+   "先创建作品，再进入这个步骤。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_025": [
+   "打开实际入口",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_026": [
+   "上一步",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_027": [
+   "完成指导",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_028": [
+   "下一步",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_029": [
+   "稍后继续 / 跳过",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_030": [
+   "从头重看",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_031": [
+   "AI 配置可跳过；设置 → 作者写作指导可继续或重看。",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_032": [
+   "写作指导 %1$s/8",
+   1,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_033": [
+   "继续指导",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "author_guide_034": [
+   "暂停写作指导",
+   0,
+   "AuthorGuide.kt"
+  ],
+  "book_ai_001": [
+   "【总纲】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_002": [
+   "【卷纲（已写到的卷）】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_003": [
+   "【最近 10 章摘要】\n",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_004": [
+   "【当前书名】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_005": [
+   "【当前简介】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_006": [
+   "【平台】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_007": [
+   "起点",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_008": [
+   "输出：{\"titles\":[5 个书名],\"blurbs\":[3 版简介，每版≤150字，开头一句抓人],\"pitch\":{\"oneLine\":\"≤25字一句话卖点\",\"tags\":[3 条标签],\"recommend\":\"≤120字推荐语\"}}",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_009": [
+   "为下面这本书设计封面配色和画面，不要另起书名，书名保持「",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_010": [
+   "未命名",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_011": [
+   "」。\n",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_012": [
+   "【类型】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_013": [
+   "【简介】",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_014": [
+   "输出：{\"top\":\"#RRGGBB\",\"bottom\":\"#RRGGBB\",\"accent\":\"#RRGGBB\",\"motif\":\"两个字的意象\",\"line\":\"不超过八个字的气氛句，不要写成新书名\"}",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_015": [
+   "作品不存在",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_016": [
+   "【%1$s】%2$s",
+   2,
+   "BookAi.kt"
+  ],
+  "book_ai_017": [
+   "第 %1$s 章：%2$s",
+   2,
+   "BookAi.kt"
+  ],
+  "book_ai_018": [
+   "模型没有按格式返回",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_019": [
+   "卷",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_020": [
+   "AI 生成书面",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_021": [
+   "书名沿用「%1$s」。按总纲和简介配封面，不另起书名。",
+   1,
+   "BookAi.kt"
+  ],
+  "book_ai_022": [
+   "正在配书面…",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_023": [
+   "生成书面",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_024": [
+   "换一张",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_025": [
+   "生成失败",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_026": [
+   "用这张",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_027": [
+   "恢复纯色封面",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_028": [
+   "一句话卖点",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_029": [
+   "推荐语",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_030": [
+   "复制上架文案",
+   0,
+   "BookAi.kt"
+  ],
+  "book_ai_031": [
+   "简介候选 · %1$s 版",
+   1,
+   "BookAi.kt"
+  ],
+  "book_ai_032": [
+   "用这版",
+   0,
+   "BookAi.kt"
+  ],
+  "breakdown_001": [
+   "拆文",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_002": [
+   "只保存分析结果，不保存原文",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_003": [
+   "请只使用你有权使用的文本。点击分析会将样章发给你配置的 AI 服务商，并可能产生费用。灵写本机只保存分析结果；服务商的数据政策请自行确认。",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_004": [
+   "第 1 步 · 贴入样章",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_005": [
+   "粘贴 1–10 章样章，章节之间用「第X章」或空行分隔",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_006": [
+   "分析中…",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_007": [
+   "开始分析",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_008": [
+   "样章",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_009": [
+   "没有拿到分析结果",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_010": [
+   "重置",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_011": [
+   "已识别 %1$s 个疑似专名，结果会进行本地脱名处理；这不改变样章会发给所选服务商的事实。",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_012": [
+   "在本机分章，再由所选 AI 分析；本机只保存结构结果，不保存样章。",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_013": [
+   "节奏曲线（冲突强度 1–5）",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_014": [
+   "强度最高：第 %1$s 章",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_015": [
+   "第 %1$s 章",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_016": [
+   "强度 %1$s",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_017": [
+   "事件：%1$s",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_018": [
+   "钩子：%1$s",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_019": [
+   "爽点：%1$s",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_020": [
+   "章尾：%1$s",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_021": [
+   "结构：%1$s",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_022": [
+   "结构模板（已抹去人名设定）",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_023": [
+   "✓ 已把模板填进 %1$s 个还没章纲的章节，去大纲页可以再改。",
+   1,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_024": [
+   "套用到本书章纲",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_025": [
+   "存为我的模板",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_026": [
+   "删除此模板",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_027": [
+   "再拆一本",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_028": [
+   "套用只填还没有章纲的章节，已有的不动；填入的都是建议，可在大纲页改。",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_029": [
+   "套用结构模板",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "breakdown_030": [
+   "把这份模板按顺序填进还没有章纲的章节（已有的章纲不动），填入的都是建议。",
+   0,
+   "BreakdownRoute.kt"
+  ],
+  "chain_001": [
+   "总纲工作台",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_002": [
+   "大纲页",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_003": [
+   "链路完成 · 从大纲页或书架进入第一章继续写作",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_004": [
+   "已完成 %1$s/6 步 · 每一步都可以跳过，手写也能继续",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_005": [
+   "一句话灵感开始",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_006": [
+   "卖点、主角、世界观",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_007": [
+   "主线 · 阶段 · 结局",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_008": [
+   "%1$s 卷",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_009": [
+   "拆卷、目标与高潮",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_010": [
+   "本卷前 N 章章纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_011": [
+   "节拍与第一章",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_012": [
+   "上游已改，可重新生成",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_013": [
+   "① 创意 → 梗概",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_014": [
+   "一句话灵感（必填）",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_015": [
+   "比如：断剑少年潜入宗门，只为查十年前的灭门案",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_016": [
+   "题材（可选）",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_017": [
+   "目标平台",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_018": [
+   "正在想 3 个方向…",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_019": [
+   "AI 生成 3 个梗概",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_020": [
+   "模型两次都没有按格式返回",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_021": [
+   "手写梗概继续",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_022": [
+   "采纳并继续",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_023": [
+   "② 核心设定",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_024": [
+   "卖点、主角卡和世界观可以在这里生成，也可以直接在创作向导或设定库里维护。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_025": [
+   "正在提炼卖点…",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_026": [
+   "生成卖点",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_027": [
+   "③ 总纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_028": [
+   "主线（≤40 字）",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_029": [
+   "阶段 %1$s",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_030": [
+   "阶段名",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_031": [
+   "目标",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_032": [
+   "主要冲突",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_033": [
+   "阶段结局",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_034": [
+   "结局走向（≤120 字）",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_035": [
+   "正在排主线和阶段…",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_036": [
+   "AI 写总纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_037": [
+   "④ 卷纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_038": [
+   "卷数（1–12）",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_039": [
+   "每卷预计章数",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_040": [
+   "正在拆卷…",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_041": [
+   "%1$s 章",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_042": [
+   "目标：%1$s",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_043": [
+   "高潮：%1$s",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_044": [
+   "落法：追加在后面",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_045": [
+   "已有 %1$s 卷，选落法：",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_046": [
+   "✓ 覆盖同序号",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_047": [
+   "覆盖同序号",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_048": [
+   "✓ 追加在后面",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_049": [
+   "追加在后面",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_050": [
+   "覆盖只改卷纲（目标 / 高潮 / 章数 / 卷名），卷内已有章节保留。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_051": [
+   "AI 拆卷纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_052": [
+   "采纳勾选的卷",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_053": [
+   "⑤ 章纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_054": [
+   "选一卷拆前 N 章，或接着已有章纲往后拆（滚动规划）。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_055": [
+   "先在 ④ 里拆卷，或去作品页新建分卷。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_056": [
+   "拆几章（本卷前 N 章用 10，滚动规划用 3 / 5）",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_057": [
+   "✓ %1$s 章",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_058": [
+   "正在拆章纲…",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_059": [
+   "新章 %1$s",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_060": [
+   "事件：%1$s\n钩子：%2$s\n悬念：%3$s",
+   3,
+   "ChainRoute.kt"
+  ],
+  "chain_061": [
+   "AI 拆章纲",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_062": [
+   "采纳 N 章",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_063": [
+   "候选属于另一卷，请在当前卷重新生成。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_064": [
+   "⑥ 第一章 · %1$s模式",
+   1,
+   "ChainRoute.kt"
+  ],
+  "chain_065": [
+   "生成节拍清单和开篇示意：只进本章便签，不进正文。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_066": [
+   "先确认节拍，再起草整章：草稿分段采纳，带 AI 标记。",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_067": [
+   "正在排节拍…",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_068": [
+   "生成节拍",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_069": [
+   "生成开篇示意",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_070": [
+   "存节拍到本章便签并完成",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_071": [
+   "存节拍，去编辑器起草",
+   0,
+   "ChainRoute.kt"
+  ],
+  "chain_072": [
+   "打开第一章起草",
+   0,
+   "ChainRoute.kt"
+  ],
+  "check_001": [
+   "写完一章自动检查",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_002": [
+   "摘要、章纲落实、一致性、伏笔建议（用自动任务模型）",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_003": [
+   "一致性检查",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_004": [
+   "%1$s 条待处理 · 人设、实力、时间线、关系",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_005": [
+   "没有待处理的问题",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_006": [
+   "登记伏笔",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_007": [
+   "未回收",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_008": [
+   "已回收",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_009": [
+   "放弃",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_010": [
+   "AI 建议的伏笔 · 确认后才进台账",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_011": [
+   "第 %1$s 章：「%2$s」",
+   2,
+   "CheckRoute.kt"
+  ],
+  "check_012": [
+   "不是伏笔",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_013": [
+   "确认",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_014": [
+   "还没有未回收的伏笔。在正文选中一段，点“登记伏笔”。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_015": [
+   "这里还是空的。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_016": [
+   "第 %1$s 章埋",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_017": [
+   "第 %1$s 章回收",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_018": [
+   "计划第 %1$s 章回收",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_019": [
+   "关联 %1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_020": [
+   "「%1$s」",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_021": [
+   "超期 %1$s 章",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_022": [
+   "临近",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_023": [
+   "确认伏笔",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_024": [
+   "伏笔",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_025": [
+   "伏笔内容",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_026": [
+   "埋了什么、打算怎么回收",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_027": [
+   "埋设原文（第 %1$s 章）",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_028": [
+   "计划回收章（可空）",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_029": [
+   "关联设定卡（提到它时自动带入上下文）",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_030": [
+   "状态",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_031": [
+   "怎么收",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_032": [
+   "正在想收法…",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_033": [
+   "AI 给 3 种收法",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_034": [
+   "需要铺垫：%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_035": [
+   "写进第 %1$s 章章纲备注",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_036": [
+   "改计划回收章",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_037": [
+   "【伏笔回收】%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_038": [
+   "确认后追加到该章章纲备注（可以撤销）。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_039": [
+   "原备注：%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_040": [
+   "追加：%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_041": [
+   "已写进章纲备注",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_042": [
+   "撤销",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_043": [
+   "章纲备注后来已修改，未撤销以保护你的编辑。可手动删除追加段。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_044": [
+   "删除",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_045": [
+   "确认进台账",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_046": [
+   "保存",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_047": [
+   "故意为之",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_048": [
+   "已忽略",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_049": [
+   "已修",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_050": [
+   "原文：「%1$s」",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_051": [
+   "依据：%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_052": [
+   "说明：%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_053": [
+   "改正文",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_054": [
+   "改设定",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_055": [
+   "补一句解释",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_056": [
+   "去原文应用",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_057": [
+   "去改设定",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_058": [
+   "采纳这句",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_059": [
+   "【%1$s】%2$s（%3$s）",
+   3,
+   "CheckRoute.kt"
+  ],
+  "check_060": [
+   "没拿到改法：%1$s",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_061": [
+   "一句说明（可空），例如：他在说谎",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_062": [
+   "以后不再提醒",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_063": [
+   "给改法",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_064": [
+   "正在想改法…",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_065": [
+   "去原文",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_066": [
+   "忽略",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_067": [
+   "对照设定库（按章生效的状态）、关系、前情摘要和相关旧片段找矛盾。结果都是候选，由你判断。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_068": [
+   "检查中…（分两步：抽取事实 → 比对）",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_069": [
+   "检查本章",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_070": [
+   "没有发现矛盾。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_071": [
+   "发现 %1$s 条可能的矛盾。",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_072": [
+   "%1$s 条待处理",
+   1,
+   "CheckRoute.kt"
+  ],
+  "check_073": [
+   "手动检查指定范围",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_074": [
+   "从第几章",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_075": [
+   "到第几章",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_076": [
+   "检查",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_077": [
+   "正在检查第 %1$s 章（%2$s/%3$s）",
+   3,
+   "CheckRoute.kt"
+  ],
+  "check_078": [
+   "全部结果",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_079": [
+   "待处理",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_080": [
+   "只看待处理",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_081": [
+   "含已处理",
+   0,
+   "CheckRoute.kt"
+  ],
+  "check_082": [
+   "没有待处理的问题。",
+   0,
+   "CheckRoute.kt"
+  ],
+  "components_001": [
+   "返回",
+   0,
+   "Components.kt"
+  ],
+  "context_001": [
+   "本章摘要",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_002": [
+   "完成本章后自动生成，可改后确认",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_003": [
+   "上下文查看器",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_004": [
+   "最近一次实际发给模型的内容和占比",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_005": [
+   "上下文预算",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_006": [
+   "每次发给模型的背景资料上限。超出时按优先级从低往高裁剪，章纲和设定始终优先。按所选模型的上下文长度设置。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_007": [
+   "（默认）",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_008": [
+   "长篇的前情、设定、旧片段带入上限",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_009": [
+   "开启语义检索？",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_010": [
+   "开启后，正文会切成小段发给你选的服务商的向量接口，用来找“意思相近”的旧片段。这会产生额外费用，正文会离开这台手机。关键词检索不受影响，始终在本机进行。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_011": [
+   "开启",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_012": [
+   "语义检索",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_013": [
+   "向量模型：%1$s",
+   1,
+   "ContextRoute.kt"
+  ],
+  "context_014": [
+   "默认关闭；开启会把正文切片发给服务商",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_015": [
+   "选择向量模型",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_016": [
+   "需要一个 OpenAI 兼容协议、已填 Key 的服务商（Claude 没有向量接口）。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_017": [
+   "向量模型名",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_018": [
+   "例如 text-embedding-3-small、text-embedding-v3",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_019": [
+   "还没有发送过。用一次 AI 工具后，这里会显示实际发给模型的全部内容。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_020": [
+   "系统指令 + 文风卡",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_021": [
+   "约 %1$s tokens · 预算 %2$s（含回复预留 1500）· %3$s",
+   3,
+   "ContextRoute.kt"
+  ],
+  "context_022": [
+   "还没有摘要。完成本章时会自动生成，也可以现在生成或自己写。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_023": [
+   "已确认：后续写作优先使用，不会被自动覆盖。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_024": [
+   "AI 生成，待确认。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_025": [
+   "200 字左右：发生了什么、人物有什么变化、留下了什么悬念",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_026": [
+   "正在写本章摘要…",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_027": [
+   "AI 生成",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_028": [
+   "搜本书正文：人名、地名、一句台词…",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_029": [
+   "搜全部作品",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_030": [
+   "问问 AI：%1$s",
+   1,
+   "ContextRoute.kt"
+  ],
+  "context_031": [
+   "新设定",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_032": [
+   "说明",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_033": [
+   "关键词检索在本机完成，不联网、不花钱。多个词用空格隔开表示同时出现。",
+   0,
+   "ContextRoute.kt"
+  ],
+  "context_034": [
+   "没有找到“%1$s”",
+   1,
+   "ContextRoute.kt"
+  ],
+  "context_035": [
+   "%1$s 处",
+   1,
+   "ContextRoute.kt"
+  ],
+  "data_001": [
+   "数据",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_002": [
+   "备份与恢复",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_003": [
+   "整库备份为一个文件；导入可覆盖或合并",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_004": [
+   "已导出 %1$s 字",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_005": [
+   "导出失败：%1$s",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_006": [
+   "导出",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_007": [
+   "章节范围",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_008": [
+   "从第",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_009": [
+   "到第",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_010": [
+   "包含章节标题",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_011": [
+   "包含作品简介",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_012": [
+   "章节号格式",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_013": [
+   "AI 段落标记不会写进导出文件；是否对外披露由你决定。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_014": [
+   "预览",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_015": [
+   "保存到文件",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_016": [
+   "作品",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_017": [
+   "备份完成",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_018": [
+   "备份失败：%1$s",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_019": [
+   "无法读取：%1$s",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_020": [
+   "备份整个灵写",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_021": [
+   "作品、章节与历史版本、设定库、大纲、伏笔、灵感、AI 使用记录和地图图片打包成一个 .zip。API Key 不会写进备份，恢复后需要重新填写。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_022": [
+   "正在备份…",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_023": [
+   "立即备份",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_024": [
+   "灵写备份-%1$s.zip",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_025": [
+   "从备份导入",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_026": [
+   "可以覆盖本机数据，或把备份里的作品合并进来。导入前会自动备份一次当前数据。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_027": [
+   "选择备份文件",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_028": [
+   "导入前的自动备份（保留最近 5 个）",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_029": [
+   "导入备份",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_030": [
+   "合并",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_031": [
+   "覆盖",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_032": [
+   "清空本机的作品数据，换成备份里的内容。模型服务商保留。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_033": [
+   "把备份里的作品作为新作品加进来；同一部作品（书名和创建时间都相同）会跳过。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_034": [
+   "导入前会自动备份当前数据。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_035": [
+   "正在导入…",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_036": [
+   "导入",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_037": [
+   "覆盖本机数据？",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_038": [
+   "本机所有作品会被备份里的内容替换。导入前会先自动备份当前数据，可以在本页恢复。",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_039": [
+   "导入完成：%1$s 部作品",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_040": [
+   "（已覆盖）",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_041": [
+   "导入未完成：%1$s。导入前的自动备份可在本页恢复。",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_042": [
+   "备份于 %1$s",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_043": [
+   "、",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_044": [
+   " 等 %1$s 部",
+   1,
+   "DataRoute.kt"
+  ],
+  "data_045": [
+   "%1$s 章 · %2$s 张设定卡 · %3$s 条伏笔 · %4$s 条灵感",
+   4,
+   "DataRoute.kt"
+  ],
+  "dl_001": [
+   "(?m)^\\s*第[一二三四五六七八九十百千0-9]+[章节卷][^\\n]{0,30}$",
+   0,
+   "data"
+  ],
+  "dl_002": [
+   "AI 味改法",
+   0,
+   "data"
+  ],
+  "dl_003": [
+   "AI 腔",
+   0,
+   "data"
+  ],
+  "dl_004": [
+   "^\\s*[0-9]+[.、)]\\s*",
+   0,
+   "data"
+  ],
+  "dl_005": [
+   "【[^】]{1,24}】",
+   0,
+   "data"
+  ],
+  "dl_006": [
+   "【写法要求】",
+   0,
+   "data"
+  ],
+  "dl_007": [
+   "【尽量不用这些词】",
+   0,
+   "data"
+  ],
+  "dl_008": [
+   "【文风要求】",
+   0,
+   "data"
+  ],
+  "dl_009": [
+   "【本卷早前】",
+   0,
+   "data"
+  ],
+  "dl_010": [
+   "【本章章纲】",
+   0,
+   "data"
+  ],
+  "dl_011": [
+   "一",
+   0,
+   "data"
+  ],
+  "dl_012": [
+   "一到两句",
+   0,
+   "data"
+  ],
+  "dl_013": [
+   "一段，约 120–200 字",
+   0,
+   "data"
+  ],
+  "dl_014": [
+   "七",
+   0,
+   "data"
+  ],
+  "dl_015": [
+   "三",
+   0,
+   "data"
+  ],
+  "dl_016": [
+   "三到五段，约 500 字",
+   0,
+   "data"
+  ],
+  "dl_017": [
+   "主角",
+   0,
+   "data"
+  ],
+  "dl_018": [
+   "主角在第一章出场",
+   0,
+   "data"
+  ],
+  "dl_019": [
+   "九",
+   0,
+   "data"
+  ],
+  "dl_020": [
+   "二",
+   0,
+   "data"
+  ],
+  "dl_021": [
+   "五",
+   0,
+   "data"
+  ],
+  "dl_022": [
+   "人物设定（当前章时）",
+   0,
+   "data"
+  ],
+  "dl_023": [
+   "代价",
+   0,
+   "data"
+  ],
+  "dl_024": [
+   "你写，AI 陪",
+   0,
+   "data"
+  ],
+  "dl_025": [
+   "你定，AI 起草",
+   0,
+   "data"
+  ],
+  "dl_026": [
+   "你是小说编辑。",
+   0,
+   "data"
+  ],
+  "dl_027": [
+   "你是网文编辑，擅长起章名。",
+   0,
+   "data"
+  ],
+  "dl_028": [
+   "你是网文起名顾问。名字要符合题材和本书已有的命名风格，好记、不撞常见网文主角名。严格只输出 JSON。",
+   0,
+   "data"
+  ],
+  "dl_029": [
+   "你是资深网文策划，熟悉起点、番茄、晋江等平台的上架包装。严格只输出 JSON。",
+   0,
+   "data"
+  ],
+  "dl_030": [
+   "八",
+   0,
+   "data"
+  ],
+  "dl_031": [
+   "六",
+   0,
+   "data"
+  ],
+  "dl_032": [
+   "写作中",
+   0,
+   "data"
+  ],
+  "dl_033": [
+   "前几章结尾",
+   0,
+   "data"
+  ],
+  "dl_034": [
+   "前情摘要",
+   0,
+   "data"
+  ],
+  "dl_035": [
+   "十",
+   0,
+   "data"
+  ],
+  "dl_036": [
+   "千",
+   0,
+   "data"
+  ],
+  "dl_037": [
+   "卖点露出",
+   0,
+   "data"
+  ],
+  "dl_038": [
+   "名词",
+   0,
+   "data"
+  ],
+  "dl_039": [
+   "周",
+   0,
+   "data"
+  ],
+  "dl_040": [
+   "四",
+   0,
+   "data"
+  ],
+  "dl_041": [
+   "地点",
+   0,
+   "data"
+  ],
+  "dl_042": [
+   "备注：",
+   0,
+   "data"
+  ],
+  "dl_043": [
+   "外貌",
+   0,
+   "data"
+  ],
+  "dl_044": [
+   "实力",
+   0,
+   "data"
+  ],
+  "dl_045": [
+   "开篇有冲突或事件，不是纯铺垫",
+   0,
+   "data"
+  ],
+  "dl_046": [
+   "开篇钩子：",
+   0,
+   "data"
+  ],
+  "dl_047": [
+   "当前卷纲",
+   0,
+   "data"
+  ],
+  "dl_048": [
+   "当前章纲",
+   0,
+   "data"
+  ],
+  "dl_049": [
+   "悬念类型",
+   0,
+   "data"
+  ],
+  "dl_050": [
+   "感情线按阶段推进，避免长时间停滞",
+   0,
+   "data"
+  ],
+  "dl_051": [
+   "感情线推进",
+   0,
+   "data"
+  ],
+  "dl_052": [
+   "感情进度",
+   0,
+   "data"
+  ],
+  "dl_053": [
+   "所属",
+   0,
+   "data"
+  ],
+  "dl_054": [
+   "批注",
+   0,
+   "data"
+  ],
+  "dl_055": [
+   "拆章纲",
+   0,
+   "data"
+  ],
+  "dl_056": [
+   "持有者",
+   0,
+   "data"
+  ],
+  "dl_057": [
+   "据点",
+   0,
+   "data"
+  ],
+  "dl_058": [
+   "文风要求",
+   0,
+   "data"
+  ],
+  "dl_059": [
+   "断绝",
+   0,
+   "data"
+  ],
+  "dl_060": [
+   "日",
+   0,
+   "data"
+  ],
+  "dl_061": [
+   "月",
+   0,
+   "data"
+  ],
+  "dl_062": [
+   "未写",
+   0,
+   "data"
+  ],
+  "dl_063": [
+   "未回收伏笔",
+   0,
+   "data"
+  ],
+  "dl_064": [
+   "本章已写内容（末尾）",
+   0,
+   "data"
+  ],
+  "dl_065": [
+   "来历",
+   0,
+   "data"
+  ],
+  "dl_066": [
+   "校对",
+   0,
+   "data"
+  ],
+  "dl_067": [
+   "核心事件：",
+   0,
+   "data"
+  ],
+  "dl_068": [
+   "每章开头 200 字内抓住读者",
+   0,
+   "data"
+  ],
+  "dl_069": [
+   "没有一次交代过多设定",
+   0,
+   "data"
+  ],
+  "dl_070": [
+   "物品",
+   0,
+   "data"
+  ],
+  "dl_071": [
+   "环境",
+   0,
+   "data"
+  ],
+  "dl_072": [
+   "生成",
+   0,
+   "data"
+  ],
+  "dl_073": [
+   "百",
+   0,
+   "data"
+  ],
+  "dl_074": [
+   "相关旧片段",
+   0,
+   "data"
+  ],
+  "dl_075": [
+   "秘密",
+   0,
+   "data"
+  ],
+  "dl_076": [
+   "立场",
+   0,
+   "data"
+  ],
+  "dl_077": [
+   "章尾悬念：",
+   0,
+   "data"
+  ],
+  "dl_078": [
+   "第 118 章",
+   0,
+   "data"
+  ],
+  "dl_079": [
+   "第118章",
+   0,
+   "data"
+  ],
+  "dl_080": [
+   "第一百一十八章",
+   0,
+   "data"
+  ],
+  "dl_081": [
+   "第一章前 500 字有钩子",
+   0,
+   "data"
+  ],
+  "dl_082": [
+   "第三章给出追读理由",
+   0,
+   "data"
+  ],
+  "dl_083": [
+   "等级划分",
+   0,
+   "data"
+  ],
+  "dl_084": [
+   "能力",
+   0,
+   "data"
+  ],
+  "dl_085": [
+   "能力体系",
+   0,
+   "data"
+  ],
+  "dl_086": [
+   "自动检查",
+   0,
+   "data"
+  ],
+  "dl_087": [
+   "设定卡（当前章时）",
+   0,
+   "data"
+  ],
+  "dl_088": [
+   "起草",
+   0,
+   "data"
+  ],
+  "dl_089": [
+   "释义",
+   0,
+   "data"
+  ],
+  "dl_090": [
+   "金手指或核心卖点已经露出",
+   0,
+   "data"
+  ],
+  "dl_091": [
+   "首领",
+   0,
+   "data"
+  ],
+  "dl_092": [
+   "，以及：",
+   0,
+   "data"
+  ],
+  "dock_001": [
+   "书架",
+   0,
+   "Dock.kt"
+  ],
+  "dock_002": [
+   "统计",
+   0,
+   "Dock.kt"
+  ],
+  "dock_003": [
+   "设置",
+   0,
+   "Dock.kt"
+  ],
+  "draft_pane_001": [
+   "草稿 · 第 %1$s/%2$s 段",
+   2,
+   "DraftPane.kt"
+  ],
+  "draft_pane_002": [
+   "收起",
+   0,
+   "DraftPane.kt"
+  ],
+  "draft_pane_003": [
+   "草稿不计入字数统计；采纳的段落会带 AI 标记。",
+   0,
+   "DraftPane.kt"
+  ],
+  "draft_pane_004": [
+   "采纳到正文",
+   0,
+   "DraftPane.kt"
+  ],
+  "draft_pane_005": [
+   "换一版",
+   0,
+   "DraftPane.kt"
+  ],
+  "draft_pane_006": [
+   "正在起草第 %1$s 段…",
+   1,
+   "DraftPane.kt"
+  ],
+  "draft_pane_007": [
+   "全部采纳",
+   0,
+   "DraftPane.kt"
+  ],
+  "editor_001": [
+   "保存失败，请保留页面并重试：%1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_002": [
+   "知道了",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_003": [
+   "卡住了？试试卡文急救，3 步给方向。",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_004": [
+   "去看看",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_005": [
+   "不用了",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_006": [
+   "待确认改法（来自一致性检查）",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_007": [
+   "原文：%1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_008": [
+   "改后：%1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_009": [
+   "改法应用前",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_010": [
+   "正在保存… · %1$s 字",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_011": [
+   "已自动保存 · %1$s 字",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_012": [
+   "今日 +%1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_013": [
+   "按这个方向写 1200 字正文，前 500 字有钩子。【方向】%1$s：%2$s",
+   2,
+   "EditorRoute.kt"
+  ],
+  "editor_014": [
+   "卡文起草",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_015": [
+   "切换写作模式",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_016": [
+   "本书写作模式：跟随全局 / 辅助 / 生成。",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_017": [
+   "辅助 · %1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_018": [
+   "生成 · %1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_019": [
+   "应用到所有作品",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_020": [
+   "写作指南",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_021": [
+   "打开当前章节的写作与修订说明",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_022": [
+   "历史版本",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_023": [
+   "自动保留最近 %1$s 个，手动快照永久保留",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_024": [
+   "保存快照",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_025": [
+   "重命名本章",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_026": [
+   "人物、势力、地点、物品、力量、概念",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_027": [
+   "改回草稿",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_028": [
+   "完成本章",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_029": [
+   "完成后会自动做摘要和一致性检查（可在设置里关闭）",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_030": [
+   "写下一章",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_031": [
+   "接在本章所在卷",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_032": [
+   "只改错字和标点，不改文风",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_033": [
+   "卡住了就走 3 步：选卡点、澄清、给方向",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_034": [
+   "读者试读",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_035": [
+   "模拟读者读完本章的追读意愿和弃书点",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_036": [
+   "章节标题",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_037": [
+   "手动快照",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_038": [
+   "回滚前",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_039": [
+   "自动保存",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_040": [
+   "还没有历史版本。写作时会自动保存版本。",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_041": [
+   "%1$s 字",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_042": [
+   "当前多 %1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_043": [
+   "当前少 %1$s",
+   1,
+   "EditorRoute.kt"
+  ],
+  "editor_044": [
+   "仅在该版本",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_045": [
+   "仅在当前",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_046": [
+   "回滚到这个版本",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_047": [
+   "回滚前会把当前内容另存为一个版本，随时可以再换回来。",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_048": [
+   "她看得清楚",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_049": [
+   "角。",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_050": [
+   "第 118 章 擂台余波",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_051": [
+   "已自动保存 · 2,416 字",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_052": [
+   "林砚",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_053": [
+   "沈清禾",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_054": [
+   "今日 +1,208",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_055": [
+   "续写建议 · DeepSeek V3 · 1/3",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_056": [
+   "收起辅助",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_057": [
+   "辅助",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_058": [
+   "重做",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_059": [
+   "更多",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_060": [
+   "AI 结果在这里预览；采纳后才写入正文。",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_061": [
+   "换一个",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_062": [
+   "引用设定",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_063": [
+   "人物",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_064": [
+   "本章节拍已完成 ✓",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_065": [
+   "展开",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_066": [
+   "本章节拍",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_067": [
+   "校对中…",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_068": [
+   "发现 %1$s 处 · 只改错字和标点",
+   1,
+   "EditorScreen.kt"
+  ],
+  "editor_069": [
+   "逐条看",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_070": [
+   "全部接受",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_071": [
+   "退出",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_072": [
+   "校对失败：%1$s",
+   1,
+   "EditorScreen.kt"
+  ],
+  "editor_073": [
+   "错别字",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_074": [
+   "的地得",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_075": [
+   "标点",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_076": [
+   "病句",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_077": [
+   "接受",
+   0,
+   "EditorScreen.kt"
+  ],
+  "editor_ai_001": [
+   "问设定、问前情、问现实知识；回答不进正文",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_002": [
+   "本章 AI 使用记录",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_003": [
+   "调用类型、范围、是否采纳（不作为平台认可的证明）",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_004": [
+   "原样采纳",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_005": [
+   "修改后采纳",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_006": [
+   "未采纳",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_007": [
+   "失败",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_008": [
+   "存便签",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_009": [
+   "自动任务",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_010": [
+   "未处理",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_011": [
+   "续写",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_012": [
+   "给方向",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_013": [
+   "改写",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_014": [
+   "扩写",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_015": [
+   "润色",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_016": [
+   "去 AI 腔",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_017": [
+   "对话",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_018": [
+   "描写",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_019": [
+   "缩写",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_020": [
+   "批注修改",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_021": [
+   "摘要",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_022": [
+   "设定提取",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_023": [
+   "伏笔建议",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_024": [
+   "创作向导",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_025": [
+   "文风学习",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_026": [
+   "AI 味检查",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_027": [
+   "【任务】",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_028": [
+   "选中 %1$s 字",
+   1,
+   "EditorAi.kt"
+  ],
+  "editor_ai_029": [
+   "光标处",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_030": [
+   "还没有本章节拍。先点「起草本章」旁的节拍生成，或去总纲工作台第 ⑥ 步。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_031": [
+   "起草本章",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_032": [
+   "AI 采纳前",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_033": [
+   "正文已修改，这份建议对应旧选区。请重新选中并生成，原稿未改动。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_034": [
+   "草稿采纳前",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_035": [
+   "写作方向",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_036": [
+   " · %1$s 个候选",
+   1,
+   "EditorAi.kt"
+  ],
+  "editor_ai_037": [
+   "建议",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_038": [
+   " · 第 %1$s 次",
+   1,
+   "EditorAi.kt"
+  ],
+  "editor_ai_039": [
+   "替换",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_040": [
+   "已采纳到正文",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_041": [
+   "已存进本章便签",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_042": [
+   "已存进设定库",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_043": [
+   "已登记伏笔",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_044": [
+   "已写进章纲",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_045": [
+   "卡文急救",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_046": [
+   "校对本章",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_047": [
+   "＋批注",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_048": [
+   "关闭",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_049": [
+   "改后",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_050": [
+   "替换选中",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_051": [
+   "辅助模式下只替换你选中的句子，标记为“AI 建议 + 人工修改”。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_052": [
+   "模型没有按格式返回，换个模型或重试",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_053": [
+   "已攒 %1$s 条批注",
+   1,
+   "EditorAi.kt"
+  ],
+  "editor_ai_054": [
+   "清空",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_055": [
+   "修改中…",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_056": [
+   "一起发给 AI",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_057": [
+   "正文已修改，请重新生成后采纳。原稿未改动。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_058": [
+   "添加批注",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_059": [
+   "「%1$s%2$s」",
+   2,
+   "EditorAi.kt"
+  ],
+  "editor_ai_060": [
+   "这里想怎么改？比如：节奏太慢，删掉一半",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_061": [
+   "可以先攒多条，再一次发给 AI。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_062": [
+   "加入批注",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_063": [
+   "批注修改结果",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_064": [
+   "批注 %1$s：%2$s",
+   2,
+   "EditorAi.kt"
+  ],
+  "editor_ai_065": [
+   "采纳这一条",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_066": [
+   "应用选中的修改",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_067": [
+   "正文已修改或批注位置失效，请重新选择原文并生成。未应用任何修改。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_068": [
+   "批注修改前",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_069": [
+   "正文在保存期间已修改，请重新生成。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_070": [
+   "本章还没有调用过 AI。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_071": [
+   "记录只存在本机，可在导出时一并导出；它不是平台认可的证明。",
+   0,
+   "EditorAi.kt"
+  ],
+  "editor_ai_072": [
+   "（估算）",
+   0,
+   "EditorAi.kt"
+  ],
+  "first_run_001": [
+   "你想让 AI\n怎么帮你写？",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_002": [
+   "两种方式都能用好灵写，之后可在设置里随时切换。",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_003": [
+   "。",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_004": [
+   "正文每个字出自你手",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_005": [
+   "产出是方向和问题，进本章便签",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_006": [
+   "按章纲起草，自动带入设定",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_007": [
+   "多候选挑选，段落带 AI 标记",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_008": [
+   "选择一种方式继续",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_009": [
+   "用辅助模式开始",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_010": [
+   "用生成模式开始",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "first_run_011": [
+   "可随时切换 · 稿件保存在本机；使用 AI 会将选定内容发给所选服务商",
+   0,
+   "FirstRunScreen.kt"
+  ],
+  "ideas_001": [
+   "（跨作品）",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_002": [
+   "（失败：%1$s）",
+   1,
+   "IdeasRoute.kt"
+  ],
+  "ideas_003": [
+   "展开成 3 个方向",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_004": [
+   "每个方向可存为新灵感，或转设定卡 / 伏笔",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_005": [
+   "AI 帮我归类",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_006": [
+   "判断适合转设定卡、伏笔还是章纲，并给出预填内容",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_007": [
+   "转成设定卡",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_008": [
+   "选一部作品，存进设定库",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_009": [
+   "转成伏笔",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_010": [
+   "登记到某部作品的伏笔台账",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_011": [
+   "取消置顶",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_012": [
+   "置顶",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_013": [
+   "「%1$s…」",
+   1,
+   "IdeasRoute.kt"
+  ],
+  "ideas_014": [
+   "生成 3 个方向",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_015": [
+   "正在展开…",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_016": [
+   "让 AI 判断这条灵感适合转成设定卡、伏笔还是章纲，并给出预填内容。",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_017": [
+   "开始归类",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_018": [
+   "正在判断…",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_019": [
+   "章纲备注",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_020": [
+   "设定卡",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_021": [
+   "建议转成 %1$s",
+   1,
+   "IdeasRoute.kt"
+  ],
+  "ideas_022": [
+   "%1$s 章后回收",
+   1,
+   "IdeasRoute.kt"
+  ],
+  "ideas_023": [
+   "%1$s（%2$s）",
+   2,
+   "IdeasRoute.kt"
+  ],
+  "ideas_024": [
+   "确认转换",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_025": [
+   "【灵感归类】%1$s",
+   1,
+   "IdeasRoute.kt"
+  ],
+  "ideas_026": [
+   "先在书架新建一部作品。",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_027": [
+   "名称",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_028": [
+   "随手记下一个点子，或者问一个写作问题",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_029": [
+   "跨作品保存，可转成设定卡或伏笔",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_030": [
+   "思考中…",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_031": [
+   "记下",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_032": [
+   "灵感不等人。洗澡时想到的反转、路上听到的一句话，先记在这里。",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_033": [
+   "已转设定卡",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_034": [
+   "已转伏笔",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_035": [
+   "正在回答…",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_036": [
+   "存为灵感",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "ideas_037": [
+   "转伏笔",
+   0,
+   "IdeasRoute.kt"
+  ],
+  "lore_001": [
+   "AI 从第 %1$s 章整理出 %2$s 条建议",
+   2,
+   "LoreRoute.kt"
+  ],
+  "lore_002": [
+   "人物关系图",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_003": [
+   "按章查看关系变化",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_004": [
+   "地图与势力",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_005": [
+   "上传地图，标注地点和范围",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_006": [
+   "全部 %1$s",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_007": [
+   "设定",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_008": [
+   "还没有%1$s卡。名字或别名出现在正文里时，卡片会自动带入 AI 上下文。",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_009": [
+   "又名 %1$s",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_010": [
+   "AI 建议",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_011": [
+   "始终带入",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_012": [
+   "不带入",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_013": [
+   "新建设定卡",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_014": [
+   "编辑 %1$s",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_015": [
+   "别名",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_016": [
+   "用逗号分隔，例如：沈师姐，清禾",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_017": [
+   "名字或别名出现在正文里，就会自动识别并带入 AI 上下文",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_018": [
+   "定位",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_019": [
+   "主角 / 主要配角 / 反派…",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_020": [
+   "一句话说明",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_021": [
+   "补全中…",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_022": [
+   "AI 补全空字段（%1$s 个）",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_023": [
+   "%1$s：%2$s",
+   2,
+   "LoreRoute.kt"
+  ],
+  "lore_024": [
+   "（空）",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_025": [
+   "自定义字段名",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_026": [
+   "添加字段",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_027": [
+   "带入 AI 上下文",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_028": [
+   "提及时",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_029": [
+   "始终",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_030": [
+   "从不",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_031": [
+   "确认采纳",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_032": [
+   "第 %1$s 章变化",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_033": [
+   "门派",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_034": [
+   "势力",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_035": [
+   "第 %1$s 章登场",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_036": [
+   "第 %1$s 章时",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_037": [
+   "记录状态变化",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_038": [
+   "例如境界突破、受伤、身份暴露、死亡。之后写到这一章及以后，AI 会按新状态理解人物。",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_039": [
+   "字段",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_040": [
+   "境界 / 伤势 / 生死…",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_041": [
+   "新的值",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_042": [
+   "从第几章起生效",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_043": [
+   "状态变化记录",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_044": [
+   "还没有记录过变化。",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_045": [
+   "第 %1$s 章起 · %2$s",
+   2,
+   "LoreRoute.kt"
+  ],
+  "lore_046": [
+   "与 %1$s 的关系",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_047": [
+   "打开 %1$s",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_048": [
+   "记录关系变化",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_049": [
+   "从某一章起关系变成…",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_050": [
+   "同伴",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_051": [
+   "师徒",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_052": [
+   "亲属",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_053": [
+   "感情",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_054": [
+   "敌对",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_055": [
+   "其他",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_056": [
+   "%1$s 的关系",
+   1,
+   "LoreRoute.kt"
+  ],
+  "lore_057": [
+   "先新建其他人物卡，才能添加关系。",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_058": [
+   "师弟、宿敌、暗恋…；填“断绝”表示从这章起不再有关系",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_059": [
+   "从第几章起",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_060": [
+   "按章查看",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_061": [
+   "查看",
+   0,
+   "LoreRoute.kt"
+  ],
+  "lore_062": [
+   "沈",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_063": [
+   "主要配角",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_064": [
+   "青云宗 · 内门",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_065": [
+   "出场 64 章",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_066": [
+   "第 118 章时",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_067": [
+   "境界",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_068": [
+   "筑基后期",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_069": [
+   "筑基中期",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_070": [
+   "话少，观察细，护短；对宗门规矩有怀疑但不明说",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_071": [
+   "查清十年前师父失踪与断剑的关系",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_072": [
+   "林",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_073": [
+   "师弟 · 起疑 → 试探",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_074": [
+   "第 118 章变化",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_075": [
+   "顾",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_076": [
+   "顾长庚",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_077": [
+   "师父 · 已失踪",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_078": [
+   "左腕红绳的来历",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_079": [
+   "第 12 章埋下 · 计划第 110 章前回收",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_080": [
+   "超期 8 章",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_081": [
+   "编辑",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_082": [
+   "又名 ",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_083": [
+   "按章查看：",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_084": [
+   "切换",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_085": [
+   "基本设定",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_086": [
+   "还没有填写设定。点右上角编辑。",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_087": [
+   "第 %1$s 章起",
+   1,
+   "LoreScreen.kt"
+  ],
+  "lore_088": [
+   "（原：%1$s）",
+   1,
+   "LoreScreen.kt"
+  ],
+  "lore_089": [
+   "记录一次状态变化",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_090": [
+   "人物关系",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_091": [
+   "添加关系",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_092": [
+   "相关伏笔",
+   0,
+   "LoreScreen.kt"
+  ],
+  "lore_ai_001": [
+   "【书名/类型/文风卡】",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_002": [
+   "\n【已有同类名字】",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_003": [
+   "\n【这张卡】类型 ",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_004": [
+   "，定位 ",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_005": [
+   "，已知字段 ",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_006": [
+   "\n【作者要求】",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_007": [
+   "\n输出：[{\"name\":\"\",\"meaning\":\"≤10字\"}] 共 8 个。",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_008": [
+   "\n【相关卡】",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_009": [
+   "\n【正文中的提及】",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_010": [
+   "\n【这张卡】",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_011": [
+   "\n严格只输出 JSON 对象 {字段名: 值}，只补空字段。不确定的写“待定”。",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_012": [
+   "AI 起名",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_013": [
+   "要求（可空）",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_014": [
+   "姓沈、清冷、两个字",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_015": [
+   "正在起名…",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_ai_016": [
+   "让 AI 起个头",
+   0,
+   "LoreAi.kt"
+  ],
+  "lore_suggest_001": [
+   "设定整理建议",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_002": [
+   "来自第 %1$s 章 · %2$s 条",
+   2,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_003": [
+   "没有待处理的建议。写完一章（开着自动检查）或点「AI 整理本章」，AI 会从正文里整理出新人物、状态变化、别名和关系变化。",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_004": [
+   "新人物",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_005": [
+   "状态变化",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_006": [
+   "新别名",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_007": [
+   "新%1$s：%2$s",
+   2,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_008": [
+   "（第 %1$s 章起变为）",
+   1,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_009": [
+   "%1$s：→ %2$s%3$s",
+   3,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_010": [
+   "别名：%1$s",
+   1,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_011": [
+   "关联",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_012": [
+   "关系：%1$s — %2$s",
+   2,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_013": [
+   "原文依据：「%1$s」",
+   1,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_014": [
+   "采纳中…",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_suggest_015": [
+   "✓ 已采纳",
+   0,
+   "LoreSuggestRoute.kt"
+  ],
+  "lore_visual_001": [
+   "第 %1$s 章时 · 点人物打开卡片，拖动可调整位置",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_002": [
+   "拖动查看不同章节时的关系",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_003": [
+   "先在设定库里建几张人物卡，再添加关系。",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_004": [
+   "地图 %1$s",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_005": [
+   "上传地图",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_006": [
+   "上传一张你自己的地图",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_007": [
+   "手绘拍照或其他工具画的都可以，只存在本机。之后可以在图上标地点、画势力范围，并关联到设定卡。",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_008": [
+   "选择图片",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_009": [
+   "标地点",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_010": [
+   "画势力范围",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_011": [
+   "依次点出范围的边界（已点 %1$s 个）",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_012": [
+   "完成",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_013": [
+   "第 %1$s 章时的势力分布",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_014": [
+   "标注地点",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_015": [
+   "势力范围",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_016": [
+   "关联到设定卡",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_017": [
+   "地点 · 第 %1$s 章起",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_018": [
+   "势力范围 · 第 %1$s 章起",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_019": [
+   "，到第 %1$s 章",
+   1,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_020": [
+   "打开设定卡",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_021": [
+   "到第几章为止（留空表示一直存在）",
+   0,
+   "LoreVisual.kt"
+  ],
+  "lore_visual_022": [
+   "删除标注",
+   0,
+   "LoreVisual.kt"
+  ],
+  "models_001": [
+   "自定义 · ",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_002": [
+   "订阅套餐",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_003": [
+   "按量付费 API",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_004": [
+   "约 ¥%.2f",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_005": [
+   "输入 %1$s · 输出 %2$s tokens",
+   2,
+   "ModelsRoute.kt"
+  ],
+  "models_006": [
+   " · 按你填的单价估算",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_007": [
+   " · 填写单价后可估算费用",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_008": [
+   "未设置",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_009": [
+   "自动选择",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_010": [
+   "跟随写作模型",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_011": [
+   "添加服务商",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_012": [
+   "自定义服务商",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_013": [
+   "OpenAI 兼容或 Anthropic 协议，例如豆包、OpenRouter",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_014": [
+   "关于模型设置",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_015": [
+   "灵写不经过任何服务器，直接用你的 Key 连接服务商。\n\n写作模型用于续写、改写等你主动发起的操作；自动任务模型用于写完一章后的摘要、一致性检查、伏笔建议，可以选更便宜的模型。\n\n各家“订阅套餐”大多只允许在编程工具中使用，用于写作 App 可能被封 Key，默认请用按量付费 API。",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_016": [
+   "自动任务模型",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_017": [
+   "写作模型",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_018": [
+   "还没有填好 Key 的服务商。先添加一个。",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_019": [
+   "不单独指定",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_020": [
+   "自定义",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_021": [
+   "添加 %1$s",
+   1,
+   "ModelsRoute.kt"
+  ],
+  "models_022": [
+   "接入方式",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_023": [
+   "连接",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_024": [
+   "例如：豆包、OpenRouter",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_025": [
+   "协议",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_026": [
+   "OpenAI 兼容",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_027": [
+   "认证方式",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_028": [
+   "接口地址",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_029": [
+   "已保存（%1$s），留空则不修改",
+   1,
+   "ModelsRoute.kt"
+  ],
+  "models_030": [
+   "粘贴 Key",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_031": [
+   "Key 用 Android Keystore 加密后只存在本机，只发给这个服务商",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_032": [
+   "模型",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_033": [
+   "添加模型名",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_034": [
+   "添加",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_035": [
+   "从服务商拉取模型列表",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_036": [
+   "拉取到 %1$s 个模型",
+   1,
+   "ModelsRoute.kt"
+  ],
+  "models_037": [
+   "拉取失败",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_038": [
+   "测试中…",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_039": [
+   "测试连接",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_040": [
+   "订阅套餐的条款风险",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_041": [
+   "\n\n灵写不会伪装成编程工具，也不会修改 User-Agent。继续使用即表示你了解并自行承担被限流、封 Key 或停订阅的风险。",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_042": [
+   "我了解风险，切换",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_043": [
+   "删除 %1$s？",
+   1,
+   "ModelsRoute.kt"
+  ],
+  "models_044": [
+   "Key 会一起删除。已有的调用记录会保留。",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_045": [
+   "输入 ¥%1$s / 输出 ¥%2$s 每百万 token",
+   2,
+   "ModelsRoute.kt"
+  ],
+  "models_046": [
+   "点按填写单价（用于估算费用）",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_047": [
+   "移除",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_048": [
+   "%1$s 单价",
+   1,
+   "ModelsRoute.kt"
+  ],
+  "models_049": [
+   "每百万 token 的价格（元），以服务商账单为准。",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_050": [
+   "输入",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_051": [
+   "输出",
+   0,
+   "ModelsRoute.kt"
+  ],
+  "models_052": [
+   "约 ¥11.40",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_053": [
+   "输入 3.12M · 输出 0.86M tokens · 按你填的单价估算",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_054": [
+   "官方 API · Key 尾号 3f9a",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_055": [
+   "智",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_056": [
+   "智谱 GLM",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_057": [
+   "GLM Coding 套餐 · 订阅",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_058": [
+   "Anthropic 兼容",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_059": [
+   "自定义 · api.example.com",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_060": [
+   "帮助",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_061": [
+   "按用途分配",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_062": [
+   "续写、改写、对话",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_063": [
+   "摘要、一致性、伏笔",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_064": [
+   "服务商",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_065": [
+   "可用",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_066": [
+   "条款",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_067": [
+   "连接失败",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_068": [
+   "未填 Key",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_069": [
+   "已停用",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_070": [
+   "7 家预设或自定义接口",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_071": [
+   "Key 加密存在本机，只发给你选的服务商。",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_072": [
+   "本月调用量",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_073": [
+   "统计详情",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_074": [
+   "次调用",
+   0,
+   "ModelsScreen.kt"
+  ],
+  "models_075": [
+   "写作 %1$s%%",
+   1,
+   "ModelsScreen.kt"
+  ],
+  "models_076": [
+   "自动任务 %1$s%%",
+   1,
+   "ModelsScreen.kt"
+  ],
+  "notes_drawer_001": [
+   "方向",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_002": [
+   "节拍",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_003": [
+   "卡文",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_004": [
+   "改法",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_005": [
+   "本章便签",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_006": [
+   "%1$s 条未完成",
+   1,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_007": [
+   "辅助模式下 AI 给的方向、节拍、改法都会存到这里，不会写进正文。",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_008": [
+   "还没有便签。辅助模式下 AI 给的方向、节拍、改法都会存到这里，不进正文。",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "notes_drawer_009": [
+   "已完成",
+   0,
+   "NotesDrawer.kt"
+  ],
+  "outline_001": [
+   "本章章纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_002": [
+   "核心事件 · 开篇钩子 · 章尾悬念",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_003": [
+   "【本章章纲】\n%1$s\n\n%2$s",
+   2,
+   "OutlineRoute.kt"
+  ],
+  "outline_004": [
+   "这一章还没有章纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_005": [
+   "正文还是空的",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_006": [
+   "正文或章纲已修改，请重新检查",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_007": [
+   "多线视图",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_008": [
+   "黄金三章",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_009": [
+   "总纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_010": [
+   "写下整本书的主线：主角要什么、挡在面前的是什么、最后会怎样。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_011": [
+   "章纲字段与线索",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_012": [
+   "模板",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_013": [
+   "%1$s/%2$s 章",
+   2,
+   "OutlineRoute.kt"
+  ],
+  "outline_014": [
+   "上移卷",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_015": [
+   "卷纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_016": [
+   "点这里写本卷要完成的事",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_017": [
+   "目标 · %1$s",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_018": [
+   "高潮 · %1$s",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_019": [
+   "约 %1$s 章",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_020": [
+   "加一章",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_021": [
+   "规划后续",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_022": [
+   "还没有分卷。写下第一章时会自动建立第一卷。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_023": [
+   " · 卷纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_024": [
+   "选择总纲、卷纲或章纲，在这里规划故事。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_025": [
+   "AI 规划后续章纲 · %1$s",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_026": [
+   "从这一卷最后一个有章纲的章节往后接着拆。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_027": [
+   "3 章",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_028": [
+   "5 章",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_029": [
+   "滚动规划，接着已有章纲往后",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_030": [
+   "自定章数",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_031": [
+   "结果是建议，采纳前都可以改。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_032": [
+   "网文模板",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_033": [
+   "套用后会给章纲加上对应字段，并在 AI 拆章纲时附上写法要求。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_034": [
+   " · 已套用",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_035": [
+   "拆一本书做模板",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_036": [
+   "我的拆文模板",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_037": [
+   "%1$s 章结构 · 点开可套用到本书",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_038": [
+   "还没写章纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_039": [
+   "事件",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_040": [
+   "钩子",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_041": [
+   "悬念",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_042": [
+   "AI 拆解",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_043": [
+   "偏离提醒：%1$s",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_044": [
+   "上移",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_045": [
+   "下移",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_046": [
+   "[\"主线\"]",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_047": [
+   "章纲已被其他操作修改，请返回列表后重新打开。草稿仍在此页。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_048": [
+   "已保存",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_049": [
+   "%1$s · 章纲",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_050": [
+   "章纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_051": [
+   "核心事件",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_052": [
+   "开篇钩子",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_053": [
+   "章尾悬念",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_054": [
+   "备注（可选）",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_055": [
+   "本章推进的线索",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_056": [
+   "落实检查",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_057": [
+   "或直接改上面的章纲，让它和正文一致",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_058": [
+   "检查中…",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_059": [
+   "检查正文是否落实",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_060": [
+   "AI 拆章纲 · %1$s",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_061": [
+   "根据总纲和本卷卷纲，接着已有章纲往后拆。结果是建议，采纳前都可以改。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_062": [
+   "拆几章（建议 3–5 章滚动规划）",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_063": [
+   "正在拆…",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_064": [
+   "开始",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_065": [
+   "先写总纲或本卷卷纲",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_066": [
+   "模型两次都没有按格式返回，重试或换个模型",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_067": [
+   "重拆",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_068": [
+   "采纳 %1$s 章",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_069": [
+   "主线",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_070": [
+   "自定义字段（全书统一，每章填写）",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_071": [
+   "固定字段：核心事件、开篇钩子、章尾悬念",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_072": [
+   "例如：爽点、情绪、字数目标",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_073": [
+   "线索",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_074": [
+   "例如：感情线、复仇线",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_075": [
+   "线索中断超过几章时提醒",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_076": [
+   "每条线索在哪些章推进",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_077": [
+   "「%1$s」已经 %2$s 章没有推进",
+   2,
+   "OutlineRoute.kt"
+  ],
+  "outline_078": [
+   "（上次在第 %1$s 章）",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_079": [
+   "（还没开始）",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_080": [
+   "先在大纲里给章纲关联线索。",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_081": [
+   "圆点表示该章推进了这条线；中断超过 %1$s 章会标红，可在“章纲字段与线索”里调整。",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_082": [
+   "黄金三章检查",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_083": [
+   "针对第 1–3 章，每项附原文依据",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_084": [
+   "编辑检查项",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_085": [
+   "AI 正在审读前三章…",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_086": [
+   "检查前三章",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_087": [
+   "前三章还没有正文",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_088": [
+   "新增检查项",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_089": [
+   "恢复默认",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_090": [
+   "通过",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_091": [
+   "待改",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "outline_092": [
+   " · 第 %1$s 章",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "outline_093": [
+   "：%1$s",
+   1,
+   "OutlineRoute.kt"
+  ],
+  "reader_001": [
+   "模拟反馈，仅供参考",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_002": [
+   "选读者画像（最多 3 个）",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_003": [
+   "自定义画像描述",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_004": [
+   "比如：只看无敌流、跳过感情戏的男频读者",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_005": [
+   "范围（本章，或第 N–M 章，最多 5 章）",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_006": [
+   "起始章",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_007": [
+   "到本章",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_008": [
+   "费用提示：预计消耗约 %1$s tokens。",
+   1,
+   "ReaderRoute.kt"
+  ],
+  "reader_009": [
+   "费用提示：开始前会显示预计消耗的 tokens。",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_010": [
+   "试读中…",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_011": [
+   "开始试读",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_012": [
+   "正在读这一章…",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_013": [
+   "【读者 %1$s.name】%2$s",
+   2,
+   "ReaderRoute.kt"
+  ],
+  "reader_014": [
+   "模拟读者反馈，仅供参考 · 本次约 %1$s tokens",
+   1,
+   "ReaderRoute.kt"
+  ],
+  "reader_015": [
+   "再测一次",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_016": [
+   "未知错误",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_017": [
+   "这个画像没拿到结果：%1$s",
+   1,
+   "ReaderRoute.kt"
+  ],
+  "reader_018": [
+   "重试中…",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_019": [
+   "弃书风险点",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_020": [
+   "去原文看",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_021": [
+   "爽点 / 期待点",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_022": [
+   "最想看到的下一章",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_023": [
+   "改进建议",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_024": [
+   "模拟读者反馈，仅供参考 · 不评判 AI 率",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_025": [
+   "读者反馈记录",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "reader_026": [
+   "第 %1$s–%2$s 章",
+   2,
+   "ReaderRoute.kt"
+  ],
+  "reader_027": [
+   "模拟读者反馈，仅供参考",
+   0,
+   "ReaderRoute.kt"
+  ],
+  "serial_board_card_001": [
+   "连载看板",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_002": [
+   "已发布到第 %1$s 章",
+   1,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_003": [
+   "今日字数",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_004": [
+   "存稿",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_005": [
+   "连续更新",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_006": [
+   "章纲余量",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_007": [
+   "标记",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_008": [
+   "拟预案中…",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_009": [
+   "短更预案",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_010": [
+   "短更预案没拿到：%1$s",
+   1,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_011": [
+   "标记已发布到第 N 章",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_012": [
+   "存稿 = 这之后已完成且有正文、尚未发布的章节数。",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_013": [
+   "已发布到第 N 章",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_014": [
+   "拆章方案",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_015": [
+   "A（%1$s）钩子：%2$s；悬念：%3$s",
+   3,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_016": [
+   "B（%1$s）钩子：%2$s；悬念：%3$s",
+   3,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_017": [
+   "过渡章思路",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_018": [
+   "· %1$s（%2$s）",
+   2,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_019": [
+   "采纳后会把方案写进章纲备注，由你决定要不要拆章。",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_020": [
+   "写进下一章章纲备注",
+   0,
+   "SerialBoardCard.kt"
+  ],
+  "serial_board_card_021": [
+   "【短更拆章】A：%1$s / B：%2$s",
+   2,
+   "SerialBoardCard.kt"
+  ],
+  "settings_001": [
+   "写作模式",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_002": [
+   "辅助：AI 只给建议；生成：AI 可起草正文",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_003": [
+   "生成模式",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_004": [
+   "辅助模式",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_005": [
+   "续写长度",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_006": [
+   "一句",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_007": [
+   "多段",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_008": [
+   "一段",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_009": [
+   "候选数量",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_010": [
+   "生成模式一次给几个候选（1–3，越多越费 tokens）",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_011": [
+   "%1$s 个",
+   1,
+   "SettingsRoute.kt"
+  ],
+  "settings_012": [
+   "卡住时轻提示",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_013": [
+   "光标停留 3 分钟没有新内容时，提示一次卡文急救",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_014": [
+   "模型设置",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_015": [
+   "服务商、Key、写作与自动任务模型",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_016": [
+   "外观",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_017": [
+   "主题",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_018": [
+   "浅色",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_019": [
+   "深色",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_020": [
+   "跟随系统",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_021": [
+   "减弱动画",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_022": [
+   "转场和列表只做淡入淡出，按压不缩放",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_023": [
+   "开",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_024": [
+   "关",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_025": [
+   "灵写 · 数据只存在这台手机上",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_026": [
+   "你来写，AI 查设定、提建议、改句子；建议默认不进正文",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_027": [
+   "你定章纲，AI 起草整章或续写，你来改",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_028": [
+   "一段（默认）",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_029": [
+   "多段（约 500 字）",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_030": [
+   "1 个（最省）",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_031": [
+   "2 个",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_032": [
+   "3 个（默认）",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "settings_033": [
+   "多候选会按次数消耗 tokens；采纳前可以左右切换和微调。",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "sheets_001": [
+   "确定",
+   0,
+   "Sheets.kt"
+  ],
+  "sheets_002": [
+   "取消",
+   0,
+   "Sheets.kt"
+  ],
+  "shelf_001": [
+   "仙侠",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_002": [
+   "玄幻",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_003": [
+   "都市",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_004": [
+   "言情",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_005": [
+   "悬疑",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_006": [
+   "科幻",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_007": [
+   "历史",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_008": [
+   "游戏",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_009": [
+   "重命名",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_010": [
+   "标记为已完结",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_011": [
+   "删除作品",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_012": [
+   "章节、设定和历史版本会一并删除",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_013": [
+   "删除《%1$s》？",
+   1,
+   "ShelfRoute.kt"
+  ],
+  "shelf_014": [
+   "删除后无法恢复。建议先在设置里做一次备份。",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_015": [
+   "新建作品",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_016": [
+   "用创作向导开书",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_017": [
+   "8 步搭好灵感、人物、世界观、大纲和前三章章纲，每步都能让 AI 帮忙",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_018": [
+   "或者直接建一本空白书",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_019": [
+   "书名（之后可改）",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_020": [
+   "创建",
+   0,
+   "ShelfRoute.kt"
+  ],
+  "shelf_021": [
+   "全部作品",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_022": [
+   "最近编辑",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_023": [
+   "开始你的第一部作品",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_024": [
+   "%1$s 部作品 · 今天写了 %2$s 字",
+   2,
+   "ShelfScreen.kt"
+  ],
+  "shelf_025": [
+   "搜索",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_026": [
+   "继续写作",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_027": [
+   "章",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_028": [
+   "继续写",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_029": [
+   "连载中",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_030": [
+   "大纲中",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_031": [
+   "草稿",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_032": [
+   "已完结",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_033": [
+   "向导 %1$s/7",
+   1,
+   "ShelfScreen.kt"
+  ],
+  "shelf_034": [
+   "伏笔超期 %1$s",
+   1,
+   "ShelfScreen.kt"
+  ],
+  "shelf_035": [
+   "尚未开写 · %1$s",
+   1,
+   "ShelfScreen.kt"
+  ],
+  "shelf_036": [
+   "书架还是空的",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_037": [
+   "从一个灵感开始，向导会一步步陪你搭好设定、大纲和前三章。",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "shelf_038": [
+   "先看看示例作品",
+   0,
+   "ShelfScreen.kt"
+  ],
+  "stats_001": [
+   " 估",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_002": [
+   "模型调用量",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_003": [
+   "上一个",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_004": [
+   "下一个",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_005": [
+   "还没有调用记录",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_006": [
+   "调用",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_007": [
+   "输入 tokens",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_008": [
+   "输出 tokens",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_009": [
+   "估算费用",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_010": [
+   "按你填的单价估算，以服务商账单为准",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_011": [
+   " 等",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_012": [
+   "未设单价：%1$s%2$s · 去填写",
+   2,
+   "StatsRoute.kt"
+  ],
+  "stats_013": [
+   "按小时",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_014": [
+   "按天",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_015": [
+   "次数",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_016": [
+   "按模型",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_017": [
+   "按任务类型",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_018": [
+   "%1$s · 输入 %2$s · 输出 %3$s",
+   3,
+   "StatsRoute.kt"
+  ],
+  "stats_019": [
+   "%1$s 次",
+   1,
+   "StatsRoute.kt"
+  ],
+  "stats_020": [
+   "未设单价",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_021": [
+   "数据仅存本机，不上传",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_022": [
+   "连续 %1$s 天",
+   1,
+   "StatsRoute.kt"
+  ],
+  "stats_023": [
+   "近 30 天共 %1$s 字",
+   1,
+   "StatsRoute.kt"
+  ],
+  "stats_024": [
+   "章节字数",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_025": [
+   "平均每章 %1$s 字",
+   1,
+   "StatsRoute.kt"
+  ],
+  "stats_026": [
+   "本书 AI 调用",
+   0,
+   "StatsRoute.kt"
+  ],
+  "stats_027": [
+   "%1$s 次 · %2$s 采纳",
+   2,
+   "StatsRoute.kt"
+  ],
+  "stats_028": [
+   " · 候选采纳率 %1$s%%",
+   1,
+   "StatsRoute.kt"
+  ],
+  "stuck_001": [
+   "卡文急救 · 第 %1$s 步 / 3",
+   1,
+   "StuckRoute.kt"
+  ],
+  "stuck_002": [
+   "跳过",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_003": [
+   "不知道怎么过渡",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_004": [
+   "上一场和下一场接不上",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_005": [
+   "大纲走不通了",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_006": [
+   "章纲写不下去或和正文冲突",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_007": [
+   "没状态",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_008": [
+   "就是不想写，或写不动",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_009": [
+   "人物不知道该怎么反应",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_010": [
+   "人物卡住了",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_011": [
+   "自己写一句",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_012": [
+   "没状态的时候不用硬写。",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_013": [
+   "短更预案：拆一章当两章发",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_014": [
+   "跳写下一个更想写的场景",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_015": [
+   "回看上一章摘要找回感觉",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_016": [
+   "没状态建议：短更预案 / 跳写 / 回看摘要",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_017": [
+   "（未回答）",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_018": [
+   "正在想方向…",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_019": [
+   "【卡文改】%1$s",
+   1,
+   "StuckRoute.kt"
+  ],
+  "stuck_020": [
+   "改进章纲",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_021": [
+   "确认后追加到本章章纲备注（可以撤销）。",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_022": [
+   "已写进本章章纲备注",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_023": [
+   "AI 想先问清楚（可以跳过）",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_024": [
+   "补充一句（可空）",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_025": [
+   "比如：这两场之间隔了三天",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_026": [
+   "生成问题",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_027": [
+   "跳过，直接给方向",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_028": [
+   "正在想问题…",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_029": [
+   "给 3 个方向",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_030": [
+   "利",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_031": [
+   "弊",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_032": [
+   "按这个方向起草一段",
+   0,
+   "StuckRoute.kt"
+  ],
+  "stuck_033": [
+   "只给方向，不写正文 · 左右滑动看另外 %1$s 个",
+   1,
+   "StuckRoute.kt"
+  ],
+  "style_001": [
+   "【文风要求】\n",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_002": [
+   "【本书文风卡】\n",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_003": [
+   "【不要使用这些词和句式】",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_004": [
+   "自然文风",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_005": [
+   "文风提示词、禁用词表、AI 味检查",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_006": [
+   "标出模板化句子和禁用词，只提示不改写",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_007": [
+   "本书文风卡",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_008": [
+   "样章学习、编辑文风",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_009": [
+   "你是文风分析师。",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_010": [
+   "让 AI 的文字更接近你本人",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_011": [
+   "目标是提升文字质量、贴近你的文风，不是规避平台的 AI 检测。AI 段落照常标记，AI 使用记录照常保留，是否对外披露由你决定。",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_012": [
+   "后台文风提示词",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_013": [
+   "附在所有生成和改写任务后",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_014": [
+   "启用",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_015": [
+   "AI 腔禁用词表",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_016": [
+   "%1$s 个 · 生成时避开，检查时标出",
+   1,
+   "StyleRoute.kt"
+  ],
+  "style_017": [
+   "添加词或短语",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_018": [
+   "恢复初版词表",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_019": [
+   "从你自己的样章学习：用词、句长、对白比例、句式、视角和语气",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_020": [
+   "还没有文风卡。上传 3–5 章样章，或用本书已写的章节学习。",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_021": [
+   "学习中…",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_022": [
+   "用本书前 5 章",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_023": [
+   "上传样章",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_024": [
+   "样章只存在本机；学习时会发给你的写作模型一次。",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_025": [
+   "没有发现明显的模板化句子。",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_026": [
+   "标出 %1$s 处。只提示、不改写；手写段落同样会被检查。",
+   1,
+   "StyleRoute.kt"
+  ],
+  "style_027": [
+   "改写建议：%1$s",
+   1,
+   "StyleRoute.kt"
+  ],
+  "style_028": [
+   "让 AI 给个改法",
+   0,
+   "StyleRoute.kt"
+  ],
+  "style_029": [
+   "这句被标为“%1$s”。给一个更自然、具体的改法，只输出改后的句子：\n「%2$s」",
+   2,
+   "StyleRoute.kt"
+  ],
+  "style_030": [
+   "失败：%1$s",
+   1,
+   "StyleRoute.kt"
+  ],
+  "tablet_workspace_001": [
+   "作品目录",
+   0,
+   "TabletWorkspace.kt"
+  ],
+  "tablet_workspace_002": [
+   "章节管理",
+   0,
+   "TabletWorkspace.kt"
+  ],
+  "tablet_workspace_003": [
+   "操作未完成，请查看目录后重试：%1$s",
+   1,
+   "TabletWorkspace.kt"
+  ],
+  "tablet_workspace_004": [
+   "选择一张设定卡，在这里查看和编辑。",
+   0,
+   "TabletWorkspace.kt"
+  ],
+  "tablet_workspace_005": [
+   "选择伏笔，编辑回收计划和关联设定。",
+   0,
+   "TabletWorkspace.kt"
+  ],
+  "update_001": [
+   "应用更新",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_002": [
+   "当前 v%1$s",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_003": [
+   "自动",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_004": [
+   "镜像",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_005": [
+   "已是最新版本 v%1$s",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_006": [
+   "%1$s（经 %2$s）",
+   2,
+   "UpdateRoute.kt"
+  ],
+  "update_007": [
+   "检查更新失败：网络不可用或更新源无响应",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_008": [
+   "正在检查…",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_009": [
+   "启动时自动检查",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_010": [
+   "每天最多一次",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_011": [
+   "更新源",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_012": [
+   "GitHub 不通时自动改走镜像",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_013": [
+   "安装包下载后会先校验 SHA-256 和签名证书，与当前版本不一致时不会安装。",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_014": [
+   "\n已跳过 v%1$s。",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_015": [
+   "自动（GitHub 优先，失败回退镜像）",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_016": [
+   "仅 GitHub",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_017": [
+   "镜像 · %1$s",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_018": [
+   "自定义镜像",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_019": [
+   "填写一个 GitHub 加速前缀",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_020": [
+   "前缀地址",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_021": [
+   "请求会变成「前缀 + GitHub 原地址」。签名与 SHA-256 校验照常进行。",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_022": [
+   "网络错误",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_023": [
+   "下载失败：%1$s",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_024": [
+   "允许灵写安装更新",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_025": [
+   "系统要求为「安装未知应用」单独授权，灵写只用它安装自己的更新包。授权后回到这里再点一次「下载并安装」。",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_026": [
+   "去授权",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_027": [
+   "新版本 v%1$s",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_028": [
+   "%1$s · %2$s · 当前 v%3$s",
+   3,
+   "UpdateRoute.kt"
+  ],
+  "update_029": [
+   "这个版本没有写更新说明。",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_030": [
+   "正在下载 %1$s%%",
+   1,
+   "UpdateRoute.kt"
+  ],
+  "update_031": [
+   "取消下载",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_032": [
+   "下载并安装",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "update_033": [
+   "跳过此版本",
+   0,
+   "UpdateRoute.kt"
+  ],
+  "wizard_001": [
+   "一句话写下你想写的故事，AI 扩展成 3 个方向不同的梗概，选一个或自己组合。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_002": [
+   "例：一个只能看见别人寿命的捕快，发现师父的寿命停在了三年前。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_003": [
+   "类型与文风",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_004": [
+   "选题材、网文模板和目标读者；可以上传自己写的样章，生成一份文风卡。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_005": [
+   "样章建议 3–5 章，只存在本机。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_006": [
+   "主角和核心人物",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_007": [
+   "AI 按梗概生成人物卡，勾选要保留的，存入设定库。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_008": [
+   "姓名、身份、性格、动机、金手指",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_009": [
+   "世界观",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_010": [
+   "力量体系、势力、地点，各自生成设定卡存入设定库。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_011": [
+   "例：境界划分、宗门、王朝、关键城市",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_012": [
+   "总纲和第一卷",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_013": [
+   "生成全书总纲和第一卷卷纲，写入三级大纲。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_014": [
+   "总纲写清主线、阶段目标与结局走向",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_015": [
+   "书名和简介",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_016": [
+   "AI 给 5 个书名和 3 版简介，选一个再改；之后随时能改。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_017": [
+   "简介开头一句要抓人",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_018": [
+   "前三章章纲",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_019": [
+   "按核心事件 / 开篇钩子 / 章尾悬念生成前三章章纲，并对照黄金三章检查表。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_020": [
+   "第一章 500 字内出现钩子",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_021": [
+   "第一章",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_022": [
+   "按第一章章纲生成场景节拍；辅助模式给开篇示意（只进便签），生成模式在编辑器起草。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_023": [
+   "第一条 300 字内抛出钩子",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_024": [
+   "身份",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_025": [
+   "性格",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_026": [
+   "当前目标",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_027": [
+   "金手指",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_028": [
+   "规则",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_029": [
+   "要点",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_030": [
+   "未命名作品",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_031": [
+   "模型没有按格式返回，重试或换个模型",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_032": [
+   "第 %1$s 步 / 共 8 步",
+   1,
+   "WizardRoute.kt"
+  ],
+  "wizard_033": [
+   "稍后继续",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_034": [
+   "采纳并去写第一章",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_035": [
+   "第一章 · %1$s模式",
+   1,
+   "WizardRoute.kt"
+  ],
+  "wizard_036": [
+   "生成节拍清单和开篇示意：只进本章便签，正文由你写。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_037": [
+   "先生成节拍，进编辑器后按节拍起草整章（草稿区分段采纳）。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_038": [
+   "换一批节拍",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_039": [
+   "下一步：点「采纳并去写第一章」进编辑器。辅助模式正文由你写；生成模式点「起草本章」按节拍起草。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_040": [
+   "AI 正在想…",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_041": [
+   "一句话灵感",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_042": [
+   "扩展成 3 个梗概",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_043": [
+   "最终梗概（可以组合、改写）",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_044": [
+   "题材",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_045": [
+   "目标读者",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_046": [
+   "男频",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_047": [
+   "女频",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_048": [
+   "通用",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_049": [
+   "文风卡（可选）",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_050": [
+   "正在学习样章…",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_051": [
+   "上传样章（txt，可多选）",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_052": [
+   "文风卡（可编辑，会附在写作提示词里）",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_053": [
+   "从样章学结构（拆文）",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_054": [
+   "生成人物卡",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_055": [
+   "动机",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_056": [
+   "生成世界观设定",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_057": [
+   "生成总纲和第一卷卷纲",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_058": [
+   "第一卷卷名（可空）",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_059": [
+   "比如：山门初入，不用写“第一卷”",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_060": [
+   "第一卷卷纲",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_061": [
+   "生成书名和简介",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_062": [
+   "书名",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_063": [
+   "简介",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_064": [
+   "第 %1$s 版",
+   1,
+   "WizardRoute.kt"
+  ],
+  "wizard_065": [
+   "最终简介",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_066": [
+   "生成前三章章纲",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_067": [
+   "章名",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_068": [
+   "黄金三章提示",
+   0,
+   "WizardRoute.kt"
+  ],
+  "wizard_069": [
+   "写完前三章后，可在 大纲 › 黄金三章 让 AI 对照正文逐项检查。",
+   0,
+   "WizardRoute.kt"
+  ],
+  "work_001": [
+   "大纲",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_002": [
+   "%1$s 即将开放",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_003": [
+   "标记为已完成",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_004": [
+   "删除本章",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_005": [
+   "删除本章？",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_006": [
+   "章节将移入回收站，正文、章纲和历史版本保留，可从作品菜单恢复。",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_007": [
+   "移入回收站",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_008": [
+   "已删除章节",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_009": [
+   "回收站为空。",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_010": [
+   "%1$s 字 · 恢复后保留历史版本",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_011": [
+   "重命名分卷",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_012": [
+   "删除分卷",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_013": [
+   "（%1$s 章移到相邻卷）",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_014": [
+   "删除后其余分卷自动重排序号，章号全书连续重排。",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_015": [
+   "「新名」",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_016": [
+   "显示为 %1$s（编号自动）",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_017": [
+   "卷名（不用写「第 N 卷」）",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_018": [
+   "至少要保留一个分卷，不能删除。",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_019": [
+   "卷里的 %1$s 章会移到相邻卷，其余分卷和章号自动重排。此操作不可撤销。",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_020": [
+   "章名（不用写“第 N 章”）",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_021": [
+   "AI 标题建议（点一个填入）",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_022": [
+   "已删除章节（%1$s）",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_023": [
+   "恢复正文、章纲和历史版本",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_024": [
+   "作品信息",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_025": [
+   "书名、类型、简介、日更目标",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_026": [
+   "用现有书名做封面",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_027": [
+   "新建分卷",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_028": [
+   "卡文了",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_029": [
+   "打开卡文急救：选卡点、澄清问题、给 3 个方向",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_030": [
+   "导出 TXT / Markdown",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_031": [
+   "将创建为 %1$s，新章节会写进最后一卷。",
+   1,
+   "WorkRoute.kt"
+  ],
+  "work_032": [
+   "卷名（可空）",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_033": [
+   "比如：山门初入",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_034": [
+   "正在起书名…",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_035": [
+   "生成 5 个书名",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_036": [
+   "类型",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_037": [
+   "点 ✨ 让 AI 给 3 版候选",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_038": [
+   "日更目标（字）",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_039": [
+   "生成上架文案",
+   0,
+   "WorkRoute.kt"
+  ],
+  "work_040": [
+   "总字数",
+   0,
+   "WorkScreen.kt"
+  ],
+  "work_041": [
+   "章节",
+   0,
+   "WorkScreen.kt"
+  ],
+  "work_042": [
+   "伏笔超期",
+   0,
+   "WorkScreen.kt"
+  ],
+  "work_043": [
+   "%1$s 个标题建议",
+   1,
+   "WorkScreen.kt"
+  ],
+  "work_044": [
+   "一致性",
+   0,
+   "WorkScreen.kt"
+  ],
+  "i18n_002": [
+   "界面语言",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "i18n_004": [
+   "AI 输出语言",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "i18n_005": [
+   "默认跟随作品语言",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "i18n_006": [
+   "跟随作品语言",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "i18n_007": [
+   "提示词始终是中文，这里只决定 AI 用什么语言回答。“跟随作品语言”会按书名、简介和最近几章的文字判断。",
+   0,
+   "SettingsRoute.kt"
+  ],
+  "work_045": [
+   "伏笔",
+   0,
+   "WorkScreen.kt"
+  ],
+  "dl_093": [
+   "正文每个字出自你手；AI 给方向、提问题、指出问题，并帮你改你选中的句子",
+   0,
+   "data"
+  ],
+  "dl_094": [
+   "你定章纲，AI 起草段落或整章，你来挑、改、定稿",
+   0,
+   "data"
+  ],
+  "dl_095": [
+   "还没有可用的模型。去 设置 › 模型设置 添加服务商和 Key。",
+   0,
+   "data"
+  ],
+  "dl_096": [
+   "模型没有返回内容，请重试；原稿未改动",
+   0,
+   "data"
+  ]
+ },
+ "skipped": [
+  "(?m)^\\s*第[一二三四五六七八九十百千0-9]+[章节卷][^\\n]{0,30}$",
+  "AI 腔",
+  "^\\s*[0-9]+[.、)]\\s*",
+  "【[^】]{1,24}】",
+  "【本章章纲】",
+  "主角",
+  "你是网文起名顾问。名字要符合题材和本书已有的命名风格，好记、不撞常见网文主角名。严格只输出 JSON。",
+  "你是资深网文策划，熟悉起点、番茄、晋江等平台的上架包装。严格只输出 JSON。",
+  "卡文",
+  "卡文急救",
+  "对话",
+  "已保存",
+  "所属",
+  "扩写",
+  "批注",
+  "描写",
+  "改写",
+  "校对",
+  "校对本章",
+  "没状态",
+  "润色",
+  "给方向",
+  "续写",
+  "缩写",
+  "起草",
+  "随手问",
+  "＋批注"
+ ]
+}

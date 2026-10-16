@@ -46,6 +46,8 @@ data class AppPrefs(
     val theme: String = "system",
     /** 减弱动画：system（跟随系统）/ on / off（MO3） */
     val reduceMotion: String = "system",
+    /** AI 输出语言：auto（跟随作品语言）/ zh-CN / zh-TW / en / ja。提示词本身始终是中文。 */
+    val aiOutputLang: String = "auto",
     /** 编辑器模式提示条是否已显示（modes.md §3.5） */
     val modeTipShown: Boolean = false,
     /** 本章便签首次提示 */

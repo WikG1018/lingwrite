@@ -20,7 +20,7 @@ import java.io.File
 /** 截图测试的公共基座：412×915dp @2x，与 ui-hifi 高保真稿同尺寸，浅色 + 深色各一张。 */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w412dp-h915dp-xhdpi", application = android.app.Application::class)
+@Config(sdk = [34], qualifiers = "zh-rCN-w412dp-h915dp-xhdpi", application = android.app.Application::class)
 abstract class ShotBase {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private val dir = File(System.getProperty("lingwrite.shotDir") ?: "build/shots").apply { mkdirs() }

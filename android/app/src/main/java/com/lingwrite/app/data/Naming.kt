@@ -34,6 +34,14 @@ object CnNum {
     }
 }
 
+/** 界面语言的粗分类：zh（简繁同规则）/ en / ja。取不到 Context（JVM 单测）时按 zh。 */
+internal object UiLang {
+    fun code(): String {
+        val l = runCatching { com.lingwrite.app.i18n.AppLocale.uiLocale() }.getOrNull() ?: return "zh"
+        return when (l.language) { "en" -> "en"; "ja" -> "ja"; "zh" -> if (l.country == "TW" || l.country == "HK" || l.script == "Hant") "zh-TW" else "zh"; else -> "en" }
+    }
+}
+
 object VolumeLabel {
     /** 完整卷头：有卷名时「第一卷 · 山门初入」，没有时「第一卷」。[index] 从 1 起。 */
     fun full(index: Int, title: String): String {
@@ -41,8 +49,12 @@ object VolumeLabel {
         return if (title.isBlank()) label else "$label · $title"
     }
 
-    fun short(index: Int): String =
-        if (index in 1..999) "第${CnNum.of(index)}卷" else "第${index}卷"
+    /** 中文「第二卷」，英文「Volume 2」，日文「第2巻」。 */
+    fun short(index: Int): String = when (UiLang.code()) {
+        "en" -> "Volume $index"
+        "ja" -> "第${index}巻"
+        else -> if (index in 1..999) "第${CnNum.of(index)}卷" else "第${index}卷"
+    }
 }
 
 object ChapterLabel {
@@ -51,12 +63,19 @@ object ChapterLabel {
         if (title.isBlank()) short(n) else "${short(n)} $title"
 
     /** 章内引用（伏笔、问题卡、设定状态等）：「第 118 章」。 */
-    fun short(n: Int): String = "第 $n 章"
+    fun short(n: Int): String = when (UiLang.code()) {
+        "en" -> "Chapter $n"
+        "ja" -> "第${n}章"
+        else -> "第 $n 章"
+    }
+
+    /** 窄列（目录里的章号列）：英文用「Ch. 118」，其余同 [short]。 */
+    fun compact(n: Int): String = if (UiLang.code() == "en") "Ch. $n" else short(n)
 
     fun export(n: Int, title: String, style: ExportNumStyle): String {
         val label = when (style) {
             ExportNumStyle.Chinese -> "第${CnNum.of(n)}章"
-            ExportNumStyle.Spaced -> short(n)
+            ExportNumStyle.Spaced -> "第 $n 章"
             ExportNumStyle.Arabic -> "第${n}章"
         }
         return if (title.isBlank()) label else "$label $title"

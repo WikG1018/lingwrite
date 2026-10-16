@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -53,7 +57,7 @@ object UpdateModule {
         ExtraDestinations.list.add { nav: NavHostController -> composable(Route) { UpdateRoute(nav) } }
         SettingsRegistry.extra += { _, nav ->
             val a by Updater.available.collectAsState()
-            "应用" to SettingRow(LingIcons.Download, "应用更新", if (a != null) "有新版本 v${a!!.version}" else "当前 v$currentVersion", tone = if (a != null) Tone.Error else Tone.Primary, onClick = { nav.navigate(Route) })
+            tr(R.string.about_001) to SettingRow(LingIcons.Download, tr(R.string.update_001), if (a != null) tr(R.string.about_026, a!!.version) else tr(R.string.update_002, currentVersion), tone = if (a != null) Tone.Error else Tone.Primary, onClick = { nav.navigate(Route) })
         }
         AppOverlays.list += { _ ->
             var found by remember { mutableStateOf<Release?>(null) }
@@ -63,12 +67,12 @@ object UpdateModule {
     }
 }
 
-private fun mirrorName(m: String) = when (m) { "auto" -> "自动"; "github" -> "GitHub"; "custom" -> "自定义"; else -> Updater.mirrors.firstOrNull { it.id == m }?.name ?: "镜像" }
+private fun mirrorName(m: String) = when (m) { "auto" -> tr(R.string.update_003); "github" -> "GitHub"; "custom" -> tr(R.string.models_020); else -> Updater.mirrors.firstOrNull { it.id == m }?.name ?: tr(R.string.update_004) }
 
 @Composable
 fun UpdateRoute(nav: NavHostController) {
     val p by remember { AppGraph.prefs.flow }.collectAsState(AppGraph.prefs.snapshot)
-    val prefs = p ?: run { SettingsListScreen("应用更新", emptyList(), onBack = { nav.popBackStack() }, footer = "正在加载…"); return }
+    val prefs = p ?: run { SettingsListScreen(tr(R.string.update_001), emptyList(), onBack = { nav.popBackStack() }, footer = tr(R.string.about_041)); return }
     val scope = rememberCoroutineScope()
     val snack = remember { SnackbarHostState() }
     var checking by remember { mutableStateOf(false) }
@@ -84,42 +88,42 @@ fun UpdateRoute(nav: NavHostController) {
                 .onSuccess { (r, src) ->
                     AppGraph.prefs.update { it.copy(lastUpdateCheck = System.currentTimeMillis()) }
                     if (r != null && Updater.newer(r.version, currentVersion)) { Updater.available.value = r; found = r }
-                    else { Updater.available.value = null; status = "已是最新版本 v$currentVersion" }
-                    if (src != "GitHub") status = status?.let { "$it（经 $src）" }
+                    else { Updater.available.value = null; status = tr(R.string.update_005, currentVersion) }
+                    if (src != "GitHub") status = status?.let { tr(R.string.update_006, it, src) }
                 }
                 .onFailure {
-                    if (snack.showSnackbar("检查更新失败：网络不可用或更新源无响应", "重试", duration = SnackbarDuration.Long) == SnackbarResult.ActionPerformed) { checking = false; check() }
+                    if (snack.showSnackbar(tr(R.string.update_007), tr(R.string.ai_components_014), duration = SnackbarDuration.Long) == SnackbarResult.ActionPerformed) { checking = false; check() }
                 }
             checking = false
         }
     }
     val a by Updater.available.collectAsState()
     Box(Modifier.fillMaxSize()) {
-        SettingsListScreen("应用更新", listOf(
+        SettingsListScreen(tr(R.string.update_001), listOf(
             SettingSection("", listOf(
-                SettingRow(LingIcons.Download, if (checking) "正在检查…" else "检查更新", status ?: (a?.let { "有新版本 v${it.version}" } ?: "当前 v$currentVersion"),
+                SettingRow(LingIcons.Download, if (checking) tr(R.string.update_008) else tr(R.string.about_025), status ?: (a?.let { tr(R.string.about_026, it.version) } ?: tr(R.string.update_002, currentVersion)),
                     tone = if (a != null) Tone.Error else Tone.Primary, onClick = { a?.let { found = it } ?: check() }),
             )),
-            SettingSection("设置", listOf(
-                SettingRow(LingIcons.Schedule, "启动时自动检查", "每天最多一次", switch = prefs.autoUpdateCheck, tone = Tone.Neutral,
+            SettingSection(tr(R.string.dock_003), listOf(
+                SettingRow(LingIcons.Schedule, tr(R.string.update_009), tr(R.string.update_010), switch = prefs.autoUpdateCheck, tone = Tone.Neutral,
                     onSwitch = { v -> scope.launch { AppGraph.prefs.update { it.copy(autoUpdateCheck = v) } } }),
-                SettingRow(LingIcons.Graph, "更新源", "GitHub 不通时自动改走镜像", mirrorName(prefs.mirror), tone = Tone.Neutral, onClick = { srcSheet = true }),
+                SettingRow(LingIcons.Graph, tr(R.string.update_011), tr(R.string.update_012), mirrorName(prefs.mirror), tone = Tone.Neutral, onClick = { srcSheet = true }),
             )),
-        ), onBack = { nav.popBackStack() }, footer = "安装包下载后会先校验 SHA-256 和签名证书，与当前版本不一致时不会安装。" + if (prefs.skippedVersion.isNotEmpty()) "\n已跳过 v${prefs.skippedVersion}。" else "")
+        ), onBack = { nav.popBackStack() }, footer = tr(R.string.update_013) + if (prefs.skippedVersion.isNotEmpty()) tr(R.string.update_014, prefs.skippedVersion) else "")
         SnackbarHost(snack, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(16.dp))
     }
-    if (srcSheet) LingSheet({ srcSheet = false }, "更新源") {
-        (listOf("auto" to "自动（GitHub 优先，失败回退镜像）", "github" to "仅 GitHub") + Updater.mirrors.map { it.id to "镜像 · ${it.name}" }).forEach { (k, v) ->
+    if (srcSheet) LingSheet({ srcSheet = false }, tr(R.string.update_011)) {
+        (listOf("auto" to tr(R.string.update_015), "github" to tr(R.string.update_016)) + Updater.mirrors.map { it.id to tr(R.string.update_017, it.name) }).forEach { (k, v) ->
             SheetAction(if (prefs.mirror == k) LingIcons.Check else LingIcons.Graph, v) { scope.launch { AppGraph.prefs.update { it.copy(mirror = k) } }; srcSheet = false }
         }
-        SheetAction(if (prefs.mirror == "custom") LingIcons.Check else LingIcons.EditOutline, "自定义镜像", sub = prefs.customMirror.ifBlank { "填写一个 GitHub 加速前缀" }) { srcSheet = false; customSheet = true }
+        SheetAction(if (prefs.mirror == "custom") LingIcons.Check else LingIcons.EditOutline, tr(R.string.update_018), sub = prefs.customMirror.ifBlank { tr(R.string.update_019) }) { srcSheet = false; customSheet = true }
     }
-    if (customSheet) LingSheet({ customSheet = false }, "自定义镜像") {
+    if (customSheet) LingSheet({ customSheet = false }, tr(R.string.update_018)) {
         var v by remember { mutableStateOf(prefs.customMirror) }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            LingTextField(v, { v = it }, Modifier.fillMaxWidth(), label = "前缀地址", placeholder = "https://example.com/")
-            Text("请求会变成「前缀 + GitHub 原地址」。签名与 SHA-256 校验照常进行。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
-            LingButton("保存", enabled = v.startsWith("https://"), modifier = Modifier.fillMaxWidth()) {
+            LingTextField(v, { v = it }, Modifier.fillMaxWidth(), label = tr(R.string.update_020), placeholder = "https://example.com/")
+            Text(tr(R.string.update_021), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
+            LingButton(tr(R.string.check_046), enabled = v.startsWith("https://"), modifier = Modifier.fillMaxWidth()) {
                 scope.launch { AppGraph.prefs.update { it.copy(mirror = "custom", customMirror = v.trim()) } }; customSheet = false
             }
             Spacer(Modifier.height(12.dp))
@@ -180,7 +184,7 @@ fun UpdateSheet(r: Release, onDismiss: () -> Unit) {
                                 is Updater.Verdict.Blocked -> error = v.reason
                             }
                         }
-                        .onFailure { if (it !is kotlinx.coroutines.CancellationException) error = "下载失败：${it.message ?: "网络错误"}" }
+                        .onFailure { if (it !is kotlinx.coroutines.CancellationException) error = tr(R.string.update_023, it.message ?: tr(R.string.update_022)) }
                     progress = null; job = null
                 }
             },
@@ -189,8 +193,8 @@ fun UpdateSheet(r: Release, onDismiss: () -> Unit) {
             onSkip = { AppGraph.scope.launch { AppGraph.prefs.update { it.copy(skippedVersion = r.version) } }; onDismiss() })
     }
     askPerm?.let { f ->
-        LingConfirm("允许灵写安装更新", "系统要求为「安装未知应用」单独授权，灵写只用它安装自己的更新包。授权后回到这里再点一次「下载并安装」。",
-            confirm = "去授权", onDismiss = { askPerm = null }, onConfirm = {
+        LingConfirm(tr(R.string.update_024), tr(R.string.update_025),
+            confirm = tr(R.string.update_026), onDismiss = { askPerm = null }, onConfirm = {
                 askPerm = null
                 ctx.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${ctx.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             })
@@ -205,12 +209,12 @@ fun UpdateContent(r: Release, progress: Float?, error: String?, onDownload: () -
             Tile(LingIcons.Download, c.primaryContainer, c.onPrimaryContainer, 44.dp)
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text("新版本 v${r.version}", style = Ling.type.title, color = c.onSurface)
-                Text("${r.date} · ${Updater.sizeText(r.size)} · 当前 v$currentVersion", style = Ling.type.caption, color = c.onSurfaceVariant)
+                Text(tr(R.string.update_027, r.version), style = Ling.type.title, color = c.onSurface)
+                Text(tr(R.string.update_028, r.date, Updater.sizeText(r.size), currentVersion), style = Ling.type.caption, color = c.onSurfaceVariant)
             }
         }
         LingCard(Modifier.fillMaxWidth().heightIn(max = 300.dp), color = c.surfaceContainer) {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(14.dp)) { MdText(r.body.ifBlank { "这个版本没有写更新说明。" }) }
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(14.dp)) { MdText(r.body.ifBlank { tr(R.string.update_029) }) }
         }
         if (error != null) Row(Modifier.fillMaxWidth().clip(Radius.sm).background(c.errorContainer).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(LingIcons.Lock, null, tint = c.error, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(10.dp))
@@ -219,14 +223,14 @@ fun UpdateContent(r: Release, progress: Float?, error: String?, onDownload: () -
         if (progress != null) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 LinearProgressIndicator({ progress }, Modifier.fillMaxWidth().height(6.dp).clip(Radius.pill), color = c.primary, trackColor = c.surfaceContainerHigh, drawStopIndicator = {}, gapSize = 0.dp)
-                Text("正在下载 ${(progress * 100).toInt()}%", style = Ling.type.caption, color = c.onSurfaceVariant)
+                Text(tr(R.string.update_030, (progress * 100).toInt()), style = Ling.type.caption, color = c.onSurfaceVariant)
             }
-            LingButton("取消下载", BtnKind.Outlined, modifier = Modifier.fillMaxWidth(), onClick = onCancel)
+            LingButton(tr(R.string.update_031), BtnKind.Outlined, modifier = Modifier.fillMaxWidth(), onClick = onCancel)
         } else {
-            LingButton("下载并安装", icon = LingIcons.Download, modifier = Modifier.fillMaxWidth(), onClick = onDownload)
+            LingButton(tr(R.string.update_032), icon = LingIcons.Download, modifier = Modifier.fillMaxWidth(), onClick = onDownload)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LingButton("稍后", BtnKind.Tonal, modifier = Modifier.weight(1f), onClick = onLater)
-                LingButton("跳过此版本", BtnKind.Text, modifier = Modifier.weight(1f), onClick = onSkip)
+                LingButton(tr(R.string.author_guide_022), BtnKind.Tonal, modifier = Modifier.weight(1f), onClick = onLater)
+                LingButton(tr(R.string.update_033), BtnKind.Text, modifier = Modifier.weight(1f), onClick = onSkip)
             }
         }
         Spacer(Modifier.height(8.dp))

@@ -103,7 +103,11 @@ android {
         getByName("test").assets.srcDir("$projectDir/schemas")
         getByName("main").res.srcDir(misansRes)
     }
-    androidResources { noCompress += listOf("ttf", "otf") }
+    androidResources {
+        noCompress += listOf("ttf", "otf")
+        // 只打包界面支持的语言，依赖库里其他语言的资源不进 APK
+        localeFilters += listOf("zh-rCN", "en", "zh-rTW", "ja")
+    }
     packaging { resources.excludes += listOf("/META-INF/{AL2.0,LGPL2.1}", "DebugProbesKt.bin") }
     testOptions {
         unitTests.isReturnDefaultValues = true

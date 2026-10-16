@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -90,10 +94,10 @@ fun RelationGraphRoute(bookId: Long, nav: NavHostController) {
     val maxCh by remember(bookId) { AppGraph.db.chapters().chapterHeaders(bookId).map { l -> l.maxOfOrNull { it.number } ?: 1 } }.collectAsState(1)
     var chapter by remember(maxCh) { mutableFloatStateOf(maxCh.toFloat()) }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("人物关系图", "第 ${chapter.toInt()} 章时 · 点人物打开卡片，拖动可调整位置", onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.lore_002), tr(R.string.lore_visual_001, chapter.toInt()), onBack = { nav.popBackStack() })
         RelationGraph(cards, relationsAt(rels, chapter.toInt()), Modifier.weight(1f).fillMaxWidth().padding(12.dp)) { nav.navigate(Routes.lore(bookId, it)) }
         if (maxCh > 1) Column(Modifier.navigationBarsPadding().padding(horizontal = 20.dp, vertical = 12.dp)) {
-            Text("拖动查看不同章节时的关系", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(tr(R.string.lore_visual_002), style = Ling.type.caption, color = c.onSurfaceVariant)
             Slider(chapter, { chapter = it }, valueRange = 1f..maxCh.toFloat(), colors = SliderDefaults.colors(thumbColor = c.primary, activeTrackColor = c.primary))
         }
     }
@@ -108,7 +112,7 @@ fun RelationGraph(cards: List<LoreCardEntity>, rels: List<LoreRelationEntity>, m
     val moved = remember(ids) { mutableStateMapOf<Long, Offset>() }
     var dragging by remember { mutableStateOf<Long?>(null) }
     if (cards.isEmpty()) {
-        Box(modifier, contentAlignment = Alignment.Center) { Text("先在设定库里建几张人物卡，再添加关系。", style = Ling.type.body, color = c.onSurfaceVariant) }
+        Box(modifier, contentAlignment = Alignment.Center) { Text(tr(R.string.lore_visual_003), style = Ling.type.body, color = c.onSurfaceVariant) }
         return
     }
     LingCard(modifier) {
@@ -178,17 +182,17 @@ fun MapRoute(bookId: Long, nav: NavHostController) {
                 ctx.contentResolver.openInputStream(uri)?.use { i -> f.outputStream().use { i.copyTo(it) } }
                 "maps/${f.name}"
             }
-            current = dao.insertMap(MapEntity(bookId = bookId, name = "地图 ${maps.size + 1}", image = name))
+            current = dao.insertMap(MapEntity(bookId = bookId, name = tr(R.string.lore_visual_004, maps.size + 1), image = name))
         }
     }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("地图与势力", onBack = { nav.popBackStack() }) { LingIconButton(LingIcons.Add, "上传地图") { picker.launch("image/*") } }
+        LingTopBar(tr(R.string.lore_004), onBack = { nav.popBackStack() }) { LingIconButton(LingIcons.Add, tr(R.string.lore_visual_005)) { picker.launch("image/*") } }
         if (map == null) {
             Column(Modifier.fillMaxSize().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Tile(LingIcons.Map, c.primaryContainer, c.onPrimaryContainer, 64.dp)
-                Text("上传一张你自己的地图", style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.padding(top = 16.dp))
-                Text("手绘拍照或其他工具画的都可以，只存在本机。之后可以在图上标地点、画势力范围，并关联到设定卡。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(vertical = 8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                LingButton("选择图片", icon = LingIcons.Add) { picker.launch("image/*") }
+                Text(tr(R.string.lore_visual_006), style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.padding(top = 16.dp))
+                Text(tr(R.string.lore_visual_007), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(vertical = 8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                LingButton(tr(R.string.lore_visual_008), icon = LingIcons.Add) { picker.launch("image/*") }
             }
         } else {
             if (maps.size > 1) LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -270,14 +274,14 @@ private fun ColumnScope.MapEditor(map: MapEntity, nav: NavHostController) {
         }
     }
     Column(Modifier.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Segmented(listOf("查看", "标地点", "画势力范围"), listOf("view", "point", "region").indexOf(mode)) { mode = listOf("view", "point", "region")[it]; draft.clear() }
+        Segmented(listOf(tr(R.string.lore_061), tr(R.string.lore_visual_009), tr(R.string.lore_visual_010)), listOf("view", "point", "region").indexOf(mode)) { mode = listOf("view", "point", "region")[it]; draft.clear() }
         if (mode == "region") Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("依次点出范围的边界（已点 ${draft.size} 个）", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
-            LingButton("撤销", BtnKind.Text, height = 36.dp, enabled = draft.isNotEmpty()) { draft.removeAt(draft.lastIndex) }
-            LingButton("完成", height = 36.dp, enabled = draft.size >= 3) { naming = "region" to draft.toList() }
+            Text(tr(R.string.lore_visual_011, draft.size), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
+            LingButton(tr(R.string.check_042), BtnKind.Text, height = 36.dp, enabled = draft.isNotEmpty()) { draft.removeAt(draft.lastIndex) }
+            LingButton(tr(R.string.lore_visual_012), height = 36.dp, enabled = draft.size >= 3) { naming = "region" to draft.toList() }
         }
         if (maxCh > 1) {
-            Text("第 ${chapter.toInt()} 章时的势力分布", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+            Text(tr(R.string.lore_visual_013, chapter.toInt()), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
             Slider(chapter, { chapter = it }, valueRange = 1f..maxCh.toFloat(), colors = SliderDefaults.colors(thumbColor = c.primary, activeTrackColor = c.primary))
         }
     }
@@ -287,11 +291,11 @@ private fun ColumnScope.MapEditor(map: MapEntity, nav: NavHostController) {
         var color by remember { mutableLongStateOf(MarkColors[0]) }
         var from by remember { mutableStateOf("${chapter.toInt()}") }
         val candidates = cards.filter { it.type == (if (kind == "point") "place" else "faction") }
-        LingSheet({ naming = null }, if (kind == "point") "标注地点" else "势力范围") {
+        LingSheet({ naming = null }, if (kind == "point") tr(R.string.lore_visual_014) else tr(R.string.lore_visual_015)) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                LingTextField(label, { label = it }, label = "名称")
+                LingTextField(label, { label = it }, label = tr(R.string.ideas_027))
                 if (candidates.isNotEmpty()) {
-                    Text("关联到设定卡", style = Ling.type.caption, color = c.onSurfaceVariant)
+                    Text(tr(R.string.lore_visual_016), style = Ling.type.caption, color = c.onSurfaceVariant)
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(candidates) { cd -> LingChip(cd == link, { link = if (link == cd) null else cd; if (label.isBlank()) label = cd.name }, cd.name) }
                     }
@@ -299,8 +303,8 @@ private fun ColumnScope.MapEditor(map: MapEntity, nav: NavHostController) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     MarkColors.forEach { col -> Box(Modifier.size(30.dp).clip(RoundedCornerShape(15.dp)).background(Color(col)).rowClick { color = col }) { if (col == color) androidx.compose.material3.Icon(LingIcons.Check, null, tint = Color.White, modifier = Modifier.align(Alignment.Center)) } }
                 }
-                LingTextField(from, { from = it.filter(Char::isDigit) }, label = "从第几章起", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-                LingButton("保存", modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = label.isNotBlank()) {
+                LingTextField(from, { from = it.filter(Char::isDigit) }, label = tr(R.string.lore_059), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                LingButton(tr(R.string.check_046), modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = label.isNotBlank()) {
                     scope.launch {
                         dao.insertMark(MapMarkEntity(mapId = map.id, cardId = link?.id, kind = kind, label = label.trim(), points = encodePoints(pts), color = color, fromChapter = from.toIntOrNull() ?: 1))
                         naming = null; draft.clear(); mode = "view"
@@ -312,14 +316,14 @@ private fun ColumnScope.MapEditor(map: MapEntity, nav: NavHostController) {
     open?.let { m ->
         var until by remember(m) { mutableStateOf(m.untilChapter?.toString() ?: "") }
         LingSheet({ open = null }, m.label) {
-            Text(if (m.kind == "point") "地点 · 第 ${m.fromChapter} 章起" else "势力范围 · 第 ${m.fromChapter} 章起" + (m.untilChapter?.let { "，到第 $it 章" } ?: ""), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
-            m.cardId?.let { id -> SheetAction(LingIcons.Book, "打开设定卡") { open = null; nav.navigate(Routes.lore(map.bookId, id)) } }
+            Text(if (m.kind == "point") tr(R.string.lore_visual_017, m.fromChapter) else tr(R.string.lore_visual_018, m.fromChapter) + (m.untilChapter?.let { tr(R.string.lore_visual_019, it) } ?: ""), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
+            m.cardId?.let { id -> SheetAction(LingIcons.Book, tr(R.string.lore_visual_020)) { open = null; nav.navigate(Routes.lore(map.bookId, id)) } }
             if (m.kind == "region") Row(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                LingTextField(until, { until = it.filter(Char::isDigit) }, Modifier.weight(1f), label = "到第几章为止（留空表示一直存在）", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                LingTextField(until, { until = it.filter(Char::isDigit) }, Modifier.weight(1f), label = tr(R.string.lore_visual_021), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
                 Spacer(Modifier.width(8.dp))
-                LingButton("保存", BtnKind.Tonal) { scope.launch { dao.updateMark(m.copy(untilChapter = until.toIntOrNull())); open = null } }
+                LingButton(tr(R.string.check_046), BtnKind.Tonal) { scope.launch { dao.updateMark(m.copy(untilChapter = until.toIntOrNull())); open = null } }
             }
-            SheetAction(LingIcons.Delete, "删除标注", danger = true) { scope.launch { dao.deleteMark(m.id); open = null } }
+            SheetAction(LingIcons.Delete, tr(R.string.lore_visual_022), danger = true) { scope.launch { dao.deleteMark(m.id); open = null } }
         }
     }
 }

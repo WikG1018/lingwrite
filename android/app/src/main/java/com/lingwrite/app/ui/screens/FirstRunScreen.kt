@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.screens
 
+import com.lingwrite.app.i18n.trText
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -49,21 +54,21 @@ fun FirstRunScreen(onContinue: (WriteMode) -> Unit = {}) {
                 Box(Modifier.size(24.dp, 8.dp).clip(RoundedCornerShape(4.dp)).background(c.primary))
                 repeat(2) { Box(Modifier.size(8.dp).clip(RoundedCornerShape(4.dp)).background(c.outlineVariant)) }
             }
-            Text("你想让 AI\n怎么帮你写？", style = Ling.type.display, color = c.onSurface, modifier = Modifier.enterStagger(0))
-            Text("两种方式都能用好灵写，之后可在设置里随时切换。", style = Ling.type.bodyLarge, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 10.dp, bottom = 24.dp).enterStagger(1))
-            ModeOption(WriteMode.Assist, mode, LingIcons.Draw, c.primaryContainer, c.onPrimaryContainer, "辅助模式", ModeCopy.ASSIST_DESC + "。",
-                listOf("正文每个字出自你手", "产出是方向和问题，进本章便签"), Modifier.enterStagger(2)) { mode = it }
+            Text(tr(R.string.first_run_001), style = Ling.type.display, color = c.onSurface, modifier = Modifier.enterStagger(0))
+            Text(tr(R.string.first_run_002), style = Ling.type.bodyLarge, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 10.dp, bottom = 24.dp).enterStagger(1))
+            ModeOption(WriteMode.Assist, mode, LingIcons.Draw, c.primaryContainer, c.onPrimaryContainer, tr(R.string.settings_004), trText(ModeCopy.ASSIST_DESC) + tr(R.string.first_run_003),
+                listOf(tr(R.string.first_run_004), tr(R.string.first_run_005)), Modifier.enterStagger(2)) { mode = it }
             Spacer(Modifier.height(14.dp))
-            ModeOption(WriteMode.Generate, mode, LingIcons.Sparkle, c.tertiaryContainer, c.onTertiaryContainer, "生成模式", ModeCopy.GENERATE_DESC + "。",
-                listOf("按章纲起草，自动带入设定", "多候选挑选，段落带 AI 标记"), Modifier.enterStagger(3)) { mode = it }
+            ModeOption(WriteMode.Generate, mode, LingIcons.Sparkle, c.tertiaryContainer, c.onTertiaryContainer, tr(R.string.settings_003), trText(ModeCopy.GENERATE_DESC) + tr(R.string.first_run_003),
+                listOf(tr(R.string.first_run_006), tr(R.string.first_run_007)), Modifier.enterStagger(3)) { mode = it }
         }
         Column(Modifier.padding(start = 24.dp, end = 24.dp, bottom = 22.dp)) {
             LingButton(
-                text = when (mode) { null -> "选择一种方式继续"; WriteMode.Assist -> "用辅助模式开始"; WriteMode.Generate -> "用生成模式开始" },
+                text = when (mode) { null -> tr(R.string.first_run_008); WriteMode.Assist -> tr(R.string.first_run_009); WriteMode.Generate -> tr(R.string.first_run_010) },
                 enabled = mode != null, height = 52.dp, modifier = Modifier.fillMaxWidth(),
                 textStyle = Ling.type.subhead.copy(fontSize = 16.sp),
             ) { mode?.let(onContinue) }
-            Text("可随时切换 · 稿件保存在本机；使用 AI 会将选定内容发给所选服务商", style = Ling.type.caption.copy(fontSize = 13.sp), color = c.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 12.dp))
+            Text(tr(R.string.first_run_011), style = Ling.type.caption.copy(fontSize = 13.sp), color = c.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 12.dp))
         }
     }
 }

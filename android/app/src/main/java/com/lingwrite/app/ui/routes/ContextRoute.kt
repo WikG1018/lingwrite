@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,8 +74,8 @@ object ContextModule {
         val prevMore = EditorHooks.moreItems
         EditorHooks.moreItems = { st, close, nav ->
             prevMore(this, st, close, nav)
-            SheetAction(LingIcons.Book, "本章摘要", sub = "完成本章后自动生成，可改后确认") { summaryFor = st.chapter.id; close() }
-            SheetAction(LingIcons.Info, "上下文查看器", sub = "最近一次实际发给模型的内容和占比") { viewer = st.chapter.id; close() }
+            SheetAction(LingIcons.Book, tr(R.string.context_001), sub = tr(R.string.context_002)) { summaryFor = st.chapter.id; close() }
+            SheetAction(LingIcons.Info, tr(R.string.context_003), sub = tr(R.string.context_004)) { viewer = st.chapter.id; close() }
         }
         val prevOv = EditorHooks.overlays
         EditorHooks.overlays = { st, nav ->
@@ -83,22 +89,22 @@ object ContextModule {
         SettingsRegistry.extra += { p, _ ->
             var open by remember { mutableStateOf(false) }
             val scope = rememberCoroutineScope()
-            if (open) LingSheet({ open = false }, "上下文预算") {
-                Text("每次发给模型的背景资料上限。超出时按优先级从低往高裁剪，章纲和设定始终优先。按所选模型的上下文长度设置。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
+            if (open) LingSheet({ open = false }, tr(R.string.context_005)) {
+                Text(tr(R.string.context_006), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp))
                 contextBudgets.forEach { n ->
-                    SheetAction(if (p.contextBudget == n) LingIcons.Check else LingIcons.Bolt, budgetLabel(n) + if (n == 128_000) "（默认）" else "") { scope.launch { AppGraph.prefs.update { it.copy(contextBudget = n) } }; open = false }
+                    SheetAction(if (p.contextBudget == n) LingIcons.Check else LingIcons.Bolt, budgetLabel(n) + if (n == 128_000) tr(R.string.context_007) else "") { scope.launch { AppGraph.prefs.update { it.copy(contextBudget = n) } }; open = false }
                 }
             }
-            "AI" to SettingRow(LingIcons.Info, "上下文预算", "长篇的前情、设定、旧片段带入上限", budgetShort(p.contextBudget), Tone.Neutral, onClick = { open = true })
+            "AI" to SettingRow(LingIcons.Info, tr(R.string.context_005), tr(R.string.context_008), budgetShort(p.contextBudget), Tone.Neutral, onClick = { open = true })
         }
         SettingsRegistry.extra += { p, _ ->
             var confirm by remember { mutableStateOf(false) }
             var pick by remember { mutableStateOf(false) }
             val scope = rememberCoroutineScope()
-            if (confirm) LingConfirm("开启语义检索？", "开启后，正文会切成小段发给你选的服务商的向量接口，用来找“意思相近”的旧片段。这会产生额外费用，正文会离开这台手机。关键词检索不受影响，始终在本机进行。",
-                confirm = "开启", onDismiss = { confirm = false }, onConfirm = { confirm = false; pick = true })
+            if (confirm) LingConfirm(tr(R.string.context_009), tr(R.string.context_010),
+                confirm = tr(R.string.context_011), onDismiss = { confirm = false }, onConfirm = { confirm = false; pick = true })
             if (pick) EmbedPicker(p.embedModel, { pick = false }) { ref -> scope.launch { AppGraph.prefs.update { it.copy(semanticSearch = true, embedModel = ref) } }; pick = false }
-            "AI" to SettingRow(LingIcons.Search, "语义检索", if (p.semanticSearch) "向量模型：${p.embedModel.substringAfter('|')}" else "默认关闭；开启会把正文切片发给服务商",
+            "AI" to SettingRow(LingIcons.Search, tr(R.string.context_012), if (p.semanticSearch) tr(R.string.context_013, p.embedModel.substringAfter('|')) else tr(R.string.context_014),
                 switch = p.semanticSearch, tone = Tone.Neutral, onSwitch = { on -> if (on) confirm = true else scope.launch { AppGraph.prefs.update { it.copy(semanticSearch = false) } } })
         }
     }
@@ -111,17 +117,17 @@ private fun EmbedPicker(current: String, onDismiss: () -> Unit, onPick: (String)
     val usable = providers.filter { it.protocol == "openai" && it.keyCipher.isNotBlank() }
     var prov by remember { mutableStateOf(current.substringBefore('|').toLongOrNull() ?: usable.firstOrNull()?.id) }
     var model by remember { mutableStateOf(current.substringAfter('|', "")) }
-    LingSheet(onDismiss, "选择向量模型") {
+    LingSheet(onDismiss, tr(R.string.context_015)) {
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (usable.isEmpty()) Text("需要一个 OpenAI 兼容协议、已填 Key 的服务商（Claude 没有向量接口）。", style = Ling.type.body, color = c.onSurfaceVariant)
+            if (usable.isEmpty()) Text(tr(R.string.context_016), style = Ling.type.body, color = c.onSurfaceVariant)
             usable.forEach { pv ->
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).rowClick { prov = pv.id }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     androidx.compose.material3.RadioButton(prov == pv.id, { prov = pv.id })
                     Text(pv.name, style = Ling.type.bodyLarge, color = c.onSurface)
                 }
             }
-            LingTextField(model, { model = it }, label = "向量模型名", placeholder = "例如 text-embedding-3-small、text-embedding-v3")
-            LingButton("开启", enabled = prov != null && model.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) { onPick("$prov|${model.trim()}") }
+            LingTextField(model, { model = it }, label = tr(R.string.context_017), placeholder = tr(R.string.context_018))
+            LingButton(tr(R.string.context_011), enabled = prov != null && model.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) { onPick("$prov|${model.trim()}") }
         }
     }
 }
@@ -129,7 +135,7 @@ private fun EmbedPicker(current: String, onDismiss: () -> Unit, onPick: (String)
 @Composable
 fun ContextViewerSheet(onDismiss: () -> Unit) {
     val snap = ContextEngine.last
-    LingSheet(onDismiss, "上下文查看器", layout = SheetLayout.Viewport) { ContextViewer(snap) }
+    LingSheet(onDismiss, tr(R.string.context_003), layout = SheetLayout.Viewport) { ContextViewer(snap) }
 }
 
 private val partColors = listOf(0xFF3E5C8A, 0xFF2E7D5B, 0xFFA8691A, 0xFF8A5A7A, 0xFF5F6B7E, 0xFFB0624A, 0xFF4F8A9C, 0xFF9C7A4F, 0xFF6E6E9C)
@@ -137,13 +143,13 @@ private val partColors = listOf(0xFF3E5C8A, 0xFF2E7D5B, 0xFFA8691A, 0xFF8A5A7A, 
 @Composable
 fun ContextViewer(snap: CtxSnapshot?) {
     val c = Ling.colors
-    if (snap == null) { Text("还没有发送过。用一次 AI 工具后，这里会显示实际发给模型的全部内容。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp)); return }
+    if (snap == null) { Text(tr(R.string.context_019), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp)); return }
     val sysTok = AiService.estimateTokens(snap.system.length)
-    val rows = listOf(Triple("系统指令 + 文风卡", sysTok, snap.system)) + snap.parts.map { Triple(it.label, it.tokens, it.text) }
+    val rows = listOf(Triple(tr(R.string.context_020), sysTok, snap.system)) + snap.parts.map { Triple(trText(it.label), it.tokens, it.text) }
     val total = rows.sumOf { it.second }.coerceAtLeast(1)
     var open by remember { mutableStateOf<Int?>(null) }
     Column(Modifier.padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {
-        Text("约 $total tokens · 预算 ${snap.budget + sysTok + 1500}（含回复预留 1500）· ${TimeFmt.relative(snap.at)}", style = Ling.type.caption, color = c.onSurfaceVariant)
+        Text(tr(R.string.context_021, total, snap.budget + sysTok + 1500, TimeFmt.relative(snap.at)), style = Ling.type.caption, color = c.onSurfaceVariant)
         Row(Modifier.padding(vertical = 12.dp).fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp))) {
             rows.forEachIndexed { i, r -> Box(Modifier.weight(r.second.toFloat().coerceAtLeast(1f)).fillMaxHeight().background(androidx.compose.ui.graphics.Color(partColors[i % partColors.size]))) }
         }
@@ -168,21 +174,21 @@ private fun SummarySheet(bookId: Long, chapterId: Long, onDismiss: () -> Unit) {
     val s by remember(chapterId) { AppGraph.db.context().summary(chapterId) }.collectAsState(null)
     var text by remember(s?.updatedAt) { mutableStateOf(s?.text.orEmpty()) }
     var busy by remember { mutableStateOf(false) }
-    LingSheet(onDismiss, "本章摘要", layout = SheetLayout.Viewport) {
+    LingSheet(onDismiss, tr(R.string.context_001), layout = SheetLayout.Viewport) {
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(when { s == null -> "还没有摘要。完成本章时会自动生成，也可以现在生成或自己写。"; s!!.confirmed -> "已确认：后续写作优先使用，不会被自动覆盖。"; else -> "AI 生成，待确认。" },
+            Text(when { s == null -> tr(R.string.context_022); s!!.confirmed -> tr(R.string.context_023); else -> tr(R.string.context_024) },
                 style = Ling.type.caption, color = if (s?.confirmed == true) c.good else c.onSurfaceVariant)
-            LingTextField(text, { text = it }, singleLine = false, minLines = 5, maxLines = 12, placeholder = "200 字左右：发生了什么、人物有什么变化、留下了什么悬念")
-            if (busy) com.lingwrite.app.ui.ai.AiThinking("正在写本章摘要…")
+            LingTextField(text, { text = it }, singleLine = false, minLines = 5, maxLines = 12, placeholder = tr(R.string.context_025))
+            if (busy) com.lingwrite.app.ui.ai.AiThinking(tr(R.string.context_026))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
-                LingButton(if (busy) "生成中…" else "AI 生成", BtnKind.Tonal, icon = LingIcons.Sparkle, enabled = !busy, modifier = Modifier.weight(1f)) {
+                LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.context_027), BtnKind.Tonal, icon = LingIcons.Sparkle, enabled = !busy, modifier = Modifier.weight(1f)) {
                     busy = true
                     scope.launch {
                         if (s?.confirmed == true) AppGraph.db.context().upsertSummary(s!!.copy(confirmed = false))
                         ContextEngine.afterChapterDone(chapterId); busy = false
                     }
                 }
-                LingButton("确认", modifier = Modifier.weight(1f), enabled = text.isNotBlank()) {
+                LingButton(tr(R.string.check_013), modifier = Modifier.weight(1f), enabled = text.isNotBlank()) {
                     scope.launch { AppGraph.db.context().upsertSummary(SummaryEntity(chapterId, bookId, text.trim(), confirmed = true)); onDismiss() }
                 }
             }
@@ -210,12 +216,12 @@ fun SearchRoute(bookId: Long, nav: NavHostController) {
     var askLore by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
         Row(Modifier.padding(start = 4.dp, end = 16.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            LingIconButton(LingIcons.Back, "返回") { nav.popBackStack() }
-            LingTextField(q, { q = it }, Modifier.weight(1f).focusRequester(focus), placeholder = if (bookId > 0) "搜本书正文：人名、地名、一句台词…" else "搜全部作品")
+            LingIconButton(LingIcons.Back, tr(R.string.components_001)) { nav.popBackStack() }
+            LingTextField(q, { q = it }, Modifier.weight(1f).focusRequester(focus), placeholder = if (bookId > 0) tr(R.string.context_028) else tr(R.string.context_029))
         }
         SearchResults(q, hits, bookId == 0L, { id -> books.firstOrNull { it.id == id }?.title.orEmpty() }, { titles[it].orEmpty() }) { nav.navigate(Routes.editor(it.chapterId)) }
         if (q.isNotBlank() && hits?.isEmpty() == true) {
-            LingButton("问问 AI：$q", BtnKind.Tonal, icon = LingIcons.Help, height = 44.dp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            LingButton(tr(R.string.context_030, q), BtnKind.Tonal, icon = LingIcons.Help, height = 44.dp, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 askLore = true
             }
         }
@@ -232,8 +238,8 @@ fun SearchRoute(bookId: Long, nav: NavHostController) {
                 onToLoreCard = { qsn, ans ->
                     scope.launch {
                         AppGraph.db.lore().insertCard(com.lingwrite.app.data.db.LoreCardEntity(
-                            bookId = bookId, type = "term", name = qsn.take(10).ifBlank { "新设定" },
-                            fields = encodeFields(listOf(Field("说明", ans.take(300)))), pending = true,
+                            bookId = bookId, type = "term", name = qsn.take(10).ifBlank { tr(R.string.context_031) },
+                            fields = encodeFields(listOf(Field(tr(R.string.context_032), ans.take(300)))), pending = true,
                         ))
                     }
                 },
@@ -247,10 +253,10 @@ fun SearchRoute(bookId: Long, nav: NavHostController) {
 fun SearchResults(q: String, hits: List<Hit>?, showBook: Boolean, bookTitle: (Long) -> String, chapterTitle: (Long) -> String, onOpen: (Hit) -> Unit) {
     val c = Ling.colors
     when {
-        hits == null -> Text("关键词检索在本机完成，不联网、不花钱。多个词用空格隔开表示同时出现。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp))
-        hits.isEmpty() -> Text("没有找到“$q”", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp))
+        hits == null -> Text(tr(R.string.context_033), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp))
+        hits.isEmpty() -> Text(tr(R.string.context_034, q), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp))
         else -> LazyColumn(contentPadding = PaddingValues(16.dp, 8.dp, 16.dp, 120.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item { Text("${hits.size} 处", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp)) }
+            item { Text(tr(R.string.context_035, hits.size), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp)) }
             items(hits, key = { it.id }) { h ->
                 LingCard {
                     Column(Modifier.fillMaxWidth().rowClick { onOpen(h) }.padding(14.dp)) {

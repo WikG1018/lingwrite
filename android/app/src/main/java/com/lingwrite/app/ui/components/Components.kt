@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.components
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.layout.heightIn
 
 import androidx.compose.animation.animateColorAsState
@@ -132,7 +136,7 @@ fun LingTopBar(
         Modifier.fillMaxWidth().height(64.dp).padding(start = 4.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (onBack != null) LingIconButton(com.lingwrite.app.ui.components.LingIcons.Back, "返回", onClick = onBack)
+        if (onBack != null) LingIconButton(com.lingwrite.app.ui.components.LingIcons.Back, tr(R.string.components_001), onClick = onBack)
         Column(Modifier.weight(1f).padding(start = 8.dp)) {
             if (title.isNotEmpty()) Text(title, style = titleStyle, color = Ling.colors.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (subtitle != null) Text(subtitle, style = Ling.type.micro.copy(fontWeight = FontWeight.Normal), color = Ling.colors.onSurfaceVariant)

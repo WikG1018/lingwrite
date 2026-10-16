@@ -34,7 +34,7 @@ import java.io.File
 /** 接真实数据（内存库 + 示例作品）的页面截图。 */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w412dp-h915dp-xhdpi", application = android.app.Application::class)
+@Config(sdk = [34], qualifiers = "zh-rCN-w412dp-h915dp-xhdpi", application = android.app.Application::class)
 abstract class RouteShotBase {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private val dir = File(System.getProperty("lingwrite.shotDir") ?: "build/shots").apply { mkdirs() }

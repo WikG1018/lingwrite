@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import com.lingwrite.app.ui.components.rowClick
 import androidx.compose.foundation.border
 import com.lingwrite.app.ui.components.enterStagger
@@ -88,10 +92,10 @@ fun ReaderRoute(bookId: Long, startChapter: Int, nav: NavHostController) {
     }
 
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("读者试读", "模拟反馈，仅供参考", onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.editor_034), tr(R.string.reader_001), onBack = { nav.popBackStack() })
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (results.isEmpty()) {
-                Text("选读者画像（最多 3 个）", style = Ling.type.label, color = c.primary)
+                Text(tr(R.string.reader_002), style = Ling.type.label, color = c.primary)
                 READER_PERSONAS.forEachIndexed { pi, p ->
                     val on = p.id in personas
                     ReaderPersonaRow(p, on, Modifier.enterStagger(pi)) {
@@ -99,20 +103,20 @@ fun ReaderRoute(bookId: Long, startChapter: Int, nav: NavHostController) {
                     }
                 }
                 if ("custom" in personas) {
-                    LingTextField(customDesc, { customDesc = it }, label = "自定义画像描述", singleLine = false, minLines = 2, placeholder = "比如：只看无敌流、跳过感情戏的男频读者")
+                    LingTextField(customDesc, { customDesc = it }, label = tr(R.string.reader_003), singleLine = false, minLines = 2, placeholder = tr(R.string.reader_004))
                 }
-                Text("范围（本章，或第 N–M 章，最多 5 章）", style = Ling.type.label, color = c.primary)
+                Text(tr(R.string.reader_005), style = Ling.type.label, color = c.primary)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    LingTextField(scopeCh, { scopeCh = it.filter(Char::isDigit) }, Modifier.weight(1f), label = "起始章")
-                    Text("到本章", style = Ling.type.body, color = c.onSurfaceVariant)
+                    LingTextField(scopeCh, { scopeCh = it.filter(Char::isDigit) }, Modifier.weight(1f), label = tr(R.string.reader_006))
+                    Text(tr(R.string.reader_007), style = Ling.type.body, color = c.onSurfaceVariant)
                 }
                 Text(
-                    if (estTokens > 0) "费用提示：预计消耗约 ${estTokens} tokens。" else "费用提示：开始前会显示预计消耗的 tokens。",
+                    if (estTokens > 0) tr(R.string.reader_008, estTokens) else tr(R.string.reader_009),
                     style = Ling.type.caption, color = c.onSurfaceVariant,
                 )
-                err?.let { Text("没拿到结果：$it", style = Ling.type.caption, color = c.error) }
+                err?.let { Text(tr(R.string.ai_components_011, it), style = Ling.type.caption, color = c.error) }
                 LingButton(
-                    if (busy) "试读中…" else "开始试读", height = 46.dp,
+                    if (busy) tr(R.string.reader_010) else tr(R.string.reader_011), height = 46.dp,
                     enabled = personas.isNotEmpty() && !busy,
                 ) {
                     busy = true; err = null; results.clear()
@@ -137,7 +141,7 @@ fun ReaderRoute(bookId: Long, startChapter: Int, nav: NavHostController) {
                 }
                 // MO2：等模型返回时先给骨架（150ms 阈值），避免空白停顿
                 if (busy && com.lingwrite.app.ui.components.rememberDelayedVisible(true)) {
-                    com.lingwrite.app.ui.ai.AiThinking("正在读这一章…")
+                    com.lingwrite.app.ui.ai.AiThinking(tr(R.string.reader_012))
                     repeat(personas.size.coerceAtLeast(1)) { com.lingwrite.app.ui.components.SkeletonCard(4) }
                 }
             } else {
@@ -149,7 +153,7 @@ fun ReaderRoute(bookId: Long, startChapter: Int, nav: NavHostController) {
                         onSave = { advice ->
                             scope.launch {
                                 val ch = AppGraph.db.chapters().chaptersOnce(bookId).firstOrNull { it.number == scopeCh.toIntOrNull() } ?: AppGraph.db.chapters().chaptersOnce(bookId).last()
-                                AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = ch.id, kind = "fix", text = "【读者 $p.name】$advice"))
+                                AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = ch.id, kind = "fix", text = tr(R.string.reader_013, p, advice)))
                             }
                         },
                         onJump = { quote ->
@@ -161,11 +165,11 @@ fun ReaderRoute(bookId: Long, startChapter: Int, nav: NavHostController) {
                     )
                 }
                 Text(
-                    "模拟读者反馈，仅供参考 · 本次约 ${estTokens} tokens",
+                    tr(R.string.reader_014, estTokens),
                     style = Ling.type.caption, color = c.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 6.dp),
                 )
-                LingButton("再测一次", BtnKind.Text, height = 40.dp) { results.clear(); estTokens = 0 }
+                LingButton(tr(R.string.reader_015), BtnKind.Text, height = 40.dp) { results.clear(); estTokens = 0 }
             }
         }
     }
@@ -191,39 +195,39 @@ fun ReaderResultCard(
             }
             val r = res.getOrNull()
             if (r == null) {
-                Text("这个画像没拿到结果：${res.exceptionOrNull()?.message ?: "未知错误"}", style = Ling.type.caption, color = c.error)
-                LingButton(if (retrying) "重试中…" else "重试", BtnKind.Text, height = 32.dp, enabled = !retrying, onClick = onRetry)
+                Text(tr(R.string.reader_017, res.exceptionOrNull()?.message ?: tr(R.string.reader_016)), style = Ling.type.caption, color = c.error)
+                LingButton(if (retrying) tr(R.string.reader_018) else tr(R.string.ai_components_014), BtnKind.Text, height = 32.dp, enabled = !retrying, onClick = onRetry)
             } else {
                 if (r.oneLine.isNotBlank()) Text("“${r.oneLine}”", style = Ling.type.bodyLarge, color = c.onSurface)
                 if (r.drops.isNotEmpty()) {
-                    Text("弃书风险点", style = Ling.type.label, color = c.error)
+                    Text(tr(R.string.reader_019), style = Ling.type.label, color = c.error)
                     r.drops.forEach { d ->
                         Row(Modifier.fillMaxWidth().padding(top = 2.dp)) {
                             Pill(d.quote.take(12) + "…", PillKind.Error, modifier = Modifier.padding(end = 8.dp))
                             Text(d.why, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
                         }
-                        LingButton("去原文看", BtnKind.Text, height = 30.dp) { onJump(d.quote) }
+                        LingButton(tr(R.string.reader_020), BtnKind.Text, height = 30.dp) { onJump(d.quote) }
                     }
                 }
                 if (r.hooks.isNotEmpty()) {
-                    Text("爽点 / 期待点", style = Ling.type.label, color = c.primary)
+                    Text(tr(R.string.reader_021), style = Ling.type.label, color = c.primary)
                     r.hooks.forEach { Text("· $it", style = Ling.type.caption, color = c.onSurfaceVariant) }
                 }
                 if (r.wantNext.isNotBlank()) {
-                    Text("最想看到的下一章", style = Ling.type.label, color = c.primary)
+                    Text(tr(R.string.reader_022), style = Ling.type.label, color = c.primary)
                     Text(r.wantNext, style = Ling.type.body, color = c.onSurface)
                 }
                 if (r.advice.isNotEmpty()) {
-                    Text("改进建议", style = Ling.type.label, color = c.primary)
+                    Text(tr(R.string.reader_023), style = Ling.type.label, color = c.primary)
                     r.advice.forEach { a ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("· $a", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
-                            LingButton("存便签", BtnKind.Text, height = 30.dp) { onSave(a) }
+                            LingButton(tr(R.string.editor_ai_008), BtnKind.Text, height = 30.dp) { onSave(a) }
                         }
                     }
                 }
                 // A16：每张卡都写明是模拟反馈，不评判 AI 率
-                Text("模拟读者反馈，仅供参考 · 不评判 AI 率", style = Ling.type.micro, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                Text(tr(R.string.reader_024), style = Ling.type.micro, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
@@ -236,7 +240,7 @@ fun ReaderHistoryList(bookId: Long, onOpen: (ReaderReportEntity) -> Unit) {
     if (reports.isEmpty()) return
     LingCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("读者反馈记录", style = Ling.type.label, color = Ling.colors.primary)
+            Text(tr(R.string.reader_025), style = Ling.type.label, color = Ling.colors.primary)
             val byKey = reports.groupBy { "${it.fromChapter}-${it.toChapter}-${it.persona}" }
             byKey.forEach { (_, list) ->
                 val latest = list.first()
@@ -245,7 +249,7 @@ fun ReaderHistoryList(bookId: Long, onOpen: (ReaderReportEntity) -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Pill(latest.persona.let { pid -> READER_PERSONAS.firstOrNull { it.id == pid }?.name ?: pid }, PillKind.Neutral)
                     Spacer(Modifier.width(8.dp))
-                    Text("第 ${latest.fromChapter}–${latest.toChapter} 章", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
+                    Text(tr(R.string.reader_026, latest.fromChapter, latest.toChapter), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
                     if (r != null && prev != null && r.stars != prev.stars) {
                         val up = r.stars > prev.stars
                         Text((if (up) "↑ " else "↓ ") + prev.stars + "→" + r.stars, style = Ling.type.caption, color = if (up) Ling.colors.good else Ling.colors.error)
@@ -255,7 +259,7 @@ fun ReaderHistoryList(bookId: Long, onOpen: (ReaderReportEntity) -> Unit) {
                     Text(TimeFmt.relative(latest.createdAt), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(start = 8.dp))
                 }
             }
-            Text("模拟读者反馈，仅供参考", style = Ling.type.micro, color = Ling.colors.onSurfaceVariant)
+            Text(tr(R.string.reader_027), style = Ling.type.micro, color = Ling.colors.onSurfaceVariant)
         }
     }
 }

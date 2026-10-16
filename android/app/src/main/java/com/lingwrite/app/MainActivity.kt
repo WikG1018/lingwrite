@@ -13,9 +13,19 @@ import androidx.compose.runtime.getValue
 import com.lingwrite.app.ui.theme.LingTheme
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.lingwrite.app.i18n.AppLocale.wrap(newBase))
+    }
+
+    override fun onDestroy() {
+        if (com.lingwrite.app.i18n.L10n.ctx === this) com.lingwrite.app.i18n.L10n.ctx = applicationContext
+        super.onDestroy()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val transparent = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
         enableEdgeToEdge(statusBarStyle = transparent, navigationBarStyle = transparent)
+        com.lingwrite.app.i18n.L10n.ctx = this
         super.onCreate(savedInstanceState)
         if (android.os.Build.VERSION.SDK_INT >= 29) {
             window.isStatusBarContrastEnforced = false

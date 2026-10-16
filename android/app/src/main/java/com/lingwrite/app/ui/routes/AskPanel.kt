@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
@@ -68,7 +75,7 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
     val listState = rememberLazyListState()
     val book by remember(bookId) { AppGraph.books.book(bookId) }.collectAsState(null)
     // 胶囊不只是标签：移除哪个，请求里就不带哪块上下文
-    var chips by remember { mutableStateOf(if (loreScope) listOf("按章状态", "关系", "检索结果") else listOf("本章", "设定库", "前情")) }
+    var chips by remember { mutableStateOf(if (loreScope) listOf(tr(R.string.ask_panel_001), tr(R.string.ask_panel_002), tr(R.string.ask_panel_003)) else listOf(tr(R.string.ask_panel_004), tr(R.string.ask_panel_005), tr(R.string.ask_panel_006))) }
 
     LaunchedEffect(history.size, busy, streamingText) { if (history.isNotEmpty() || busy) listState.animateScrollToItem((history.size.coerceAtMost(20)) * 2) }
 
@@ -83,35 +90,35 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
                 val cards = AppGraph.db.lore().cardsOnce(bookId).filter { !it.pending && it.inject != "never" && (it.firstChapter == null || it.firstChapter <= cur) }
                 val states = AppGraph.db.lore().statesForBook(bookId).groupBy { it.cardId }
                 val named = cards.filter { card -> card.inject == "always" || card.allNames().any { question.contains(it) } }
-                val statesText = if ("按章状态" in chips) named.joinToString("\n") { card ->
+                val statesText = if (tr(R.string.ask_panel_001) in chips) named.joinToString("\n") { card ->
                     val f = com.lingwrite.app.data.resolveAt(card, states[card.id].orEmpty(), cur)
-                    "· ${card.name}：" + f.joinToString("；") { "${it.k}=${it.v}" + (it.changedAt?.let { a -> "（第 $a 章起）" } ?: "") }
+                    tr(R.string.ask_panel_007, card.name) + f.joinToString(tr(R.string.ask_panel_008)) { "${it.k}=${it.v}" + (it.changedAt?.let { a -> tr(R.string.ask_panel_009, a) } ?: "") }
                 } else ""
-                val relText = if ("关系" in chips) {
+                val relText = if (tr(R.string.ask_panel_002) in chips) {
                     val names = cards.associate { it.id to it.name }
                     com.lingwrite.app.data.relationsAt(AppGraph.db.lore().relationsOnce(bookId), cur)
-                        .joinToString("；") { "${names[it.fromId]}—${names[it.toId]}：${it.label}" }
+                        .joinToString(tr(R.string.ask_panel_008)) { tr(R.string.ask_panel_010, names[it.fromId], names[it.toId], trText(it.label)) }
                 } else ""
-                val hits = if ("检索结果" in chips) runCatching { ContextEngine.retrieve(bookId, chapter, named.filter { it.type == "character" }.map { it.name }, question) }.getOrDefault(emptyList()) else emptyList()
+                val hits = if (tr(R.string.ask_panel_003) in chips) runCatching { ContextEngine.retrieve(bookId, chapter, named.filter { it.type == "character" }.map { it.name }, question) }.getOrDefault(emptyList()) else emptyList()
                 listOfNotNull(
-                    statesText.takeIf { it.isNotBlank() }?.let { "【设定（以第 $cur 章时为准）】\n$it" },
-                    relText.takeIf { it.isNotBlank() }?.let { "【关系】\n$it" },
-                    hits.takeIf { it.isNotEmpty() }?.let { "【检索片段】\n" + hits.joinToString("\n") { h -> "（第 ${h.number} 章）${h.text.take(200)}" } },
+                    statesText.takeIf { it.isNotBlank() }?.let { trZh(R.string.ask_panel_011, cur, it) },
+                    relText.takeIf { it.isNotBlank() }?.let { trZh(R.string.ask_panel_012, it) },
+                    hits.takeIf { it.isNotEmpty() }?.let { trZh(R.string.ask_panel_013) + hits.joinToString("\n") { h -> trZh(R.string.ask_panel_014, h.number, h.text.take(200)) } },
                 ).joinToString("\n\n")
             } else {
                 val parts = buildList {
-                    if ("设定库" in chips) { add(ContextEngine.Part.Characters); add(ContextEngine.Part.Lore(question)) }
-                    if ("前情" in chips) add(ContextEngine.Part.PrevSummaries(5))
-                    if ("本章" in chips) add(ContextEngine.Part.ChapterPlan)
+                    if (tr(R.string.ask_panel_005) in chips) { add(ContextEngine.Part.Characters); add(ContextEngine.Part.Lore(question)) }
+                    if (tr(R.string.ask_panel_006) in chips) add(ContextEngine.Part.PrevSummaries(5))
+                    if (tr(R.string.ask_panel_004) in chips) add(ContextEngine.Part.ChapterPlan)
                 }
-                if (parts.isEmpty()) "（未带入任何上下文）" else ContextEngine.brief(bookId, chapterId, parts.toSet())
+                if (parts.isEmpty()) trZh(R.string.ask_panel_015) else ContextEngine.brief(bookId, chapterId, parts.toSet())
             }
             val hist = AppGraph.db.stats().askHistory(chapterId).first().takeLast(3).map { it.text to it.answer }
             val chapter = AppGraph.db.chapters().get(chapterId)
-            val sys = if (loreScope) AskPrompts.SYS + "\n回答必须给出处；没有出处的推断要注明“（推断）”。" else AskPrompts.SYS
+            val sys = if (loreScope) AskPrompts.SYS + trZh(R.string.ask_panel_016) else AskPrompts.SYS
             val user = AskPrompts.user(book?.title.orEmpty(), chapter?.number ?: chapterNo, brief, chapter?.content.orEmpty(), quote, hist, question)
             var answer = ""
-            AppGraph.ai.stream("ask", Slot.Writing, sys, listOf(ChatMessage("user", user)), 600, bookId, chapterId, scope = if (loreScope) "问设定" else "随手问")
+            AppGraph.ai.stream("ask", Slot.Writing, sys, listOf(ChatMessage("user", user)), 600, bookId, chapterId, scope = if (loreScope) trZh(R.string.ask_panel_017) else trZh(R.string.ask_panel_018))
                 .collect { e ->
                     when (e) {
                         is AiStream.Partial -> streamingText = e.text
@@ -126,16 +133,16 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
         }
     }
 
-    LingSheet(onDismiss, if (loreScope) "问设定" else "随手问", skipPartial = false, layout = SheetLayout.Viewport) {
+    LingSheet(onDismiss, if (loreScope) trZh(R.string.ask_panel_017) else trZh(R.string.ask_panel_018), skipPartial = false, layout = SheetLayout.Viewport) {
         Column(Modifier.fillMaxWidth().heightIn(max = 520.dp)) {
-            Text("回答不进正文", style = Ling.type.micro, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 20.dp))
+            Text(tr(R.string.ask_panel_019), style = Ling.type.micro, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 20.dp))
             Spacer(Modifier.height(4.dp))
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 val showEmpty = history.isEmpty() && !busy && streamingText.isBlank() && error == null && pending.isBlank()
                 if (showEmpty) {
                     Column(Modifier.align(Alignment.Center).padding(24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("可以问书里的设定，也可以问现实知识。", style = Ling.type.body, color = c.onSurfaceVariant)
-                        listOf("这个朝代的官职怎么称呼", "沈砚现在是什么境界", "这章节奏是不是太慢").forEachIndexed { si, sample ->
+                        Text(tr(R.string.ask_panel_020), style = Ling.type.body, color = c.onSurfaceVariant)
+                        listOf(tr(R.string.ask_panel_021), tr(R.string.ask_panel_022), tr(R.string.ask_panel_023)).forEachIndexed { si, sample ->
                             // 示例问题：在 sheet 底色上用 surfaceContainer 区分，整卡可点，前置图标
                             LingCard(Modifier.fillMaxWidth().enterStagger(si), color = c.surfaceContainer) {
                                 Row(Modifier.fillMaxWidth().rowClick { q = sample }.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -155,7 +162,7 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
                         }
                         AskAnswer(h.answer, onCopy = { clipboard.setText(AnnotatedString(h.answer)) },
                             onNote = {
-                                scope.launch { AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = chapterId, kind = "ask", text = "问：${h.text}\n${h.answer}")) }
+                                scope.launch { AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = chapterId, kind = "ask", text = tr(R.string.ask_panel_024, h.text, h.answer))) }
                             },
                             onLore = onToLoreCard?.let { cb -> { cb(h.text, h.answer) } })
                     }
@@ -167,7 +174,7 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
                         }
                         when {
                             error != null -> AiErrorCard(error!!, modifier = Modifier.padding(top = 8.dp), onRetry = { send(pending) })
-                            busy && streamingText.isBlank() -> AiThinking("正在翻设定和前情…", Modifier.padding(12.dp))
+                            busy && streamingText.isBlank() -> AiThinking(tr(R.string.ask_panel_025), Modifier.padding(12.dp))
                             else -> AskAnswer(streamingText, onCopy = { clipboard.setText(AnnotatedString(streamingText)) })
                         }
                     }
@@ -175,17 +182,17 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
             }
             // 输入区：上下文胶囊 + 输入框 + 发送
             Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                if (!quote.isNullOrBlank()) Text("选中：「${quote.take(24)}…」", style = Ling.type.micro, color = c.primary, modifier = Modifier.padding(bottom = 4.dp))
+                if (!quote.isNullOrBlank()) Text(tr(R.string.ask_panel_026, quote.take(24)), style = Ling.type.micro, color = c.primary, modifier = Modifier.padding(bottom = 4.dp))
                 ContextChips(chips, Modifier.padding(bottom = 6.dp)) { i -> chips = chips.toMutableList().also { it.removeAt(i) } }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingTextField(q, { q = it }, Modifier.weight(1f), placeholder = "问点什么…", singleLine = true)
+                    LingTextField(q, { q = it }, Modifier.weight(1f), placeholder = tr(R.string.ask_panel_027), singleLine = true)
                     val i = remember { MutableInteractionSource() }
                     Box(
                         Modifier.size(44.dp).pressScale(i, 0.90f).clip(RoundedCornerShape(22.dp))
                             .background(if (q.isBlank() || busy) c.surfaceContainer else c.primary)
                             .clickable(i, indication = null, enabled = q.isNotBlank() && !busy, onClick = { send(q) }),
                         contentAlignment = Alignment.Center,
-                    ) { Icon(LingIcons.Send, "发送", tint = if (q.isBlank() || busy) c.onSurfaceVariant else c.onPrimary, modifier = Modifier.size(20.dp)) }
+                    ) { Icon(LingIcons.Send, tr(R.string.ask_panel_028), tint = if (q.isBlank() || busy) c.onSurfaceVariant else c.onPrimary, modifier = Modifier.size(20.dp)) }
                 }
             }
         }
@@ -209,9 +216,9 @@ private fun AskAnswer(answer: String, onCopy: () -> Unit, onNote: (() -> Unit)? 
         } }
         Text(annotated, style = Ling.type.body.copy(lineHeight = 22.sp), color = c.onSurface)
         Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton("复制", BtnKind.Text, height = 32.dp, onClick = onCopy)
-            if (onNote != null) LingButton("存到本章便签", BtnKind.Text, height = 32.dp, onClick = onNote)
-            if (onLore != null) LingButton("转设定卡", BtnKind.Text, height = 32.dp, onClick = onLore)
+            LingButton(tr(R.string.ai_components_005), BtnKind.Text, height = 32.dp, onClick = onCopy)
+            if (onNote != null) LingButton(tr(R.string.ask_panel_029), BtnKind.Text, height = 32.dp, onClick = onNote)
+            if (onLore != null) LingButton(tr(R.string.ask_panel_030), BtnKind.Text, height = 32.dp, onClick = onLore)
         }
     }
 }
