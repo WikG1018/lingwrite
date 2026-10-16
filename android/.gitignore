@@ -1,0 +1,11 @@
+.gradle/
+build/
+/app/build/
+local.properties
+.idea/
+*.iml
+# 签名密钥永不入库
+*.jks
+*.keystore
+signing.properties
+*.apk

@@ -1,0 +1,12 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<resources>
+    <style name="Theme.LingWrite" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+    <color name="bg">#0F1218</color>
+</resources>

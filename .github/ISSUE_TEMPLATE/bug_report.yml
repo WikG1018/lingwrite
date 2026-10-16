@@ -1,0 +1,27 @@
+name: 问题反馈 / Bug report
+description: App 出错、闪退或表现与预期不符 / Something is broken
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        安全漏洞请不要在这里提，按 SECURITY.md 私下报告。**不要贴 API Key 或作品全文。**
+        Please report security issues privately (see SECURITY.en.md). **Never paste API keys.**
+  - type: input
+    id: version
+    attributes: { label: 版本 / Version, placeholder: "v0.2.12（关于页长按可复制）" }
+    validations: { required: true }
+  - type: input
+    id: device
+    attributes: { label: 设备与系统 / Device & Android version, placeholder: "Xiaomi 14 · Android 15" }
+  - type: textarea
+    id: steps
+    attributes: { label: 复现步骤 / Steps to reproduce, placeholder: "1. …\n2. …" }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: 期望与实际 / Expected vs actual }
+    validations: { required: true }
+  - type: textarea
+    id: extra
+    attributes: { label: 截图或日志 / Screenshots or logs }

@@ -1,0 +1,471 @@
+// SPDX-FileCopyrightText: 2026 WikG and LingWrite contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+package com.lingwrite.app.ui.routes
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.lingwrite.app.data.ChapterLabel
+import com.lingwrite.app.AppGraph
+import com.lingwrite.app.data.*
+import com.lingwrite.app.data.db.ChapterEntity
+import com.lingwrite.app.data.db.ChapterNoteEntity
+import com.lingwrite.app.data.db.ChapterVersionEntity
+import com.lingwrite.app.ui.Routes
+import com.lingwrite.app.ui.components.*
+import com.lingwrite.app.ui.screens.EditorActions
+import com.lingwrite.app.ui.screens.EditorScreen
+import com.lingwrite.app.ui.theme.Ling
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+
+/** 编辑器状态，供 AI 工具条等模块读写正文。 */
+class EditorState(chapter: ChapterEntity) {
+    var chapter by mutableStateOf(chapter)
+    var value by mutableStateOf(TextFieldValue(chapter.content, TextRange(chapter.content.length)))
+    var marks by mutableStateOf(parseMarks(chapter.aiMarks))
+    private val undo = ArrayDeque<Pair<TextFieldValue, List<AiMark>>>()
+    private val redo = ArrayDeque<Pair<TextFieldValue, List<AiMark>>>()
+    private var lastPush = 0L
+    val canUndo get() = undo.isNotEmpty()
+    val canRedo get() = redo.isNotEmpty()
+
+    fun edit(v: TextFieldValue) {
+        if (v.text != value.text) {
+            redo.clear()
+            val now = System.currentTimeMillis()
+            if (now - lastPush > 1500 || undo.isEmpty()) { undo.addLast(value to marks); if (undo.size > 100) undo.removeFirst(); lastPush = now }
+            marks = MarkTracker.adjust(value.text, v.text, marks)
+        }
+        value = v
+    }
+
+    /** 程序化替换 [start,end) 为 [text]；[kind] 非空时把新文本标为 AI 段落。 */
+    fun replace(start: Int, end: Int, text: String, kind: String? = null) {
+        require(start in 0..value.text.length && end in start..value.text.length)
+        redo.clear()
+        undo.addLast(value to marks); lastPush = System.currentTimeMillis()
+        val old = value.text
+        val nt = old.substring(0, start) + text + old.substring(end)
+        var m = MarkTracker.adjust(old, nt, marks).filterNot { it.s >= start && it.e <= start + text.length && kind != null }
+        if (kind != null && text.isNotEmpty()) m = (m + AiMark(start, start + text.length, kind)).sortedBy { it.s }
+        marks = m
+        value = TextFieldValue(nt, TextRange(start + text.length))
+    }
+
+    fun undo() { undo.removeLastOrNull()?.let { (v, m) -> redo.addLast(value to marks); value = v; marks = m; lastPush = 0 } }
+    fun redo() { redo.removeLastOrNull()?.let { (v, m) -> undo.addLast(value to marks); value = v; marks = m; lastPush = 0 } }
+    fun reset(content: String) { value = TextFieldValue(content, TextRange(content.length)); marks = emptyList(); undo.clear(); redo.clear() }
+}
+
+/** 编辑器扩展点（后续模块注册）。 */
+object EditorHooks {
+    var names: (Long) -> Flow<List<String>> = { flowOf(emptyList()) }
+    /** 底部 AI 面板 */
+    var aiPanel: @Composable ColumnScope.(EditorState, aiOpen: MutableState<Boolean>) -> Unit = { _, _ -> }
+    /** 更多菜单里的附加项 */
+    var moreItems: @Composable ColumnScope.(EditorState, close: () -> Unit, nav: NavHostController) -> Unit = { _, _, _ -> }
+    var onForeshadow: (EditorState, NavHostController) -> Unit = { _, _ -> }
+    var onCheck: (EditorState, NavHostController) -> Unit = { _, _ -> }
+    var onQuote: (EditorState, NavHostController) -> Unit = { _, _ -> }
+    /** 章节被标记完成时（自动一致性检查等） */
+    var onChapterDone: (Long) -> Unit = {}
+    /** 「换个模型」：编辑器路由注册，跳到模型设置 */
+    var onOpenModels: (() -> Unit)? = null
+    var overlays: @Composable (EditorState, NavHostController) -> Unit = { _, _ -> }
+}
+
+@Composable
+fun EditorRoute(chapterId: Long, nav: NavHostController) {
+    val repo = AppGraph.books
+    val scope = rememberCoroutineScope()
+    var state by remember { mutableStateOf<EditorState?>(null) }
+    LaunchedEffect(chapterId) {
+        val loaded = repo.editorChapter(chapterId)
+        if (loaded == null) nav.popBackStack() else state = EditorState(loaded)
+    }
+    val st = state ?: return
+    val ch = st.chapter
+    val live by remember(chapterId) { repo.chapter(chapterId) }.collectAsState(ch)
+    // Metadata may change while this editor remains open; keep anchors on the current chapter number.
+    LaunchedEffect(live) {
+        val current = live ?: return@LaunchedEffect
+        if (current.deletedAt != 0L) nav.popBackStack() else st.chapter = current
+    }
+    val today by remember { repo.todayWords() }.collectAsState(0)
+    val names by remember(ch.bookId) { EditorHooks.names(ch.bookId) }.collectAsState(emptyList())
+    var saving by remember { mutableStateOf(false) }
+    var saveError by remember(chapterId) { mutableStateOf(repo.saveFailure(chapterId)) }
+    var more by remember { mutableStateOf(false) }
+    var history by remember { mutableStateOf(false) }
+    var renaming by remember { mutableStateOf(false) }
+    var modeSheet by remember { mutableStateOf(false) }
+    var notesOpen by remember { mutableStateOf(false) }
+    val aiOpen = remember { mutableStateOf(false) }
+    val prefs by remember { AppGraph.prefs.flow }.collectAsState(AppGraph.prefs.snapshot)
+    val s = remember(chapterId) { sessionFor(chapterId) }
+    // 本书模式（MD2）：作品设置优先，否则跟随全局
+    var mode by remember(ch.bookId) { mutableStateOf(WriteMode.Assist) }
+    LaunchedEffect(ch.bookId) {
+        mode = com.lingwrite.app.data.modeFor(ch.bookId)
+        s.mode = mode
+    }
+    LaunchedEffect(mode) { s.mode = mode }
+    LaunchedEffect(nav) { EditorHooks.onOpenModels = { nav.navigate(Routes.Models) } }
+    val notesUnread by remember(chapterId) { AppGraph.db.notes().unreadCount(chapterId) }.collectAsState(0)
+    // C5 节拍清单（链路第 ⑥ 步）：正文上方的可勾选清单
+    var beats by remember(chapterId) { mutableStateOf(emptyList<com.lingwrite.app.data.Beat>()) }
+    LaunchedEffect(chapterId) {
+        val p = AppGraph.db.plan().chapterOnce(chapterId)
+        if (p != null) beats = parseBeats(p.beats)
+    }
+    // A9 校对（ai-features §9）：结果只在内存里，接受后不加 AI 段落标记
+    val proof = remember { mutableStateListOf<com.lingwrite.app.data.ProofIssue>() }
+    var proofBusy by remember { mutableStateOf(false) }
+    var proofErr by remember { mutableStateOf<String?>(null) }
+    var proofPick by remember { mutableStateOf(-1) }
+    var stuck by remember { mutableStateOf(false) }
+    val proofRanges = proof.mapNotNull { issue ->
+        val at = com.lingwrite.app.data.Proof.locate(st.value.text, issue.quote)
+        if (at >= 0) at until (at + issue.quote.length) else null
+    }
+    fun acceptProof(i: Int) {
+        val issue = proof.getOrNull(i) ?: return
+        val at = com.lingwrite.app.data.Proof.locate(st.value.text, issue.quote)
+        if (at >= 0) {
+            val kind = if (com.lingwrite.app.data.Proof.needsAiMark(issue)) "edited" else null
+            st.replace(at, at + issue.quote.length, issue.fix, kind)
+        }
+        proof.removeAt(i)
+        proofPick = -1
+    }
+    val onBeatToggle: (Int) -> Unit = { i ->
+        scope.launch {
+            val plan = AppGraph.db.plan().chapterOnce(chapterId) ?: com.lingwrite.app.data.db.ChapterPlanEntity(chapterId, ch.bookId)
+            beats = beats.mapIndexed { k, b -> if (k == i) b.copy(done = !b.done) else b }
+            AppGraph.db.plan().upsertChapter(plan.copy(beats = encodeBeats(beats)))
+        }
+    }
+    // A9 校对：工具条胶囊「校对本章」和 ⋮ 菜单共用同一条入口
+    fun runProof() {
+        proofBusy = true; proofErr = null
+        scope.launch {
+            runCatching { com.lingwrite.app.data.Proof.run(ch.bookId, chapterId, st.value.text) }
+                .onSuccess { proof.clear(); proof.addAll(it) }
+                .onFailure { proofErr = it.message }
+            proofBusy = false
+        }
+    }
+    // A5 卡文急救：工具条胶囊（辅助模式常驻）
+    LaunchedEffect(s.wantProof) { if (s.wantProof) { s.wantProof = false; runProof() } }
+    LaunchedEffect(s.wantStuck) { if (s.wantStuck) { s.wantStuck = false; stuck = true } }
+    // A5：光标停留 3 分钟没有新内容 → 轻提示一次（prefs.stuckHint，每章一次）
+    var stuckHinted by remember(chapterId) { mutableStateOf(false) }
+    var stuckHintClosed by remember(chapterId) { mutableStateOf(false) }
+    val stuckHintOn = prefs?.stuckHint ?: true
+    LaunchedEffect(st.value.text, stuckHintOn) {
+        if (stuckHintOn && !stuckHinted && st.value.text.isNotBlank()) {
+            delay(3 * 60_000)
+            stuckHinted = true
+        }
+    }
+    // 切到辅助模式时，未采纳的候选存进便签（modes.md §4）
+    fun switchMode(m: WriteMode, applyAll: Boolean) {
+        scope.launch {
+            if (m == WriteMode.Assist && (s.multi && s.cands.isNotEmpty())) {
+                s.cands.forEach { cand -> if (cand.display.isNotBlank()) AppGraph.db.notes().insert(ChapterNoteEntity(chapterId = chapterId, kind = "direction", text = cand.display)) }
+                s.clear()
+            }
+            mode = m
+            AppGraph.db.books().get(ch.bookId)?.let { b ->
+                AppGraph.books.updateBook(b.copy(writeMode = if (applyAll) null else m.id))
+            }
+            if (applyAll) AppGraph.prefs.update { it.copy(writeMode = m.id) }
+        }
+    }
+
+    // 自动保存：停止输入 1.2 秒后写库；离开页面时兜底保存
+    LaunchedEffect(st.value.text, st.marks) {
+        saving = true
+        val revision = repo.captureRevision()
+        val text = st.value.text
+        val marks = encodeMarks(st.marks)
+        delay(1200)
+        try { repo.saveContent(chapterId, text, marks, revision = revision); saveError = null; saving = false }
+        catch (e: kotlinx.coroutines.CancellationException) { throw e }
+        catch (e: Exception) { saveError = "保存失败，请保留页面并重试：${e.message}"; saving = false }
+    }
+    val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(chapterId, lifecycle) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_STOP) repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks))
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    DisposableEffect(chapterId) {
+        onDispose { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) }
+    }
+    val words = Words.count(st.value.text)
+
+    val p = prefs
+    val imeVisible = WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+    EditorScreen(
+        noticeBar = {
+    // 首次进入编辑器的一次性提示（modes.md §3.5）
+    if (!imeVisible && p != null && !p.modeTipShown && st.value.text.isBlank()) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(12.dp)).background(Ling.colors.surfaceContainer).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(if (mode == WriteMode.Assist) ModeCopy.ASSIST_TIP else ModeCopy.GENERATE_TIP, style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
+            LingButton("知道了", BtnKind.Text, height = 32.dp) { scope.launch { AppGraph.prefs.update { it.copy(modeTipShown = true) } } }
+        }
+    }
+
+    // A5：3 分钟没有新内容时的轻提示（只弹一次，可在设置里关闭）
+    if (!imeVisible && stuckHintOn && stuckHinted && !stuckHintClosed && !stuck) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp).clip(RoundedCornerShape(12.dp)).background(Ling.colors.surfaceContainer).padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("卡住了？试试卡文急救，3 步给方向。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.weight(1f))
+            LingButton("去看看", BtnKind.Tonal, height = 32.dp) { stuckHintClosed = true; stuck = true }
+            LingButton("不用了", BtnKind.Text, height = 32.dp) { stuckHintClosed = true }
+        }
+    }
+
+    // A6：一致性问题「去原文应用」——作者在这里确认后才写正文，并标 edited
+    val pf = com.lingwrite.app.data.IssueFixes.PendingFix
+    if (pf.active && pf.chapterId == chapterId) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp).clip(RoundedCornerShape(12.dp)).background(Ling.colors.amber.copy(alpha = 0.14f)).padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text("待确认改法（来自一致性检查）", style = Ling.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = Ling.colors.onSurface)
+                Text("原文：${pf.before.take(50)}", style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text("改后：${pf.after.take(50)}", style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.primary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+            LingButton("应用", BtnKind.Tonal, height = 32.dp) {
+                scope.launch {
+                    val at = st.value.text.indexOf(pf.before)
+                    if (at >= 0) {
+                        repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
+                        repo.snapshot(chapterId, "ai", "改法应用前")
+                        st.replace(at, at + pf.before.length, pf.after, "edited")
+                    }
+                    pf.clear()
+                }
+            }
+            LingButton("忽略", BtnKind.Text, height = 32.dp) { pf.clear() }
+        }
+    }
+
+        },
+        title = ChapterLabel.full(ch.number, live?.title ?: ch.title),
+        subtitle = saveError ?: if (saving) "正在保存… · ${Words.grouped(words)} 字" else "已自动保存 · ${Words.grouped(words)} 字",
+        value = st.value, onValueChange = st::edit, marks = st.marks, names = names,
+        todayDelta = "今日 +${Words.grouped(today)}", canUndo = st.canUndo, canRedo = st.canRedo,
+        mode = mode, notesUnread = notesUnread,
+        beats = beats, onBeatToggle = onBeatToggle,
+        proofRanges = proofRanges,
+        proofBar = {
+            if (proofBusy || proof.isNotEmpty() || proofErr != null) com.lingwrite.app.ui.screens.ProofBar(
+                count = proof.size,
+                busy = proofBusy,
+                error = proofErr,
+                pick = proofPick,
+                onPick = { proofPick = it },
+                onAcceptAll = {
+                    while (proof.isNotEmpty()) acceptProof(0)
+                },
+                onAcceptOne = { acceptProof(it) },
+                onExit = { proof.clear(); proofPick = -1; proofErr = null },
+            )
+        },
+        proofBubble = {
+            proof.getOrNull(proofPick)?.let { issue ->
+                com.lingwrite.app.ui.screens.ProofBubble(
+                    issue = issue,
+                    onIgnore = { proofPick = (proofPick + 1) % proof.size.coerceAtLeast(1) },
+                    onAccept = { acceptProof(proofPick) },
+                )
+            }
+        },
+        emptyHint = if (mode == WriteMode.Assist) ModeCopy.ASSIST_EMPTY else ModeCopy.GENERATE_EMPTY,
+        badge = { com.lingwrite.app.ui.ai.ModeBadge(mode) { modeSheet = true } },
+        actions = EditorActions(
+            onBack = { nav.popBackStack() }, onUndo = st::undo, onRedo = st::redo, onMore = { more = true },
+            onLore = { nav.navigate(Routes.lore(ch.bookId, 0)) },
+            onCharacters = { nav.navigate(Routes.lore(ch.bookId, -1)) },
+            onQuote = { EditorHooks.onQuote(st, nav) }, onForeshadow = { EditorHooks.onForeshadow(st, nav) },
+            onCheck = { EditorHooks.onCheck(st, nav) }, onAi = { aiOpen.value = !aiOpen.value },
+            onNotes = { notesOpen = true },
+            onSave = { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) },
+        ),
+        directory = { EditorDirectory(st, nav) },
+        tools = { tab -> EditorInspector(st, nav, tab) },
+        bottomPanel = { EditorHooks.aiPanel(this, st, aiOpen) },
+    )
+    EditorHooks.overlays(st, nav)
+    NotesDrawer(chapterId, notesOpen, onClose = { notesOpen = false })
+    if (stuck) StuckSheet(
+        chapterId = chapterId, bookId = ch.bookId, isGenerate = mode == com.lingwrite.app.data.WriteMode.Generate,
+        onDismiss = { stuck = false },
+        onDraftAWay = { w ->
+            val aiSession = com.lingwrite.app.ui.routes.sessionFor(chapterId)
+            aiSession.ask = false
+            // 生成模式：按方向起草一段，走草稿区
+            scope.launch {
+                aiSession.draftOpen = true
+                aiSession.draftStreaming = 0
+                val prompt = "按这个方向写 1200 字正文，前 500 字有钩子。【方向】${w.title}：${w.how}"
+                AppGraph.ai.stream("draft", com.lingwrite.app.data.ai.Slot.Writing,
+                    com.lingwrite.app.data.ai.Prompts.BASE, listOf(com.lingwrite.app.data.ai.ChatMessage("user", prompt)), 1200, ch.bookId, chapterId, scope = "卡文起草")
+                    .collect { e ->
+                        val t = (e as? com.lingwrite.app.data.ai.AiStream.Partial)?.text
+                            ?: (e as? com.lingwrite.app.data.ai.AiStream.Finished)?.text
+                        if (t != null) {
+                            if (aiSession.draftSegs.isEmpty()) aiSession.draftSegs += t else aiSession.draftSegs[0] = t
+                        }
+                    }
+                aiSession.draftStreaming = -1
+            }
+        },
+    )
+
+    if (modeSheet) {
+        var applyAll by remember { mutableStateOf(false) }
+        LingSheet({ modeSheet = false }, "切换写作模式") {
+            Text("本书写作模式：跟随全局 / 辅助 / 生成。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+            SheetAction(LingIcons.Draw, "辅助 · ${ModeCopy.ASSIST_ONE_LINER}", sub = ModeCopy.ASSIST_RESULT) { switchMode(WriteMode.Assist, applyAll); modeSheet = false }
+            SheetAction(LingIcons.SparkleFilled, "生成 · ${ModeCopy.GENERATE_ONE_LINER}", sub = ModeCopy.GENERATE_RESULT) { switchMode(WriteMode.Generate, applyAll); modeSheet = false }
+            Row(Modifier.padding(horizontal = 24.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                androidx.compose.material3.Checkbox(applyAll, { applyAll = it })
+                Text("应用到所有作品", style = Ling.type.body, color = Ling.colors.onSurface)
+            }
+        }
+    }
+
+    if (more) LingSheet({ more = false }) {
+        SheetAction(LingIcons.Help, "写作指南", sub = "打开当前章节的写作与修订说明") {
+            scope.launch {
+                AppGraph.prefs.update { it.copy(authorGuide = true, authorGuideStep = 5, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION) }
+                AuthorGuideUi.openEpoch++
+            }
+            more = false
+        }
+        SheetAction(LingIcons.History, "历史版本", sub = "自动保留最近 ${BookRepository.KEEP_AUTO} 个，手动快照永久保留") { history = true; more = false }
+        SheetAction(LingIcons.BookmarkAdd, "保存快照") { scope.launch { repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks)); repo.snapshot(chapterId) }; more = false }
+        SheetAction(LingIcons.EditOutline, "重命名本章") { renaming = true; more = false }
+        SheetAction(LingIcons.Book, "设定库", sub = "人物、势力、地点、物品、力量、概念") { nav.navigate(Routes.lore(ch.bookId, 0)); more = false }
+        val done = live?.state == "done"
+        SheetAction(LingIcons.Check, if (done) "改回草稿" else "完成本章", sub = if (done) null else "完成后会自动做摘要和一致性检查（可在设置里关闭）") {
+            scope.launch {
+                repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
+                repo.setChapterState(chapterId, if (done) "draft" else "done")
+                if (!done) EditorHooks.onChapterDone(chapterId)
+            }
+            more = false
+        }
+        SheetAction(LingIcons.Add, "写下一章", sub = "接在本章所在卷") { scope.launch { val n = repo.nextChapter(ch.bookId, afterChapterId = ch.id); nav.navigate(Routes.editor(n)) { popUpTo(Routes.Editor) { inclusive = true } } }; more = false }
+        SheetAction(LingIcons.FactCheck, "校对本章", sub = "只改错字和标点，不改文风") {
+            more = false; runProof()
+        }
+        SheetAction(LingIcons.Help, "卡文急救", sub = "卡住了就走 3 步：选卡点、澄清、给方向") { more = false; stuck = true }
+        // A16 读者试读：模拟反馈，仅供参考（ai-features §16）
+        SheetAction(LingIcons.FactCheck, "读者试读", sub = "模拟读者读完本章的追读意愿和弃书点") { more = false; nav.navigate(com.lingwrite.app.ui.Routes.reader(ch.bookId, ch.number)) }
+        EditorHooks.moreItems(this, st, { more = false }, nav)
+    }
+    if (renaming) {
+        var t by remember { mutableStateOf(live?.title ?: ch.title) }
+        LingConfirm("章节标题", "", onDismiss = { renaming = false }, onConfirm = { scope.launch { repo.renameChapter(chapterId, t) }; renaming = false }, extra = {
+            LingTextField(t, { t = it }, Modifier.padding(top = 4.dp))
+        })
+    }
+    if (history) HistorySheet(chapterId, st.value.text, onDismiss = { history = false }) { v ->
+        scope.launch {
+            repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
+            repo.rollback(chapterId, v.id)
+            st.reset(v.content)
+            history = false
+        }
+    }
+}
+
+private fun kindLabel(k: String) = when (k) { "manual" -> "手动快照"; "rollback" -> "回滚前"; "ai" -> "AI 采纳前"; else -> "自动保存" }
+
+@Composable
+fun HistorySheet(chapterId: Long, current: String, onDismiss: () -> Unit, onRollback: (ChapterVersionEntity) -> Unit) {
+    val c = Ling.colors
+    val versions by remember(chapterId) { AppGraph.books.versions(chapterId) }.collectAsState(emptyList())
+    var open by remember { mutableStateOf<ChapterVersionEntity?>(null) }
+    LingSheet(onDismiss, "历史版本", layout = SheetLayout.Viewport) {
+        if (versions.isEmpty()) Text("还没有历史版本。写作时会自动保存版本。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+        LazyColumn(Modifier.heightIn(max = 520.dp)) {
+            items(versions, key = { it.id }) { v ->
+                val delta = Words.count(current) - v.wordCount
+                Row(Modifier.fillMaxWidth().rowClick { open = v }.padding(horizontal = 24.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(TimeFmt.clock(v.createdAt), style = Ling.type.bodyLarge, color = c.onSurface)
+                            Spacer(Modifier.width(8.dp))
+                            Pill(kindLabel(v.kind), if (v.kind == "manual") PillKind.Primary else PillKind.Neutral)
+                        }
+                        Text(v.content.trim().take(40).replace("\n", " "), style = Ling.type.caption, color = c.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("${Words.grouped(v.wordCount)} 字", style = Ling.type.caption, color = c.onSurfaceVariant)
+                        if (delta != 0) Text(if (delta > 0) "当前多 $delta" else "当前少 ${-delta}", style = Ling.type.micro, color = if (delta > 0) c.good else c.tertiary)
+                    }
+                }
+            }
+        }
+    }
+    open?.let { v -> VersionCompare(v, current, onDismiss = { open = null }) { onRollback(v); open = null } }
+}
+
+@Composable
+private fun VersionCompare(v: ChapterVersionEntity, current: String, onDismiss: () -> Unit, onRollback: () -> Unit) {
+    val c = Ling.colors
+    val diff = remember(v.id, current) { ParaDiff.diff(v.content, current) }
+    LingSheet(onDismiss, "${TimeFmt.clock(v.createdAt)} · ${kindLabel(v.kind)}", layout = SheetLayout.Viewport) {
+        Row(Modifier.padding(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Legend(c.errorContainer, "仅在该版本"); Legend(c.goodContainer, "仅在当前")
+        }
+        Column(Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            diff.forEach { l ->
+                val bg = when (l.op) { ParaDiff.Op.Del -> c.errorContainer; ParaDiff.Op.Add -> c.goodContainer; else -> c.surface }
+                Text(l.text, style = Ling.type.body.copy(textDecoration = if (l.op == ParaDiff.Op.Del) TextDecoration.LineThrough else null),
+                    color = if (l.op == ParaDiff.Op.Same) c.onSurfaceVariant else c.onSurface,
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(bg).padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+        }
+        LingButton("回滚到这个版本", modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), height = 50.dp, onClick = onRollback)
+        Text("回滚前会把当前内容另存为一个版本，随时可以再换回来。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+    }
+}
+
+@Composable
+private fun Legend(color: androidx.compose.ui.graphics.Color, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(10.dp).clip(RoundedCornerShape(3.dp)).background(color))
+        Spacer(Modifier.width(6.dp)); Text(text, style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
+    }
+}

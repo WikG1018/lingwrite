@@ -1,0 +1,7 @@
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="52" android:viewportHeight="52">
+  <group android:translateX="-28" android:translateY="-33">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M38,70 L62,40 Q66,36 70,40 Q73,44 69,48 L45,76 L36,78 Z"/>
+    <path android:fillColor="#FFFFFFFF" android:pathData="M36,80 L72,80 L72,83 L36,83 Z"/>
+  </group>
+</vector>

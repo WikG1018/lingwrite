@@ -1,0 +1,46 @@
+/* v0.2 新增组件（沿用 theme.css 变量） */
+.sb2{height:36px}
+.badge{display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 9px 0 7px;border-radius:12px;font-size:12px;font-weight:600;flex:none}
+.badge.as{background:var(--pc);color:var(--on-pc)}.badge.ge{background:var(--tc);color:var(--on-tc)}
+.badge .ms{font-size:15px}
+.chips{display:flex;gap:8px;padding:0 16px;overflow:hidden}
+.chip{height:32px;padding:0 13px;border-radius:16px;font-size:13.5px;display:inline-flex;align-items:center;gap:4px;background:var(--sch);color:var(--onv);white-space:nowrap;font-weight:500}
+.chip.on{background:var(--pc);color:var(--on-pc)}.chip .ms{font-size:16px}
+/* 禁用左侧色条：类型用浅底色 + 1px 描边 + 标题前小圆标 */
+.note{margin:0 16px;border-radius:16px;background:color-mix(in srgb,var(--primary) 4.5%,var(--surface));border:1px solid color-mix(in srgb,var(--primary) 22%,transparent);box-shadow:0 2px 14px rgba(20,30,50,.08);padding:12px 14px;position:relative;overflow:hidden}
+.note .h{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--primary);font-weight:600}
+.note ol{margin:8px 0 10px 18px;font-size:14.5px;line-height:23px}.note li{margin-bottom:4px}
+.cand{margin:0 16px;border-radius:16px;background:color-mix(in srgb,var(--tert-accent) 4.5%,var(--surface));border:1px solid color-mix(in srgb,var(--tert-accent) 22%,transparent);box-shadow:0 2px 14px rgba(20,30,50,.08);padding:12px 14px;position:relative;overflow:hidden}
+.cand .h{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--tertiary);font-weight:600}
+.cand .b{font-size:15px;line-height:26px;margin:8px 0 10px}
+.dots{display:flex;gap:5px;align-items:center;margin-left:auto}.dots i{width:6px;height:6px;border-radius:3px;background:var(--outline)}.dots i.on{width:16px;background:var(--tert-accent)}.dots i.ready{background:var(--tertiary)}
+.acts{display:flex;gap:8px;justify-content:flex-end}.acts .btn{height:34px;font-size:13.5px;padding:0 14px}
+.btn.tn{background:var(--pc);color:var(--on-pc)}
+.think{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--onv)}
+.think b{display:inline-flex;gap:4px}.think b i{width:6px;height:6px;border-radius:3px;background:var(--tert-accent);opacity:.35}.think b i:nth-child(2){opacity:.7}.think b i:nth-child(3){opacity:1}
+.skel{height:12px;border-radius:6px;background:var(--sch);margin:8px 0}
+.caret{display:inline-block;width:2px;height:18px;background:var(--tert-accent);vertical-align:-3px;margin-left:1px}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;padding:10px 0 34px;z-index:30;box-shadow:0 -4px 24px rgba(0,0,0,.12)}
+.sheet .grab{width:36px;height:4px;border-radius:2px;background:var(--outline);margin:0 auto 10px}
+.sheet .st{font-size:20px;font-weight:600;padding:4px 24px 12px}
+.scrim{position:absolute;inset:0;background:var(--scrim);z-index:25}
+.row{display:flex;align-items:center;gap:14px;padding:13px 16px}
+.row .t{font-size:15.5px;font-weight:500}.row .s{font-size:12.5px;color:var(--onv)}
+.field{background:var(--sch);border-radius:14px;padding:12px 14px;font-size:15px;color:var(--on)}
+.field.ph{color:var(--onv)}
+.banner{margin:8px 16px;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;background:var(--tc);color:var(--on-tc);font-size:13.5px;font-weight:500}
+.lbl{font-size:12.5px;color:var(--onv)}
+.wavy{text-decoration:underline wavy var(--error);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.hl{background:rgba(217,154,60,.30);border-radius:3px}
+.step{display:flex;gap:12px;padding:0 20px}
+.step .rail{display:flex;flex-direction:column;align-items:center;width:24px;flex:none}
+.step .dot{width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:2px solid var(--outline);color:var(--onv);background:var(--bg)}
+.step .dot.done{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.step .dot.cur{background:var(--primary);border-color:var(--primary);color:var(--on-primary);box-shadow:0 0 0 6px color-mix(in srgb,var(--primary) 18%,transparent)}
+.step .line{width:2px;flex:1;background:var(--ov);min-height:14px}
+.step .line.done{background:var(--primary)}
+.step .body{flex:1;padding-bottom:14px}
+.step .ttl{font-size:15px;font-weight:600}.step .sum{font-size:12.5px;color:var(--onv);margin-top:2px}
+.warnp{color:var(--tertiary);font-size:12px;font-weight:500}
+
+.note .h .ms,.cand .h .ms{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;background:color-mix(in srgb,currentColor 14%,transparent)}

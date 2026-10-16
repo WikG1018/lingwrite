@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞 / Security vulnerability
+    url: https://github.com/WikG1018/lingwrite/security/advisories/new
+    about: 请私下报告 / Please report privately
