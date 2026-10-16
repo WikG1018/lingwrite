@@ -40,7 +40,7 @@ LingWrite is open source under the AGPL-3.0, and the maintainer keeps the option
 - You allow the maintainer to distribute your contribution under the AGPL-3.0 **and under other licenses**.
 - You confirm the work is your own, or that you have the right to submit it.
 
-To sign, add the line "I have read and agree to CLA.md (version 0.1)" to your PR description, and make sure your commit email matches your GitHub account. We may switch to the CLA Assistant bot later.
+To sign, add the line "I have read and agree to CLA.md (version 0.2)" to your PR description, and make sure your commit email matches your GitHub account. We may switch to the CLA Assistant bot later.
 
 > Why not a DCO? A DCO only certifies where the code came from. It doesn't give the maintainer permission to distribute it under anything other than the AGPL. Keeping dual licensing possible requires a CLA.
 

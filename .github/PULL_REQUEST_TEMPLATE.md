@@ -12,4 +12,4 @@
 ## CLA
 
 <!-- 首次贡献请保留下面这一行 / First-time contributors: keep the line below -->
-- [ ] 我已阅读并同意 CLA.md（版本 0.1）/ I have read and agree to CLA.md (version 0.1)
+- [ ] 我已阅读并同意 CLA.md（版本 0.2）/ I have read and agree to CLA.md (version 0.2)
