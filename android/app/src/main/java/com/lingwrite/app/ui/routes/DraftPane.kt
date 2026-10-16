@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,24 +46,24 @@ fun DraftPane(
     LingCard(Modifier.padding(horizontal = 16.dp, vertical = 6.dp).fillMaxWidth(), shape = RoundedCornerShape(16.dp), color = c.surfaceContainer) {
         Column(Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("草稿 · 第 ${segments.size.coerceAtMost(total)}/$total 段", style = Ling.type.caption.copy(fontWeight = FontWeight.SemiBold), color = c.tertiary, modifier = Modifier.weight(1f))
-                LingButton("收起", BtnKind.Text, height = 32.dp, onClick = onDismiss)
+                Text(tr(R.string.draft_pane_001, segments.size.coerceAtMost(total), total), style = Ling.type.caption.copy(fontWeight = FontWeight.SemiBold), color = c.tertiary, modifier = Modifier.weight(1f))
+                LingButton(tr(R.string.draft_pane_002), BtnKind.Text, height = 32.dp, onClick = onDismiss)
             }
-            Text("草稿不计入字数统计；采纳的段落会带 AI 标记。", style = Ling.type.caption.copy(fontSize = 11.5.sp), color = c.onSurfaceVariant)
+            Text(tr(R.string.draft_pane_003), style = Ling.type.caption.copy(fontSize = 11.5.sp), color = c.onSurfaceVariant)
             segments.forEachIndexed { i, seg ->
                 Column(Modifier.padding(top = 10.dp)) {
                     if (i == streamingIndex) Row(verticalAlignment = Alignment.Top) { Text(seg, style = Ling.type.bodyLarge.copy(lineHeight = 27.sp), color = c.onSurface, modifier = Modifier.weight(1f, fill = false)); com.lingwrite.app.ui.ai.AiStreamCursor(Modifier.padding(top = 4.dp)) }
                     else Text(seg, style = Ling.type.bodyLarge.copy(lineHeight = 27.sp), color = c.onSurface)
                     Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LingButton("采纳到正文", BtnKind.Tonal, height = 32.dp, enabled = streamingIndex < 0, onClick = { onAdopt(i) })
-                        LingButton("微调", BtnKind.Outlined, height = 32.dp, onClick = { onTweak(i) })
-                        LingButton("换一版", BtnKind.Text, height = 32.dp, onClick = { onReroll(i) })
+                        LingButton(tr(R.string.draft_pane_004), BtnKind.Tonal, height = 32.dp, enabled = streamingIndex < 0, onClick = { onAdopt(i) })
+                        LingButton(tr(R.string.ai_components_009), BtnKind.Outlined, height = 32.dp, onClick = { onTweak(i) })
+                        LingButton(tr(R.string.draft_pane_005), BtnKind.Text, height = 32.dp, onClick = { onReroll(i) })
                     }
                 }
             }
-            if (streamingIndex >= segments.size) AiThinking("正在起草第 ${segments.size + 1} 段…", Modifier.padding(top = 10.dp))
+            if (streamingIndex >= segments.size) AiThinking(tr(R.string.draft_pane_006, segments.size + 1), Modifier.padding(top = 10.dp))
             if (segments.isNotEmpty() && streamingIndex < 0) LingButton(
-                "全部采纳", modifier = Modifier.padding(top = 8.dp).fillMaxWidth(), height = 44.dp, onClick = onAdoptAll,
+                tr(R.string.draft_pane_007), modifier = Modifier.padding(top = 8.dp).fillMaxWidth(), height = 44.dp, onClick = onAdoptAll,
             )
         }
     }

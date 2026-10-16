@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -66,7 +70,7 @@ fun ProviderEntity.ui(): ProviderUi {
     val preset = Presets.byId(presetId)
     val color = preset?.color?.let { Color(it) } ?: Color(0xFF5F6B7E)
     val letter = preset?.letter ?: name.take(1).uppercase()
-    val mode = when { presetId == "custom" -> "自定义 · " + baseUrl.removePrefix("https://").substringBefore('/'); access == "sub" -> "订阅套餐"; else -> "按量付费 API" }
+    val mode = when { presetId == "custom" -> tr(R.string.models_001) + baseUrl.removePrefix("https://").substringBefore('/'); access == "sub" -> tr(R.string.models_002); else -> tr(R.string.models_003) }
     val sub = mode + (if (keyHint.isNotBlank()) " · Key $keyHint" else "")
     val status = when { !enabled -> "off"; keyCipher.isBlank() -> "nokey"; access == "sub" -> "terms"; lastTest == "ok" -> "ok"; lastTest == "fail" -> "fail"; else -> "ok" }
     return ProviderUi(id, letter, color, name, sub, status, enabled)
@@ -93,11 +97,11 @@ fun ModelsRoute(nav: NavHostController) {
         return if (p == null) fallback else ref.substringAfter('|')
     }
     val ui = ModelsUi(
-        calls = calls, cost = cost?.let { "约 ¥%.2f".format(it) },
-        tokens = "输入 ${tokensLabel(usage.sumOf { it.inTok })} · 输出 ${tokensLabel(usage.sumOf { it.outTok })} tokens" + if (cost != null) " · 按你填的单价估算" else " · 填写单价后可估算费用",
+        calls = calls, cost = cost?.let { tr(R.string.models_004).format(it) },
+        tokens = tr(R.string.models_005, tokensLabel(usage.sumOf { it.inTok }), tokensLabel(usage.sumOf { it.outTok })) + if (cost != null) tr(R.string.models_006) else tr(R.string.models_007),
         split = if (calls == 0) listOf(0f, 0f, 0f) else listOf(w / total * 100, a / total * 100, (total - w - a) / total * 100),
-        writing = label(prefs?.writingModel.orEmpty(), if (providers.isEmpty()) "未设置" else "自动选择"),
-        auto = label(prefs?.autoModel.orEmpty(), "跟随写作模型"),
+        writing = label(prefs?.writingModel.orEmpty(), if (providers.isEmpty()) tr(R.string.models_008) else tr(R.string.models_009)),
+        auto = label(prefs?.autoModel.orEmpty(), tr(R.string.models_010)),
         providers = providers.map { it.ui() },
     )
     ModelsScreen(
@@ -114,16 +118,16 @@ fun ModelsRoute(nav: NavHostController) {
             pick = null
         }
     }
-    if (add) LingSheet({ add = false }, "添加服务商") {
+    if (add) LingSheet({ add = false }, tr(R.string.models_011)) {
         LazyColumn(Modifier.heightIn(max = 560.dp)) {
             items(Presets.all) { p ->
                 ProviderPick(p.letter, Color(p.color), p.name, p.note.ifBlank { p.baseUrl.removePrefix("https://") }) { add = false; nav.navigate("provider/0/${p.id}") }
             }
-            item { ProviderPick("+", Ling.colors.outline, "自定义服务商", "OpenAI 兼容或 Anthropic 协议，例如豆包、OpenRouter") { add = false; nav.navigate("provider/0/custom") } }
+            item { ProviderPick("+", Ling.colors.outline, tr(R.string.models_012), tr(R.string.models_013)) { add = false; nav.navigate("provider/0/custom") } }
         }
     }
-    if (help) LingConfirm("关于模型设置", "灵写不经过任何服务器，直接用你的 Key 连接服务商。\n\n写作模型用于续写、改写等你主动发起的操作；自动任务模型用于写完一章后的摘要、一致性检查、伏笔建议，可以选更便宜的模型。\n\n各家“订阅套餐”大多只允许在编程工具中使用，用于写作 App 可能被封 Key，默认请用按量付费 API。",
-        confirm = "知道了", dismiss = "", onDismiss = { help = false }, onConfirm = { help = false })
+    if (help) LingConfirm(tr(R.string.models_014), tr(R.string.models_015),
+        confirm = tr(R.string.editor_002), dismiss = "", onDismiss = { help = false }, onConfirm = { help = false })
 }
 
 @Composable
@@ -144,10 +148,10 @@ private fun ProviderPick(letter: String, color: Color, name: String, sub: String
 @Composable
 fun ModelPicker(providers: List<ProviderEntity>, allowFollow: Boolean, current: String, onDismiss: () -> Unit, onPick: (String) -> Unit) {
     val c = Ling.colors
-    LingSheet(onDismiss, if (allowFollow) "自动任务模型" else "写作模型") {
-        if (providers.isEmpty()) Text("还没有填好 Key 的服务商。先添加一个。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+    LingSheet(onDismiss, if (allowFollow) tr(R.string.models_016) else tr(R.string.models_017)) {
+        if (providers.isEmpty()) Text(tr(R.string.models_018), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
         LazyColumn(Modifier.heightIn(max = 560.dp)) {
-            if (allowFollow) item { PickRow("跟随写作模型", "不单独指定", current.isBlank()) { onPick("") } }
+            if (allowFollow) item { PickRow(tr(R.string.models_010), tr(R.string.models_019), current.isBlank()) { onPick("") } }
             providers.forEach { p ->
                 item { Text(p.name, style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 24.dp, top = 14.dp, bottom = 4.dp)) }
                 items(p.models.split(',').map { it.trim() }.filter { it.isNotBlank() }) { m ->
@@ -205,7 +209,7 @@ fun ProviderEditRoute(id: Long, presetId: String, nav: NavHostController) {
     fun build(): ProviderEntity {
         val cipher = if (key.isNotBlank()) KeyVault.encrypt(key.trim()) else base.keyCipher
         val hint = if (key.isNotBlank()) KeyVault.mask(key.trim()) else base.keyHint
-        return base.copy(name = name.ifBlank { "自定义" }, protocol = protocol, baseUrl = url.trim(), auth = auth, access = access,
+        return base.copy(name = name.ifBlank { tr(R.string.models_020) }, protocol = protocol, baseUrl = url.trim(), auth = auth, access = access,
             models = models.joinToString(","), keyCipher = cipher, keyHint = hint, prices = AiService.encodePrices(prices.filterKeys { it in models }))
     }
     suspend fun save(): ProviderEntity {
@@ -214,50 +218,50 @@ fun ProviderEditRoute(id: Long, presetId: String, nav: NavHostController) {
     }
 
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar(if (id > 0) name else "添加 ${preset?.name ?: "自定义服务商"}", onBack = { nav.popBackStack() }) {
-            if (id > 0) LingIconButton(LingIcons.Delete, "删除", tint = c.error) { confirmDelete = true }
+        LingTopBar(if (id > 0) name else tr(R.string.models_021, preset?.name ?: tr(R.string.models_012)), onBack = { nav.popBackStack() }) {
+            if (id > 0) LingIconButton(LingIcons.Delete, tr(R.string.check_044), tint = c.error) { confirmDelete = true }
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
             if (preset?.subscription != null) {
-                SectionLabel("接入方式")
-                Segmented(listOf("按量付费 API", "订阅套餐"), if (access == "sub") 1 else 0, Modifier.padding(horizontal = 16.dp)) { i ->
+                SectionLabel(tr(R.string.models_022))
+                Segmented(listOf(tr(R.string.models_003), tr(R.string.models_002)), if (access == "sub") 1 else 0, Modifier.padding(horizontal = 16.dp)) { i ->
                     if (i == 1 && access != "sub") termsAsk = true
                     if (i == 0 && access == "sub") { access = "payg"; url = preset.baseUrl; models = preset.models }
                 }
             }
-            SectionLabel("连接")
+            SectionLabel(tr(R.string.models_023))
             LingCard(Modifier.padding(horizontal = 16.dp)) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     if (preset == null) {
-                        LingTextField(name, { name = it }, label = "名称", placeholder = "例如：豆包、OpenRouter")
-                        Text("协议", style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
-                        Segmented(listOf("OpenAI 兼容", "Anthropic"), if (protocol == "anthropic") 1 else 0) { protocol = if (it == 1) "anthropic" else "openai"; auth = if (it == 1) "x-api-key" else "bearer" }
-                        Text("认证方式", style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
+                        LingTextField(name, { name = it }, label = tr(R.string.ideas_027), placeholder = tr(R.string.models_024))
+                        Text(tr(R.string.models_025), style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
+                        Segmented(listOf(tr(R.string.models_026), "Anthropic"), if (protocol == "anthropic") 1 else 0) { protocol = if (it == 1) "anthropic" else "openai"; auth = if (it == 1) "x-api-key" else "bearer" }
+                        Text(tr(R.string.models_027), style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
                         Segmented(listOf("Bearer", "x-api-key", "api-key"), listOf("bearer", "x-api-key", "api-key").indexOf(auth).coerceAtLeast(0)) { auth = listOf("bearer", "x-api-key", "api-key")[it] }
                     }
-                    LingTextField(url, { url = it }, label = "接口地址", keyboardType = KeyboardType.Uri, supporting = preset?.note?.takeIf { it.isNotBlank() })
-                    LingTextField(key, { key = it }, label = "API Key", placeholder = if (base.keyHint.isNotBlank()) "已保存（${base.keyHint}），留空则不修改" else (if (access == "sub") preset?.subscription?.keyHint else preset?.keyHint) ?: "粘贴 Key",
-                        visualTransformation = PasswordVisualTransformation(), supporting = "Key 用 Android Keystore 加密后只存在本机，只发给这个服务商")
+                    LingTextField(url, { url = it }, label = tr(R.string.models_028), keyboardType = KeyboardType.Uri, supporting = preset?.note?.takeIf { it.isNotBlank() })
+                    LingTextField(key, { key = it }, label = "API Key", placeholder = if (base.keyHint.isNotBlank()) tr(R.string.models_029, base.keyHint) else (if (access == "sub") preset?.subscription?.keyHint else preset?.keyHint) ?: tr(R.string.models_030),
+                        visualTransformation = PasswordVisualTransformation(), supporting = tr(R.string.models_031))
                 }
             }
-            SectionLabel("模型")
+            SectionLabel(tr(R.string.models_032))
             LingCard(Modifier.padding(horizontal = 16.dp)) {
                 models.forEachIndexed { i, m ->
                     if (i > 0) InsetDivider(16.dp)
                     ModelRow(m, prices[m], onPrice = { p -> prices = if (p == null) prices - m else prices + (m to p) }) { models = models - m }
                 }
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    LingTextField(newModel, { newModel = it }, Modifier.weight(1f), placeholder = "添加模型名")
+                    LingTextField(newModel, { newModel = it }, Modifier.weight(1f), placeholder = tr(R.string.models_033))
                     Spacer(Modifier.width(8.dp))
-                    LingButton("添加", BtnKind.Tonal, enabled = newModel.isNotBlank()) { models = (models + newModel.trim()).distinct(); newModel = "" }
+                    LingButton(tr(R.string.models_034), BtnKind.Tonal, enabled = newModel.isNotBlank()) { models = (models + newModel.trim()).distinct(); newModel = "" }
                 }
                 if (protocol == "openai" && (preset?.canListModels != false)) {
-                    LingButton("从服务商拉取模型列表", BtnKind.Text, modifier = Modifier.padding(start = 4.dp, bottom = 8.dp), enabled = !busy) {
+                    LingButton(tr(R.string.models_035), BtnKind.Text, modifier = Modifier.padding(start = 4.dp, bottom = 8.dp), enabled = !busy) {
                         scope.launch {
                             busy = true
                             val r = AppGraph.ai.listModels(save())
-                            r.onSuccess { list -> if (list.isNotEmpty()) models = (models + list).distinct(); testMsg = true to "拉取到 ${list.size} 个模型" }
-                                .onFailure { testMsg = false to (it.message ?: "拉取失败") }
+                            r.onSuccess { list -> if (list.isNotEmpty()) models = (models + list).distinct(); testMsg = true to tr(R.string.models_036, list.size) }
+                                .onFailure { testMsg = false to (it.message ?: tr(R.string.models_037)) }
                             busy = false
                         }
                     }
@@ -271,18 +275,18 @@ fun ProviderEditRoute(id: Long, presetId: String, nav: NavHostController) {
             }
         }
         Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LingButton(if (busy) "测试中…" else "测试连接", BtnKind.Outlined, modifier = Modifier.weight(1f), height = 50.dp, enabled = !busy && models.isNotEmpty() && url.isNotBlank() && (key.isNotBlank() || base.keyCipher.isNotBlank())) {
+            LingButton(if (busy) tr(R.string.models_038) else tr(R.string.models_039), BtnKind.Outlined, modifier = Modifier.weight(1f), height = 50.dp, enabled = !busy && models.isNotEmpty() && url.isNotBlank() && (key.isNotBlank() || base.keyCipher.isNotBlank())) {
                 scope.launch { busy = true; val p = save(); val r = AppGraph.ai.test(p, models.first()); testMsg = r.isSuccess to (r.getOrNull() ?: r.exceptionOrNull()?.message ?: ""); busy = false }
             }
-            LingButton("保存", modifier = Modifier.weight(1f), height = 50.dp, enabled = url.isNotBlank() && models.isNotEmpty()) {
+            LingButton(tr(R.string.check_046), modifier = Modifier.weight(1f), height = 50.dp, enabled = url.isNotBlank() && models.isNotEmpty()) {
                 scope.launch { save(); nav.popBackStack() }
             }
         }
     }
     if (termsAsk && preset?.subscription != null) {
         val sub = preset.subscription
-        LingConfirm("订阅套餐的条款风险", sub.terms + "\n\n灵写不会伪装成编程工具，也不会修改 User-Agent。继续使用即表示你了解并自行承担被限流、封 Key 或停订阅的风险。",
-            confirm = "我了解风险，切换", danger = true, onDismiss = { termsAsk = false },
+        LingConfirm(tr(R.string.models_040), sub.terms + tr(R.string.models_041),
+            confirm = tr(R.string.models_042), danger = true, onDismiss = { termsAsk = false },
             onConfirm = { access = "sub"; url = sub.baseUrl; sub.defaultModel?.let { models = listOf(it) }; termsAsk = false },
             extra = {
                 sub.sources.forEach { s ->
@@ -291,7 +295,7 @@ fun ProviderEditRoute(id: Long, presetId: String, nav: NavHostController) {
                 }
             })
     }
-    if (confirmDelete) LingConfirm("删除 ${base.name}？", "Key 会一起删除。已有的调用记录会保留。", confirm = "删除", danger = true,
+    if (confirmDelete) LingConfirm(tr(R.string.models_043, base.name), tr(R.string.models_044), confirm = tr(R.string.check_044), danger = true,
         onDismiss = { confirmDelete = false }, onConfirm = { scope.launch { dao.deleteProvider(base.id); nav.popBackStack() } })
 }
 
@@ -302,19 +306,19 @@ private fun ModelRow(model: String, price: Pair<Double, Double>?, onPrice: (Pair
     Row(Modifier.fillMaxWidth().rowClick { edit = true }.padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(model, style = Ling.type.bodyLarge, color = c.onSurface)
-            Text(price?.let { "输入 ¥${it.first} / 输出 ¥${it.second} 每百万 token" } ?: "点按填写单价（用于估算费用）", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(price?.let { tr(R.string.models_045, it.first, it.second) } ?: tr(R.string.models_046), style = Ling.type.caption, color = c.onSurfaceVariant)
         }
-        LingIconButton(LingIcons.Close, "移除", tint = c.onSurfaceVariant, onClick = onRemove)
+        LingIconButton(LingIcons.Close, tr(R.string.models_047), tint = c.onSurfaceVariant, onClick = onRemove)
     }
     if (edit) {
         var i by remember { mutableStateOf(price?.first?.toString() ?: "") }
         var o by remember { mutableStateOf(price?.second?.toString() ?: "") }
-        LingConfirm("$model 单价", "每百万 token 的价格（元），以服务商账单为准。", onDismiss = { edit = false },
+        LingConfirm(tr(R.string.models_048, model), tr(R.string.models_049), onDismiss = { edit = false },
             onConfirm = { val a = i.toDoubleOrNull(); val b = o.toDoubleOrNull(); onPrice(if (a != null && b != null) a to b else null); edit = false },
             extra = {
                 Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    LingTextField(i, { i = it }, Modifier.weight(1f), label = "输入", keyboardType = KeyboardType.Decimal)
-                    LingTextField(o, { o = it }, Modifier.weight(1f), label = "输出", keyboardType = KeyboardType.Decimal)
+                    LingTextField(i, { i = it }, Modifier.weight(1f), label = tr(R.string.models_050), keyboardType = KeyboardType.Decimal)
+                    LingTextField(o, { o = it }, Modifier.weight(1f), label = tr(R.string.models_051), keyboardType = KeyboardType.Decimal)
                 }
             })
     }

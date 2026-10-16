@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.data.ai
 
+import kotlinx.coroutines.flow.first
 import com.lingwrite.app.data.LingJson
 import com.lingwrite.app.data.Prefs
 import com.lingwrite.app.data.db.AiDao
@@ -48,10 +49,12 @@ class AiService(private val dao: AiDao, private val prefs: Prefs) {
         outcome: String = "pending",
     ): Flow<AiStream> = flow {
         val r = resolve(slot)
-        if (r == null) { emit(AiStream.Error("还没有可用的模型。去 设置 › 模型设置 添加服务商和 Key。")); return@flow }
+        if (r == null) { emit(AiStream.Error(com.lingwrite.app.i18n.trText("还没有可用的模型。去 设置 › 模型设置 添加服务商和 Key。"))); return@flow }
+        val lang = OutputLang.resolve(prefs.flow.first().aiOutputLang, bookId)
+        val sys = if (lang != null) system + OutputLang.directive(lang) else system
         val sb = StringBuilder()
         var inT: Int? = null; var outT: Int? = null; var err: String? = null
-        try { providerFor(r.endpoint).stream(ChatRequest(system, messages, r.model, maxTokens, temperature)).collect { e ->
+        try { providerFor(r.endpoint).stream(ChatRequest(sys, messages, r.model, maxTokens, temperature)).collect { e ->
             when (e) {
                 is LlmEvent.Delta -> { sb.append(e.text); emit(AiStream.Partial(sb.toString())) }
                 is LlmEvent.Done -> { inT = e.inputTokens; outT = e.outputTokens }
@@ -59,8 +62,8 @@ class AiService(private val dao: AiDao, private val prefs: Prefs) {
             }
         } } catch (e: kotlinx.coroutines.CancellationException) { throw e }
         catch (e: Exception) { err = "连接失败：${e.message ?: "服务未返回结果"}" }
-        if (err == null && sb.isBlank()) err = "模型没有返回内容，请重试；原稿未改动"
-        val promptChars = system.length + messages.sumOf { it.content.length }
+        if (err == null && sb.isBlank()) err = com.lingwrite.app.i18n.trText("模型没有返回内容，请重试；原稿未改动")
+        val promptChars = sys.length + messages.sumOf { it.content.length }
         val log = CallLogEntity(
             bookId = bookId, chapterId = chapterId, provider = r.provider.name, model = r.model, task = task,
             inputTokens = inT ?: estimateTokens(promptChars), outputTokens = outT ?: estimateTokens(sb.length),

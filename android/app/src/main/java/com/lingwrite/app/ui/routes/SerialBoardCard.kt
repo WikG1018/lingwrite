@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,15 +74,15 @@ fun SerialBoardCard(bookId: Long) {
         ) {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("连载看板", style = Ling.type.label, color = if (s.low) c.onTertiaryContainer else c.primary, modifier = Modifier.weight(1f))
-                    Pill("已发布到第 ${s.publishedUpTo} 章", PillKind.Neutral, modifier = Modifier.rowClick { published = true })
+                    Text(tr(R.string.serial_board_card_001), style = Ling.type.label, color = if (s.low) c.onTertiaryContainer else c.primary, modifier = Modifier.weight(1f))
+                    Pill(tr(R.string.serial_board_card_002, s.publishedUpTo), PillKind.Neutral, modifier = Modifier.rowClick { published = true })
                 }
                 Row(Modifier.padding(top = 10.dp).fillMaxWidth().height(IntrinsicSize.Min)) {
                     listOf(
-                        Triple("${s.todayWords}", "今日字数", if (s.dailyTarget > 0 && s.todayWords < s.dailyTarget) c.tertiary else c.onSurface),
-                        Triple("${s.buffer}/${s.bufferTarget}", "存稿", if (s.buffer < s.bufferTarget) c.tertiary else c.onSurface),
-                        Triple("${s.streak}", "连续更新", c.onSurface),
-                        Triple("${s.planAhead}", "章纲余量", if (s.planAhead < 3) c.tertiary else c.onSurface),
+                        Triple("${s.todayWords}", tr(R.string.serial_board_card_003), if (s.dailyTarget > 0 && s.todayWords < s.dailyTarget) c.tertiary else c.onSurface),
+                        Triple("${s.buffer}/${s.bufferTarget}", tr(R.string.serial_board_card_004), if (s.buffer < s.bufferTarget) c.tertiary else c.onSurface),
+                        Triple("${s.streak}", tr(R.string.serial_board_card_005), c.onSurface),
+                        Triple("${s.planAhead}", tr(R.string.serial_board_card_006), if (s.planAhead < 3) c.tertiary else c.onSurface),
                     ).forEachIndexed { i, (n, l, col) ->
                         if (i > 0) Box(Modifier.width(1.dp).fillMaxHeight().background(c.outlineVariant))
                         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -88,20 +92,20 @@ fun SerialBoardCard(bookId: Long) {
                     }
                 }
                 Row(Modifier.padding(top = 10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalAlignment = Alignment.CenterVertically) {
-                    LingButton("标记", BtnKind.Text, height = 32.dp) { published = true }
+                    LingButton(tr(R.string.serial_board_card_007), BtnKind.Text, height = 32.dp) { published = true }
                     if (s.low) {
-                        LingButton(if (planBusy) "拟预案中…" else "短更预案", BtnKind.Tonal, height = 32.dp, enabled = !planBusy) {
+                        LingButton(if (planBusy) tr(R.string.serial_board_card_008) else tr(R.string.serial_board_card_009), BtnKind.Tonal, height = 32.dp, enabled = !planBusy) {
                             planBusy = true; planErr = null
                             scope.launch {
                                 runCatching { SerialBoard.plan(bookId, s) }
                                     .onSuccess { plan = it }
-                                    .onFailure { planErr = it.message ?: "模型没有按格式返回" }
+                                    .onFailure { planErr = it.message ?: tr(R.string.book_ai_018) }
                                 planBusy = false
                             }
                         }
                     }
                 }
-                planErr?.let { Text("短更预案没拿到：$it", style = Ling.type.caption, color = c.error, modifier = Modifier.padding(top = 4.dp)) }
+                planErr?.let { Text(tr(R.string.serial_board_card_010, it), style = Ling.type.caption, color = c.error, modifier = Modifier.padding(top = 4.dp)) }
             }
         }
     }
@@ -109,8 +113,8 @@ fun SerialBoardCard(bookId: Long) {
     if (published) {
         var n by remember { mutableStateOf("${state?.publishedUpTo ?: 0}") }
         com.lingwrite.app.ui.components.LingConfirm(
-            "标记已发布到第 N 章",
-            "存稿 = 这之后已完成且有正文、尚未发布的章节数。",
+            tr(R.string.serial_board_card_011),
+            tr(R.string.serial_board_card_012),
             onDismiss = { published = false },
             onConfirm = {
                 val v = n.toIntOrNull() ?: 0
@@ -121,35 +125,35 @@ fun SerialBoardCard(bookId: Long) {
                 }
             },
             extra = {
-                com.lingwrite.app.ui.components.LingTextField(n, { n = it.filter(Char::isDigit) }, Modifier.padding(top = 4.dp), label = "已发布到第 N 章")
+                com.lingwrite.app.ui.components.LingTextField(n, { n = it.filter(Char::isDigit) }, Modifier.padding(top = 4.dp), label = tr(R.string.serial_board_card_013))
             },
         )
     }
 
     plan?.let { p ->
         var applied by remember { mutableStateOf(false) }
-        LingSheet({ plan = null }, "短更预案") {
+        LingSheet({ plan = null }, tr(R.string.serial_board_card_009)) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Pill("拆章方案", PillKind.Primary)
+                Pill(tr(R.string.serial_board_card_014), PillKind.Primary)
                 listOf(
-                    "A（${p.splitA.event}）钩子：${p.splitA.hook}；悬念：${p.splitA.cliff}",
-                    "B（${p.splitB.event}）钩子：${p.splitB.hook}；悬念：${p.splitB.cliff}",
+                    tr(R.string.serial_board_card_015, p.splitA.event, p.splitA.hook, p.splitA.cliff),
+                    tr(R.string.serial_board_card_016, p.splitB.event, p.splitB.hook, p.splitB.cliff),
                 ).forEach { t -> Text(t, style = Ling.type.body, color = Ling.colors.onSurface) }
                 if (p.bridges.isNotEmpty()) {
-                    Pill("过渡章思路", PillKind.Amber)
+                    Pill(tr(R.string.serial_board_card_017), PillKind.Amber)
                     p.bridges.forEach { b ->
-                        Text("· ${b.event}（${b.why}）", style = Ling.type.body, color = Ling.colors.onSurface)
+                        Text(tr(R.string.serial_board_card_018, b.event, b.why), style = Ling.type.body, color = Ling.colors.onSurface)
                     }
                 }
-                Text("采纳后会把方案写进章纲备注，由你决定要不要拆章。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
-                if (!applied) LingButton("写进下一章章纲备注", height = 46.dp, modifier = Modifier.fillMaxWidth()) {
+                Text(tr(R.string.serial_board_card_019), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
+                if (!applied) LingButton(tr(R.string.serial_board_card_020), height = 46.dp, modifier = Modifier.fillMaxWidth()) {
                     applied = true
                     scope.launch {
                         val chs = AppGraph.db.chapters().chaptersOnce(bookId).sortedBy { it.number }
                         val target = chs.firstOrNull { it.state != "done" } ?: chs.lastOrNull()
                         if (target != null) {
                             val cp = AppGraph.db.plan().chapterOnce(target.id) ?: com.lingwrite.app.data.db.ChapterPlanEntity(target.id, bookId)
-                            val note = "【短更拆章】A：${p.splitA.event} / B：${p.splitB.event}"
+                            val note = tr(R.string.serial_board_card_021, p.splitA.event, p.splitB.event)
                             AppGraph.db.plan().upsertChapter(cp.copy(note = cp.note + (if (cp.note.isNotBlank()) "\n" else "") + note))
                         }
                         plan = null

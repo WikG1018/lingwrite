@@ -17,9 +17,11 @@ object Words {
         return n
     }
 
-    fun format(n: Int): String = when {
-        n >= 10_000 -> "%.1f 万字".format(n / 10_000f)
-        else -> "%,d 字".format(n)
+    fun format(n: Int): String = when (UiLang.code()) {
+        "en" -> if (n >= 10_000) "%.1fK chars".format(n / 1_000f) else "%,d chars".format(n)
+        "ja" -> if (n >= 10_000) "%.1f万字".format(n / 10_000f) else "%,d字".format(n)
+        "zh-TW" -> if (n >= 10_000) "%.1f 萬字".format(n / 10_000f) else "%,d 字".format(n)
+        else -> if (n >= 10_000) "%.1f 万字".format(n / 10_000f) else "%,d 字".format(n)
     }
 
     fun grouped(n: Int): String = "%,d".format(n)

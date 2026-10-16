@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.screens
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.R
+
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
@@ -69,19 +74,19 @@ data class EditorActions(
 /** 截图 / 预览用的示例正文。 */
 fun demoManuscript(): Pair<TextFieldValue, List<AiMark>> {
     val text = FakeData.manuscript.joinToString("\n") { it.replace("{", "").replace("}", "").removePrefix("[ai]") }
-    val s = text.indexOf("她看得清楚"); val e = text.indexOf("角。") + 2
+    val s = text.indexOf(tr(R.string.editor_048)); val e = text.indexOf(tr(R.string.editor_049)) + 2
     return TextFieldValue(text, TextRange(text.length)) to listOf(AiMark(s, e, "gen"))
 }
 
 @Composable
 fun EditorScreen(
-    title: String = "第 118 章 擂台余波",
-    subtitle: String = "已自动保存 · 2,416 字",
+    title: String = tr(R.string.editor_050),
+    subtitle: String = tr(R.string.editor_051),
     value: TextFieldValue = remember { demoManuscript().first },
     onValueChange: (TextFieldValue) -> Unit = {},
     marks: List<AiMark> = remember { demoManuscript().second },
-    names: List<String> = listOf("林砚", "沈清禾"),
-    todayDelta: String = "今日 +1,208",
+    names: List<String> = listOf(tr(R.string.editor_052), tr(R.string.editor_053)),
+    todayDelta: String = tr(R.string.editor_054),
     canUndo: Boolean = true,
     canRedo: Boolean = false,
     actions: EditorActions = EditorActions(),
@@ -98,7 +103,7 @@ fun EditorScreen(
     proofBubble: (@Composable () -> Unit)? = null,
     directory: (@Composable () -> Unit)? = null,
     tools: (@Composable (Int) -> Unit)? = null,
-    bottomPanel: @Composable ColumnScope.() -> Unit = { SuggestionCard(FakeData.suggestion, "续写建议 · DeepSeek V3 · 1/3"); ToolChips(0) {} },
+    bottomPanel: @Composable ColumnScope.() -> Unit = { SuggestionCard(FakeData.suggestion, tr(R.string.editor_055)); ToolChips(0) {} },
 ) {
     val editorHaze = remember { HazeState() }
     val c = Ling.colors
@@ -125,21 +130,22 @@ fun EditorScreen(
         Column(Modifier.fillMaxSize()) {
             Box(Modifier.statusBarsPadding()) {
             if (compactHeader) {
-                LingTopBar(title, subtitle, actions.onBack, titleStyle = Ling.type.subhead)
+                // 右侧图标行叠在标题栏上，给它留出位置，长标题（如英文）才不会压到图标下面
+                LingTopBar(title, subtitle, actions.onBack, titleStyle = Ling.type.subhead) { Spacer(Modifier.width(if (tablet) 232.dp else 144.dp)) }
                 Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End) {
-                if (tablet) LingButton(if (toolsOpen) "收起辅助" else "辅助", BtnKind.Text, height = 36.dp, modifier = Modifier.testTag("toggle-writing-tools")) { toolsOpen = !toolsOpen }
+                if (tablet) LingButton(if (toolsOpen) tr(R.string.editor_056) else tr(R.string.editor_057), BtnKind.Text, height = 36.dp, modifier = Modifier.testTag("toggle-writing-tools")) { toolsOpen = !toolsOpen }
                 badge?.invoke()
-                LingIconButton(LingIcons.Undo, "撤销", tint = if (canUndo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onUndo)
-                LingIconButton(LingIcons.Redo, "重做", tint = if (canRedo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onRedo)
-                LingIconButton(LingIcons.More, "更多", onClick = actions.onMore)
+                LingIconButton(LingIcons.Undo, tr(R.string.check_042), tint = if (canUndo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onUndo)
+                LingIconButton(LingIcons.Redo, tr(R.string.editor_058), tint = if (canRedo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onRedo)
+                LingIconButton(LingIcons.More, tr(R.string.editor_059), onClick = actions.onMore)
                 }
             } else {
             LingTopBar(title, subtitle, actions.onBack, titleStyle = Ling.type.subhead) {
-                if (tablet) LingButton(if (toolsOpen) "收起辅助" else "辅助", BtnKind.Text, height = 36.dp, modifier = Modifier.testTag("toggle-writing-tools")) { toolsOpen = !toolsOpen }
+                if (tablet) LingButton(if (toolsOpen) tr(R.string.editor_056) else tr(R.string.editor_057), BtnKind.Text, height = 36.dp, modifier = Modifier.testTag("toggle-writing-tools")) { toolsOpen = !toolsOpen }
                 badge?.invoke()
-                LingIconButton(LingIcons.Undo, "撤销", tint = if (canUndo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onUndo)
-                LingIconButton(LingIcons.Redo, "重做", tint = if (canRedo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onRedo)
-                LingIconButton(LingIcons.More, "更多", onClick = actions.onMore)
+                LingIconButton(LingIcons.Undo, tr(R.string.check_042), tint = if (canUndo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onUndo)
+                LingIconButton(LingIcons.Redo, tr(R.string.editor_058), tint = if (canRedo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onRedo)
+                LingIconButton(LingIcons.More, tr(R.string.editor_059), onClick = actions.onMore)
             }
             }
             }
@@ -167,13 +173,13 @@ fun EditorScreen(
     }, tools = {
         Column(Modifier.fillMaxSize().background(c.surface)) {
             Row(Modifier.fillMaxWidth().statusBarsPadding().horizontalScroll(rememberScrollState()).padding(8.dp)) {
-                listOf("章纲", "设定", "伏笔", "AI").forEachIndexed { i, label ->
+                listOf(tr(R.string.outline_050), tr(R.string.lore_007), tr(R.string.check_024), "AI").forEachIndexed { i, label ->
                     LingButton(label, if (toolTab == i) BtnKind.Tonal else BtnKind.Text, height = 36.dp) { toolTab = i }
                 }
             }
             Box(Modifier.weight(1f)) { tools?.invoke(toolTab) }
         }
-    }, ai = { Column(Modifier.fillMaxWidth()) { if (tablet) Text("AI 结果在这里预览；采纳后才写入正文。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(12.dp)); bottomPanel() } })
+    }, ai = { Column(Modifier.fillMaxWidth()) { if (tablet) Text(tr(R.string.editor_060), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(12.dp)); bottomPanel() } })
 }
 
 /** 正文输入区：首行缩进两字、AI 段落底色 + 虚线、人物名下划线。 */
@@ -249,7 +255,7 @@ fun ManuscriptField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Un
 fun SuggestionCard(
     text: String, header: String, streaming: Boolean = false, onClose: () -> Unit = {},
     onAnother: () -> Unit = {}, onEdit: () -> Unit = {}, onAccept: () -> Unit = {},
-    acceptLabel: String = "采纳", editLabel: String = "改写",
+    acceptLabel: String = tr(R.string.ai_components_007), editLabel: String = tr(R.string.editor_ai_013),
 ) {
     val c = Ling.colors
     com.lingwrite.app.ui.ai.ToneCard(
@@ -257,7 +263,7 @@ fun SuggestionCard(
         Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
         trailing = {
             Box(Modifier.size(32.dp).clip(Radius.pill).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
-                Icon(LingIcons.Close, "关闭", Modifier.size(18.dp), tint = c.onSurfaceVariant)
+                Icon(LingIcons.Close, tr(R.string.editor_ai_048), Modifier.size(18.dp), tint = c.onSurfaceVariant)
             }
         },
         contentPadding = PaddingValues(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 12.dp),
@@ -268,13 +274,14 @@ fun SuggestionCard(
         }
         Row(Modifier.fillMaxWidth().padding(end = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
             val st = Ling.type.label.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
-            LingButton("换一个", BtnKind.Text, height = 34.dp, textStyle = st, enabled = !streaming, onClick = onAnother)
+            LingButton(tr(R.string.editor_061), BtnKind.Text, height = 34.dp, textStyle = st, enabled = !streaming, onClick = onAnother)
             LingButton(editLabel, BtnKind.Outlined, height = 34.dp, textStyle = st, modifier = Modifier.widthIn(min = 64.dp), enabled = !streaming, onClick = onEdit)
             LingButton(acceptLabel, BtnKind.Filled, height = 34.dp, textStyle = st, enabled = !streaming, onClick = onAccept)
         }
     }
 }
 
+/** 工具 id（中文原文），显示时经 trText 翻译。 */
 val AiTools = listOf("续写", "改写", "扩写", "润色", "去 AI 腔", "对话")
 
 /** 工具胶囊图标（ui-spec §2：每个胶囊前 16dp 图标）。 */
@@ -309,7 +316,7 @@ fun ToolChips(selected: Int, tools: List<String> = AiTools, onSelect: (Int) -> U
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     Icon(toolIcon(t), null, Modifier.size(16.dp), tint = fg)
-                    Text(t, style = Ling.type.label, color = fg)
+                    Text(trText(t), style = Ling.type.label, color = fg)
                 }
             }
         }
@@ -330,13 +337,13 @@ private fun BottomToolbar(today: String, a: EditorActions, mode: WriteMode, note
         Box(Modifier.fillMaxWidth().height(1.dp).background(c.outlineVariant.copy(alpha = 0.7f)))
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f).horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically) {
-                listOf(Triple(LingIcons.Quote, "引用设定", a.onQuote), Triple(LingIcons.BookmarkAdd, "登记伏笔", a.onForeshadow), Triple(LingIcons.Badge, "人物", a.onCharacters), Triple(LingIcons.FactCheck, "检查", a.onCheck)).forEach { (ic, d, f) ->
+                listOf(Triple(LingIcons.Quote, tr(R.string.editor_062), a.onQuote), Triple(LingIcons.BookmarkAdd, tr(R.string.check_006), a.onForeshadow), Triple(LingIcons.Badge, tr(R.string.editor_063), a.onCharacters), Triple(LingIcons.FactCheck, tr(R.string.check_076), a.onCheck)).forEach { (ic, d, f) ->
                     Box(Modifier.size(44.dp, 48.dp).clip(Radius.pill).clickable(onClick = f), contentAlignment = Alignment.Center) { Icon(ic, d, Modifier.size(24.dp), tint = c.onSurface) }
                 }
                 // 本章便签（MD3）：替代原“设定”入口，带未读角标
                 Box {
                     Box(Modifier.size(44.dp, 48.dp).clip(Radius.pill).clickable(onClick = a.onNotes), contentAlignment = Alignment.Center) {
-                        Icon(LingIcons.StickyNote, "本章便签", Modifier.size(24.dp), tint = c.onSurface)
+                        Icon(LingIcons.StickyNote, tr(R.string.notes_drawer_005), Modifier.size(24.dp), tint = c.onSurface)
                     }
                     if (notesUnread > 0) Box(Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = 4.dp).size(8.dp).clip(Radius.pill).background(c.amber))
                 }
@@ -359,18 +366,18 @@ fun BeatsChecklist(beats: List<com.lingwrite.app.data.Beat>, onToggle: (Int) -> 
                 .clickable { collapsed = false },
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("本章节拍已完成 ✓", style = Ling.type.caption, color = c.primary)
+            Text(tr(R.string.editor_064), style = Ling.type.caption, color = c.primary)
             Spacer(Modifier.weight(1f))
-            Text("展开", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(tr(R.string.editor_065), style = Ling.type.caption, color = c.onSurfaceVariant)
         }
         return
     }
     LingCard(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
         Column(Modifier.padding(horizontal = 14.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("本章节拍", style = Ling.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = c.primary, modifier = Modifier.weight(1f))
+                Text(tr(R.string.editor_066), style = Ling.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = c.primary, modifier = Modifier.weight(1f))
                 Text("${beats.count { it.done }}/${beats.size}", style = Ling.type.caption, color = c.onSurfaceVariant)
-                LingButton("收起", BtnKind.Text, height = 30.dp) { collapsed = true }
+                LingButton(tr(R.string.draft_pane_002), BtnKind.Text, height = 30.dp) { collapsed = true }
             }
             beats.forEachIndexed { i, b ->
                 Row(Modifier.fillMaxWidth().heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -382,7 +389,7 @@ fun BeatsChecklist(beats: List<com.lingwrite.app.data.Beat>, onToggle: (Int) -> 
                             .clickable { onToggle(i) },
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (b.done) Icon(LingIcons.Check, "已完成", tint = c.onPrimary, modifier = Modifier.size(14.dp))
+                        if (b.done) Icon(LingIcons.Check, tr(R.string.notes_drawer_009), tint = c.onPrimary, modifier = Modifier.size(14.dp))
                     }
                     Spacer(Modifier.width(10.dp))
                     Text(
@@ -408,21 +415,21 @@ fun ProofBar(count: Int, busy: Boolean, error: String?, pick: Int, onPick: (Int)
                 Icon(LingIcons.Spellcheck, null, tint = c.error, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    if (busy) "校对中…" else "发现 $count 处 · 只改错字和标点",
+                    if (busy) tr(R.string.editor_067) else tr(R.string.editor_068, count),
                     style = Ling.type.label, color = c.onSurface, modifier = Modifier.weight(1f),
                 )
-                LingButton("逐条看", BtnKind.Text, height = 32.dp, enabled = !busy && count > 0) { onPick(if (pick < 0) 0 else (pick + 1) % count) }
-                LingButton("全部接受", BtnKind.Tonal, height = 32.dp, enabled = !busy && count > 0) { onAcceptAll() }
-                LingButton("退出", BtnKind.Text, height = 32.dp) { onExit() }
+                LingButton(tr(R.string.editor_069), BtnKind.Text, height = 32.dp, enabled = !busy && count > 0) { onPick(if (pick < 0) 0 else (pick + 1) % count) }
+                LingButton(tr(R.string.editor_070), BtnKind.Tonal, height = 32.dp, enabled = !busy && count > 0) { onAcceptAll() }
+                LingButton(tr(R.string.editor_071), BtnKind.Text, height = 32.dp) { onExit() }
             }
-            if (error != null) Text("校对失败：$error", style = Ling.type.caption, color = c.error)
+            if (error != null) Text(tr(R.string.editor_072, error), style = Ling.type.caption, color = c.error)
         }
     }
 }
 
 /** 校对类别 → 中文标签（A9）。 */
 fun proofTypeLabel(type: String): String = when (type) {
-    "typo" -> "错别字"; "de" -> "的地得"; "punct" -> "标点"; "grammar" -> "病句"; else -> type
+    "typo" -> tr(R.string.editor_073); "de" -> tr(R.string.editor_074); "punct" -> tr(R.string.editor_075); "grammar" -> tr(R.string.editor_076); else -> type
 }
 
 /**
@@ -445,8 +452,8 @@ fun ProofBubble(issue: com.lingwrite.app.data.ProofIssue, onIgnore: () -> Unit, 
         if (issue.why.isNotBlank()) Text(issue.why, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 2.dp))
         Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Spacer(Modifier.weight(1f))
-            LingButton("忽略", BtnKind.Text, height = 32.dp, onClick = onIgnore)
-            LingButton("接受", BtnKind.Tonal, height = 32.dp, onClick = onAccept)
+            LingButton(tr(R.string.check_066), BtnKind.Text, height = 32.dp, onClick = onIgnore)
+            LingButton(tr(R.string.editor_077), BtnKind.Tonal, height = 32.dp, onClick = onAccept)
         }
     }
 }

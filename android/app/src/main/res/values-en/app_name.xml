@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<!-- 应用名（不经 gen.py 生成）。名称与图标受 TRADEMARK.md 约束。 -->
+<resources><string name="app_name">LingWrite</string></resources>

@@ -21,7 +21,7 @@ import java.io.File
 
 /** A1 随手问面板截图（ui-spec §3、§11：40 空 / 41 有回答）。ModalBottomSheet 是独立窗口，截 dialog 节点。 */
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [34], qualifiers = "w412dp-h915dp-xhdpi", application = android.app.Application::class)
+@Config(sdk = [34], qualifiers = "zh-rCN-w412dp-h915dp-xhdpi", application = android.app.Application::class)
 @org.robolectric.annotation.GraphicsMode(org.robolectric.annotation.GraphicsMode.Mode.NATIVE)
 class AskShotTest {
     @get:Rule val compose = androidx.compose.ui.test.junit4.createAndroidComposeRule<androidx.activity.ComponentActivity>()

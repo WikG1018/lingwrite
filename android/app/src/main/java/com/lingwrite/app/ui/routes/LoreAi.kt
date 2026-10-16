@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -51,20 +56,20 @@ object LoreAiPrompts {
     const val NAMING_SYS = "你是网文起名顾问。名字要符合题材和本书已有的命名风格，好记、不撞常见网文主角名。严格只输出 JSON。"
 
     fun naming(book: String, genre: String, style: String, sameKind: String, type: String, role: String, fields: String, ask: String) = buildString {
-        append("【书名/类型/文风卡】").append(book).append(' ').append(genre)
+        append(trZh(R.string.lore_ai_001)).append(book).append(' ').append(genre)
         if (style.isNotBlank()) append(' ').append(style.take(300))
-        if (sameKind.isNotBlank()) append("\n【已有同类名字】").append(sameKind)
-        append("\n【这张卡】类型 ").append(type).append("，定位 ").append(role).append("，已知字段 ").append(fields)
-        if (ask.isNotBlank()) append("\n【作者要求】").append(ask)
-        append("\n输出：[{\"name\":\"\",\"meaning\":\"≤10字\"}] 共 8 个。")
+        if (sameKind.isNotBlank()) append(trZh(R.string.lore_ai_002)).append(sameKind)
+        append(trZh(R.string.lore_ai_003)).append(type).append(trZh(R.string.lore_ai_004)).append(role).append(trZh(R.string.lore_ai_005)).append(fields)
+        if (ask.isNotBlank()) append(trZh(R.string.lore_ai_006)).append(ask)
+        append(trZh(R.string.lore_ai_007))
     }
 
     fun complete(synopsis: String, related: String, mentions: String, fields: String) = buildString {
-        append("【总纲】").append(synopsis.take(600))
-        if (related.isNotBlank()) append("\n【相关卡】").append(related)
-        if (mentions.isNotBlank()) append("\n【正文中的提及】").append(mentions)
-        append("\n【这张卡】").append(fields)
-        append("\n严格只输出 JSON 对象 {字段名: 值}，只补空字段。不确定的写“待定”。")
+        append(trZh(R.string.book_ai_001)).append(synopsis.take(600))
+        if (related.isNotBlank()) append(trZh(R.string.lore_ai_008)).append(related)
+        if (mentions.isNotBlank()) append(trZh(R.string.lore_ai_009)).append(mentions)
+        append(trZh(R.string.lore_ai_010)).append(fields)
+        append(trZh(R.string.lore_ai_011))
     }
 }
 
@@ -83,7 +88,7 @@ object LoreAi {
         val raw = AppGraph.ai.complete("extract", LoreAiPrompts.NAMING_SYS,
             LoreAiPrompts.naming(bookTitle, genre, style, sameKind, type, role, fields, ask), null, null, 500).getOrThrow()
         val arr = (JsonReply.parse(raw) as? JsonReply.Result.Ok)?.json
-            ?: extractJson(raw) ?: error("模型没有按格式返回")
+            ?: extractJson(raw) ?: error(tr(R.string.book_ai_018))
         arr.jsonArray.map { e -> e.jsonObject.let { NameIdea(it.str("name"), it.str("meaning")) } }.filter { it.name.isNotBlank() }
     }
 
@@ -94,7 +99,7 @@ object LoreAi {
         val raw = AppGraph.ai.complete("extract", LoreAiPrompts.NAMING_SYS,
             LoreAiPrompts.complete(synopsis, related, mentions, fields), null, null, 600).getOrThrow()
         val obj = JsonReply.parse(raw, array = false).let { (it as? JsonReply.Result.Ok)?.json as? kotlinx.serialization.json.JsonObject }
-            ?: extractJson(raw, array = false)?.jsonObject ?: error("模型没有按格式返回")
+            ?: extractJson(raw, array = false)?.jsonObject ?: error(tr(R.string.book_ai_018))
         obj.entries.associate { it.key to (it.value as? JsonPrimitive)?.contentOrNull.orEmpty() }.filterValues { it.isNotBlank() }
     }
 }
@@ -116,13 +121,13 @@ fun LoreNamingCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(LingIcons.SparkleFilled, null, tint = c.tertiary, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("AI 起名", style = Ling.type.label, color = c.tertiary, modifier = Modifier.weight(1f))
-                if (names.isNotEmpty()) LingButton("换一批", BtnKind.Text, height = 32.dp, enabled = !loading, onClick = onGenerate)
+                Text(tr(R.string.lore_ai_012), style = Ling.type.label, color = c.tertiary, modifier = Modifier.weight(1f))
+                if (names.isNotEmpty()) LingButton(tr(R.string.ai_components_008), BtnKind.Text, height = 32.dp, enabled = !loading, onClick = onGenerate)
             }
             Spacer(Modifier.height(8.dp))
-            LingTextField(ask, onAskChange, label = "要求（可空）", placeholder = "姓沈、清冷、两个字", singleLine = true)
+            LingTextField(ask, onAskChange, label = tr(R.string.lore_ai_013), placeholder = tr(R.string.lore_ai_014), singleLine = true)
             Spacer(Modifier.height(10.dp))
-            if (loading) com.lingwrite.app.ui.ai.AiThinking("正在起名…")
+            if (loading) com.lingwrite.app.ui.ai.AiThinking(tr(R.string.lore_ai_015))
             else names.forEach { n ->
                 val i = remember { MutableInteractionSource() }
                 Row(
@@ -139,7 +144,7 @@ fun LoreNamingCard(
                 }
             }
             if (names.isEmpty() && !loading) {
-                LingButton("让 AI 起个头", BtnKind.Tonal, icon = LingIcons.SparkleFilled, height = 38.dp, onClick = onGenerate)
+                LingButton(tr(R.string.lore_ai_016), BtnKind.Tonal, icon = LingIcons.SparkleFilled, height = 38.dp, onClick = onGenerate)
             }
         }
     }

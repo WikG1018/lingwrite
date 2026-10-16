@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,7 +50,7 @@ object DataModule {
             composable(Routes.Export) { e: androidx.navigation.NavBackStackEntry -> ExportRoute(e.arguments!!.getString("bookId")!!.toLong(), nav) }
             composable(Routes.Backup) { BackupRoute(nav) }
         }
-        SettingsRegistry.extra += { _, nav -> "数据" to SettingRow(LingIcons.Lock, "备份与恢复", "整库备份为一个文件；导入可覆盖或合并", tone = Tone.Good, onClick = { nav.navigate(Routes.Backup) }) }
+        SettingsRegistry.extra += { _, nav -> tr(R.string.data_001) to SettingRow(LingIcons.Lock, tr(R.string.data_002), tr(R.string.data_003), tone = Tone.Good, onClick = { nav.navigate(Routes.Backup) }) }
     }
 }
 
@@ -67,38 +74,38 @@ fun ExportRoute(bookId: Long, nav: NavHostController) {
     val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(if (md) "text/markdown" else "text/plain")) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         scope.launch {
-            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { it.write(Exporter.render(bookId, opts).toByteArray()) } }; "已导出 ${Words.grouped(Words.count(preview))} 字" }.getOrElse { "导出失败：${it.message}" }
+            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { it.write(Exporter.render(bookId, opts).toByteArray()) } }; tr(R.string.data_004, Words.grouped(Words.count(preview))) }.getOrElse { tr(R.string.data_005, it.message) }
         }
     }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("导出", book?.title, onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.data_006), book?.title, onBack = { nav.popBackStack() })
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Segmented(listOf("TXT", "Markdown"), if (md) 1 else 0) { md = it == 1 }
             LingCard {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("章节范围", style = Ling.type.label, color = c.primary)
+                    Text(tr(R.string.data_007), style = Ling.type.label, color = c.primary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        LingTextField(from, { from = it.filter(Char::isDigit) }, Modifier.weight(1f), label = "从第", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-                        LingTextField(to, { to = it.filter(Char::isDigit) }, Modifier.weight(1f), label = "到第", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                        LingTextField(from, { from = it.filter(Char::isDigit) }, Modifier.weight(1f), label = tr(R.string.data_008), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                        LingTextField(to, { to = it.filter(Char::isDigit) }, Modifier.weight(1f), label = tr(R.string.data_009), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
                     }
-                    CheckRow("包含章节标题", titles) { titles = it }
-                    CheckRow("包含作品简介", blurb) { blurb = it }
+                    CheckRow(tr(R.string.data_010), titles) { titles = it }
+                    CheckRow(tr(R.string.data_011), blurb) { blurb = it }
                     if (titles) {
-                        Text("章节号格式", style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
-                        Segmented(ExportNumStyle.entries.map { it.label }, ExportNumStyle.entries.indexOf(numStyle)) { numStyle = ExportNumStyle.entries[it] }
+                        Text(tr(R.string.data_012), style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
+                        Segmented(ExportNumStyle.entries.map { trText(it.label) }, ExportNumStyle.entries.indexOf(numStyle)) { numStyle = ExportNumStyle.entries[it] }
                     }
-                    Text("AI 段落标记不会写进导出文件；是否对外披露由你决定。", style = Ling.type.caption, color = c.onSurfaceVariant)
+                    Text(tr(R.string.data_013), style = Ling.type.caption, color = c.onSurfaceVariant)
                 }
             }
-            Text("预览", style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 8.dp))
+            Text(tr(R.string.data_014), style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 8.dp))
             LingCard(color = c.paper) {
                 Text(preview.take(900) + if (preview.length > 900) "\n…" else "", style = Ling.type.body.copy(lineHeight = 22.sp, fontFamily = if (md) FontFamily.Monospace else Ling.type.body.fontFamily), color = c.paperInk, modifier = Modifier.padding(16.dp))
             }
             msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(start = 8.dp)) }
             Spacer(Modifier.height(8.dp))
         }
-        LingButton("保存到文件", icon = LingIcons.Share, height = 50.dp, modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)) {
-            saver.launch("${book?.title?.ifBlank { "未命名" } ?: "作品"}.${if (md) "md" else "txt"}")
+        LingButton(tr(R.string.data_015), icon = LingIcons.Share, height = 50.dp, modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)) {
+            saver.launch("${book?.title?.ifBlank { tr(R.string.book_ai_010) } ?: tr(R.string.data_016)}.${if (md) "md" else "txt"}")
         }
     }
 }
@@ -124,36 +131,36 @@ fun BackupRoute(nav: NavHostController) {
         busy = true
         scope.launch {
             val p = AppGraph.prefs.flow.first()
-            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { Backup.writeZip(it, ctx, p) } }; "备份完成" }.getOrElse { "备份失败：${it.message}" }
+            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { Backup.writeZip(it, ctx, p) } }; tr(R.string.data_017) }.getOrElse { tr(R.string.data_018, it.message) }
             busy = false
         }
     }
     val opener = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
-        scope.launch { runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openInputStream(uri)!!.use { Backup.readZip(it) } } }.onSuccess { pending = it }.onFailure { msg = "无法读取：${it.message}" } }
+        scope.launch { runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openInputStream(uri)!!.use { Backup.readZip(it) } } }.onSuccess { pending = it }.onFailure { msg = tr(R.string.data_019, it.message) } }
     }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("备份与恢复", onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.data_002), onBack = { nav.popBackStack() })
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             LingCard {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("备份整个灵写", style = Ling.type.titleSmall, color = c.onSurface)
-                    Text("作品、章节与历史版本、设定库、大纲、伏笔、灵感、AI 使用记录和地图图片打包成一个 .zip。API Key 不会写进备份，恢复后需要重新填写。", style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
-                    LingButton(if (busy) "正在备份…" else "立即备份", icon = LingIcons.Lock, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
-                        saver.launch("灵写备份-${java.text.SimpleDateFormat("yyyyMMdd-HHmm", java.util.Locale.ROOT).format(java.util.Date())}.zip")
+                    Text(tr(R.string.data_020), style = Ling.type.titleSmall, color = c.onSurface)
+                    Text(tr(R.string.data_021), style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
+                    LingButton(if (busy) tr(R.string.data_022) else tr(R.string.data_023), icon = LingIcons.Lock, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+                        saver.launch(tr(R.string.data_024, java.text.SimpleDateFormat("yyyyMMdd-HHmm", java.util.Locale.ROOT).format(java.util.Date())))
                     }
                 }
             }
             LingCard {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("从备份导入", style = Ling.type.titleSmall, color = c.onSurface)
-                    Text("可以覆盖本机数据，或把备份里的作品合并进来。导入前会自动备份一次当前数据。", style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
-                    LingButton("选择备份文件", BtnKind.Tonal, icon = LingIcons.Add, modifier = Modifier.fillMaxWidth()) { opener.launch(arrayOf("application/zip", "application/octet-stream")) }
+                    Text(tr(R.string.data_025), style = Ling.type.titleSmall, color = c.onSurface)
+                    Text(tr(R.string.data_026), style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
+                    LingButton(tr(R.string.data_027), BtnKind.Tonal, icon = LingIcons.Add, modifier = Modifier.fillMaxWidth()) { opener.launch(arrayOf("application/zip", "application/octet-stream")) }
                 }
             }
             msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(horizontal = 8.dp)) }
             if (autos.isNotEmpty()) {
-                SectionLabel("导入前的自动备份（保留最近 5 个）")
+                SectionLabel(tr(R.string.data_028))
                 LingCard {
                     autos.forEachIndexed { i, f ->
                         if (i > 0) InsetDivider(16.dp)
@@ -170,17 +177,17 @@ fun BackupRoute(nav: NavHostController) {
     pending?.let { a ->
         var overwrite by remember { mutableStateOf(false) }
         var confirm by remember { mutableStateOf(false) }
-        LingSheet({ pending = null }, "导入备份") {
+        LingSheet({ pending = null }, tr(R.string.data_029)) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 ImportSummary(a)
-                Segmented(listOf("合并", "覆盖"), if (overwrite) 1 else 0) { overwrite = it == 1 }
-                Text(if (overwrite) "清空本机的作品数据，换成备份里的内容。模型服务商保留。" else "把备份里的作品作为新作品加进来；同一部作品（书名和创建时间都相同）会跳过。",
+                Segmented(listOf(tr(R.string.data_030), tr(R.string.data_031)), if (overwrite) 1 else 0) { overwrite = it == 1 }
+                Text(if (overwrite) tr(R.string.data_032) else tr(R.string.data_033),
                     style = Ling.type.caption, color = if (overwrite) c.error else c.onSurfaceVariant)
-                Text("导入前会自动备份当前数据。", style = Ling.type.caption, color = c.onSurfaceVariant)
-                LingButton(if (busy) "正在导入…" else "导入", enabled = !busy, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) { if (overwrite) confirm = true else doImport(a, false, ctx, { busy = it }) { msg = it; pending = null; autos = Backup.autoBackups(ctx) } }
+                Text(tr(R.string.data_034), style = Ling.type.caption, color = c.onSurfaceVariant)
+                LingButton(if (busy) tr(R.string.data_035) else tr(R.string.data_036), enabled = !busy, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) { if (overwrite) confirm = true else doImport(a, false, ctx, { busy = it }) { msg = it; pending = null; autos = Backup.autoBackups(ctx) } }
             }
         }
-        if (confirm) LingConfirm("覆盖本机数据？", "本机所有作品会被备份里的内容替换。导入前会先自动备份当前数据，可以在本页恢复。", confirm = "覆盖", danger = true,
+        if (confirm) LingConfirm(tr(R.string.data_037), tr(R.string.data_038), confirm = tr(R.string.data_031), danger = true,
             onDismiss = { confirm = false }, onConfirm = { confirm = false; doImport(a, true, ctx, { busy = it }) { msg = it; pending = null; autos = Backup.autoBackups(ctx) } })
     }
 }
@@ -197,7 +204,7 @@ private fun doImport(a: Backup.Archive, overwrite: Boolean, ctx: android.content
             }
             n
         }
-        withContext(Dispatchers.Main) { busy(false); done(r.fold({ "导入完成：$it 部作品" + if (overwrite) "（已覆盖）" else "" }, { "导入未完成：${it.message}。导入前的自动备份可在本页恢复。" })) }
+        withContext(Dispatchers.Main) { busy(false); done(r.fold({ tr(R.string.data_039, it) + if (overwrite) tr(R.string.data_040) else "" }, { tr(R.string.data_041, it.message) })) }
     }
 }
 
@@ -206,9 +213,9 @@ fun ImportSummary(a: Backup.Archive) {
     val c = Ling.colors
     LingCard(color = c.surfaceContainer) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("备份于 ${TimeFmt.clock(a.exportedAt)}", style = Ling.type.caption, color = c.onSurfaceVariant)
-            Text(a.bookTitles.take(4).joinToString("、") + if (a.bookTitles.size > 4) " 等 ${a.bookTitles.size} 部" else "", style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.onSurface)
-            Text("${a.count("chapters")} 章 · ${a.count("lore_cards")} 张设定卡 · ${a.count("foreshadows")} 条伏笔 · ${a.count("ideas")} 条灵感", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(tr(R.string.data_042, TimeFmt.clock(a.exportedAt)), style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(a.bookTitles.take(4).joinToString(tr(R.string.data_043)) + if (a.bookTitles.size > 4) tr(R.string.data_044, a.bookTitles.size) else "", style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.onSurface)
+            Text(tr(R.string.data_045, a.count("chapters"), a.count("lore_cards"), a.count("foreshadows"), a.count("ideas")), style = Ling.type.caption, color = c.onSurfaceVariant)
         }
     }
 }

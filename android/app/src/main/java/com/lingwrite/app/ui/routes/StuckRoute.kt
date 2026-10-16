@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import com.lingwrite.app.ui.components.enterStagger
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -86,17 +91,17 @@ fun StuckSheet(
 
     fun saveWay(w: StuckPrompts.Way) {
         scope.launch {
-            AppGraph.db.notes().insert(ChapterNoteEntity(chapterId = chapterId, kind = "stuck", text = "【${w.title}】${w.how}"))
+            AppGraph.db.notes().insert(ChapterNoteEntity(chapterId = chapterId, kind = "stuck", text = tr(R.string.book_ai_016, w.title, w.how)))
             onDismiss()
         }
     }
 
-    LingSheet(onDismiss, "卡文急救 · 第 $step 步 / 3") {
+    LingSheet(onDismiss, tr(R.string.stuck_001, step)) {
         if (step == 3 && !busy && ways.isNotEmpty()) {
             // 第 3 步整屏给方向卡：横向翻页，卡宽 300dp（ui-spec §6）
             val chips = listOf(kind) + clarifies.mapIndexed { i, cl ->
                 val q = cl.q.trim('？', '?', '。')
-                "$q → ${answers.getOrNull(i)?.ifBlank { "跳过" } ?: "跳过"}"
+                "$q → ${answers.getOrNull(i)?.ifBlank { tr(R.string.stuck_002) } ?: tr(R.string.stuck_002)}"
             }
             StuckWaysPager(
                 ways = ways, chips = chips.filter { it.isNotBlank() }, isGenerate = isGenerate,
@@ -110,11 +115,11 @@ fun StuckSheet(
             when (step) {
                 1 -> {
                     listOf(
-                        "不知道怎么过渡" to "上一场和下一场接不上",
-                        "大纲走不通了" to "章纲写不下去或和正文冲突",
-                        "没状态" to "就是不想写，或写不动",
-                        "人物不知道该怎么反应" to "人物卡住了",
-                        "其他" to "自己写一句",
+                        tr(R.string.stuck_003) to tr(R.string.stuck_004),
+                        tr(R.string.stuck_005) to tr(R.string.stuck_006),
+                        tr(R.string.stuck_007) to tr(R.string.stuck_008),
+                        tr(R.string.stuck_009) to tr(R.string.stuck_010),
+                        tr(R.string.lore_055) to tr(R.string.stuck_011),
                     ).forEachIndexed { si, (t, sub) ->
                         val on = kind == t
                         val i = remember { MutableInteractionSource() }
@@ -137,13 +142,13 @@ fun StuckSheet(
                 2 -> {
                     if (kind == "没状态") {
                         // 不调用 AI：直接给本地建议（ai-features §5.4）
-                        Text("没状态的时候不用硬写。", style = Ling.type.body, color = c.onSurfaceVariant)
-                        listOf("短更预案：拆一章当两章发", "跳写下一个更想写的场景", "回看上一章摘要找回感觉").forEachIndexed { qi, s ->
+                        Text(tr(R.string.stuck_012), style = Ling.type.body, color = c.onSurfaceVariant)
+                        listOf(tr(R.string.stuck_013), tr(R.string.stuck_014), tr(R.string.stuck_015)).forEachIndexed { qi, s ->
                             LingCard(Modifier.fillMaxWidth().enterStagger(qi)) { Text(s, style = Ling.type.body, color = c.onSurface, modifier = Modifier.padding(12.dp)) }
                         }
-                        LingButton("存到本章便签", BtnKind.Tonal, height = 44.dp, modifier = Modifier.fillMaxWidth()) {
+                        LingButton(tr(R.string.ask_panel_029), BtnKind.Tonal, height = 44.dp, modifier = Modifier.fillMaxWidth()) {
                             scope.launch {
-                                AppGraph.db.notes().insert(ChapterNoteEntity(chapterId = chapterId, kind = "stuck", text = "没状态建议：短更预案 / 跳写 / 回看摘要"))
+                                AppGraph.db.notes().insert(ChapterNoteEntity(chapterId = chapterId, kind = "stuck", text = tr(R.string.stuck_016)))
                                 onDismiss()
                             }
                         }
@@ -165,7 +170,7 @@ fun StuckSheet(
                             busy = true
                             step = 3
                             scope.launch {
-                                runCatching { StuckPrompts.ways(bookId, chapterId, kind, note, "（未回答）") }
+                                runCatching { StuckPrompts.ways(bookId, chapterId, kind, note, tr(R.string.stuck_017)) }
                                     .onSuccess { ways = it }.onFailure { err = it.message }
                                 busy = false
                             }
@@ -175,7 +180,7 @@ fun StuckSheet(
                             busy = true
                             step = 3
                             scope.launch {
-                                runCatching { StuckPrompts.ways(bookId, chapterId, kind, note, answers.joinToString("；")) }
+                                runCatching { StuckPrompts.ways(bookId, chapterId, kind, note, answers.joinToString(tr(R.string.ask_panel_008))) }
                                     .onSuccess { ways = it }.onFailure { err = it.message }
                                 busy = false
                             }
@@ -184,10 +189,10 @@ fun StuckSheet(
                 }
                 else -> {
                     if (busy) {
-                        com.lingwrite.app.ui.ai.AiThinking("正在想方向…")
+                        com.lingwrite.app.ui.ai.AiThinking(tr(R.string.stuck_018))
                     } else {
-                        err?.let { Text("没拿到结果：$it", style = Ling.type.caption, color = c.error) }
-                        LingButton("重试", BtnKind.Outlined, height = 40.dp) { step = 2 }
+                        err?.let { Text(tr(R.string.ai_components_011, it), style = Ling.type.caption, color = c.error) }
+                        LingButton(tr(R.string.ai_components_014), BtnKind.Outlined, height = 40.dp) { step = 2 }
                     }
                 }
             }
@@ -196,9 +201,9 @@ fun StuckSheet(
 
     // 改进章纲：显示要追加的内容，确认后才写，并给一次撤销
     outlineFix?.let { w ->
-        val added = "【卡文改】${w.outlineChange.ifBlank { w.how }}"
+        val added = tr(R.string.stuck_019, w.outlineChange.ifBlank { w.how })
         LingConfirm(
-            "改进章纲", "确认后追加到本章章纲备注（可以撤销）。",
+            tr(R.string.stuck_020), tr(R.string.stuck_021),
             onDismiss = { outlineFix = null },
             onConfirm = {
                 scope.launch {
@@ -209,8 +214,8 @@ fun StuckSheet(
                 }
             },
             extra = {
-                if (outlineBefore.isNotBlank()) Text("原备注：${outlineBefore.take(80)}", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
-                Text("追加：$added", style = Ling.type.caption, color = Ling.colors.primary, modifier = Modifier.padding(top = 6.dp))
+                if (outlineBefore.isNotBlank()) Text(tr(R.string.check_039, outlineBefore.take(80)), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+                Text(tr(R.string.check_040, added), style = Ling.type.caption, color = Ling.colors.primary, modifier = Modifier.padding(top = 6.dp))
             },
         )
     }
@@ -219,15 +224,15 @@ fun StuckSheet(
             Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp).clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("已写进本章章纲备注", style = Ling.type.caption, color = c.onSurface, modifier = Modifier.weight(1f))
-            LingButton("撤销", BtnKind.Text, height = 30.dp) {
+            Text(tr(R.string.stuck_022), style = Ling.type.caption, color = c.onSurface, modifier = Modifier.weight(1f))
+            LingButton(tr(R.string.check_042), BtnKind.Text, height = 30.dp) {
                 scope.launch {
                     val cp = AppGraph.db.plan().chapterOnce(chapterId)
                     if (cp != null) AppGraph.db.plan().upsertChapter(cp.copy(note = outlineBefore))
                     outlineApplied = false
                 }
             }
-            LingButton("知道了", BtnKind.Text, height = 30.dp) { outlineApplied = false }
+            LingButton(tr(R.string.editor_002), BtnKind.Text, height = 30.dp) { outlineApplied = false }
         }
     }
 }
@@ -246,13 +251,13 @@ fun StuckClarifyStep(
     onWays: () -> Unit,
 ) {
     val c = Ling.colors
-    Text("AI 想先问清楚（可以跳过）", style = Ling.type.caption, color = c.onSurfaceVariant)
+    Text(tr(R.string.stuck_023), style = Ling.type.caption, color = c.onSurfaceVariant)
     if (clarifies.isEmpty() && !busy) {
-        LingTextField(note, onNote, label = "补充一句（可空）", singleLine = false, minLines = 2, placeholder = "比如：这两场之间隔了三天")
-        LingButton("生成问题", icon = LingIcons.SparkleFilled, height = 46.dp, modifier = Modifier.fillMaxWidth(), onClick = onGenerate)
-        LingButton("跳过，直接给方向", BtnKind.Text, height = 40.dp, onClick = onSkip)
+        LingTextField(note, onNote, label = tr(R.string.stuck_024), singleLine = false, minLines = 2, placeholder = tr(R.string.stuck_025))
+        LingButton(tr(R.string.stuck_026), icon = LingIcons.SparkleFilled, height = 46.dp, modifier = Modifier.fillMaxWidth(), onClick = onGenerate)
+        LingButton(tr(R.string.stuck_027), BtnKind.Text, height = 40.dp, onClick = onSkip)
     } else if (busy) {
-        com.lingwrite.app.ui.ai.AiThinking("正在想问题…")
+        com.lingwrite.app.ui.ai.AiThinking(tr(R.string.stuck_028))
     } else {
         clarifies.forEachIndexed { i, cl ->
             Text(cl.q, style = Ling.type.bodyLarge, color = c.onSurface)
@@ -268,7 +273,7 @@ fun StuckClarifyStep(
                 }
             }
         }
-        LingButton("给 3 个方向", icon = LingIcons.SparkleFilled, height = 46.dp, modifier = Modifier.fillMaxWidth(), onClick = onWays)
+        LingButton(tr(R.string.stuck_029), icon = LingIcons.SparkleFilled, height = 46.dp, modifier = Modifier.fillMaxWidth(), onClick = onWays)
     }
 }
 
@@ -315,29 +320,29 @@ fun StuckWaysPager(
                 }
                 Text(w.how, style = Ling.type.body, color = c.onSurface, modifier = Modifier.padding(top = 6.dp))
                 if (w.pro.isNotBlank()) Row(Modifier.padding(top = 6.dp)) {
-                    Text("利", style = Ling.type.label, color = c.good, modifier = Modifier.width(24.dp))
+                    Text(tr(R.string.stuck_030), style = Ling.type.label, color = c.good, modifier = Modifier.width(24.dp))
                     Text(w.pro, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
                 }
                 if (w.con.isNotBlank()) Row(Modifier.padding(top = 2.dp)) {
-                    Text("弊", style = Ling.type.label, color = c.error, modifier = Modifier.width(24.dp))
+                    Text(tr(R.string.stuck_031), style = Ling.type.label, color = c.error, modifier = Modifier.width(24.dp))
                     Text(w.con, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
                 }
                 if (w.outlineChange.isNotBlank()) Row(Modifier.padding(top = 2.dp)) {
-                    Text("章纲", style = Ling.type.label, color = c.primary, modifier = Modifier.width(24.dp))
+                    Text(tr(R.string.outline_050), style = Ling.type.label, color = c.primary, modifier = Modifier.width(24.dp))
                     Text(w.outlineChange, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.weight(1f))
                 }
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingButton("存到本章便签", BtnKind.Tonal, height = 32.dp) { onSave(w) }
-                    LingButton("改进章纲", BtnKind.Text, height = 32.dp) { onOutline(w) }
+                    LingButton(tr(R.string.ask_panel_029), BtnKind.Tonal, height = 32.dp) { onSave(w) }
+                    LingButton(tr(R.string.stuck_020), BtnKind.Text, height = 32.dp) { onOutline(w) }
                     if (isGenerate && onDraftAWay != null) {
-                        LingButton("按这个方向起草一段", BtnKind.Text, height = 32.dp) { onDraftAWay(w) }
+                        LingButton(tr(R.string.stuck_032), BtnKind.Text, height = 32.dp) { onDraftAWay(w) }
                     }
                 }
             }
         }
     }
     Text(
-        "只给方向，不写正文 · 左右滑动看另外 ${(ways.size - 1).coerceAtLeast(0)} 个",
+        tr(R.string.stuck_033, (ways.size - 1).coerceAtLeast(0)),
         style = Ling.type.caption, color = c.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
     )

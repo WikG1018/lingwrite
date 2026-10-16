@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -73,8 +80,8 @@ fun LoreLibraryPage(bookId: Long, type: String, nav: NavHostController) {
     // A15：设定库「问」入口
     var ask by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("设定库", onBack = { nav.popBackStack() }) {
-            LingIconButton(LingIcons.Help, "问设定", onClick = { ask = true })
+        LingTopBar(tr(R.string.ask_panel_005), onBack = { nav.popBackStack() }) {
+            LingIconButton(LingIcons.Help, tr(R.string.ask_panel_017), onClick = { ask = true })
         }
         LoreWorkspace(bookId, nav, type, Modifier.weight(1f))
     }
@@ -90,8 +97,8 @@ fun LoreLibraryPage(bookId: Long, type: String, nav: NavHostController) {
                 onToLoreCard = { qsn, ans ->
                     scope.launch {
                         AppGraph.db.lore().insertCard(LoreCardEntity(
-                            bookId = bookId, type = "concept", name = qsn.take(10).ifBlank { "新设定" },
-                            fields = encodeFields(listOf(Field("说明", ans.take(300)))), pending = true,
+                            bookId = bookId, type = "concept", name = qsn.take(10).ifBlank { tr(R.string.context_031) },
+                            fields = encodeFields(listOf(Field(tr(R.string.context_032), ans.take(300)))), pending = true,
                         ))
                     }
                 },
@@ -122,24 +129,24 @@ fun LoreLibrary(bookId: Long, nav: NavHostController, initialType: String = "", 
             ) {
                 Icon(LingIcons.SparkleFilled, null, tint = c.onTertiaryContainer, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("AI 从第 ${pending.first().number} 章整理出 ${pending.size} 条建议", style = Ling.type.label, color = c.onTertiaryContainer, modifier = Modifier.weight(1f))
+                Text(tr(R.string.lore_001, pending.first().number, pending.size), style = Ling.type.label, color = c.onTertiaryContainer, modifier = Modifier.weight(1f))
                 Icon(LingIcons.Chevron, null, tint = c.onTertiaryContainer, modifier = Modifier.size(18.dp))
             }
         }
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            EntryCard(LingIcons.Graph, "人物关系图", "按章查看关系变化", Modifier.weight(1f)) { nav.navigate("graph/$bookId") }
-            EntryCard(LingIcons.Map, "地图与势力", "上传地图，标注地点和范围", Modifier.weight(1f)) { nav.navigate("maps/$bookId") }
+            EntryCard(LingIcons.Graph, tr(R.string.lore_002), tr(R.string.lore_003), Modifier.weight(1f)) { nav.navigate("graph/$bookId") }
+            EntryCard(LingIcons.Map, tr(R.string.lore_004), tr(R.string.lore_005), Modifier.weight(1f)) { nav.navigate("maps/$bookId") }
         }
         LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            item { LingChip(type == "", { type = "" }, "全部 ${cards.size}") }
+            item { LingChip(type == "", { type = "" }, tr(R.string.lore_006, cards.size)) }
             items(LoreType.entries) { t ->
                 val n = cards.count { it.type == t.id }
-                LingChip(type == t.id, { type = if (type == t.id) "" else t.id }, "${t.label} $n")
+                LingChip(type == t.id, { type = if (type == t.id) "" else t.id }, "${trText(t.label)} $n")
             }
         }
         val shown = cards.filter { type.isEmpty() || it.type == type }
         Spacer(Modifier.height(8.dp))
-        if (shown.isEmpty()) Text("还没有${LoreType.entries.firstOrNull { it.id == type }?.label ?: "设定"}卡。名字或别名出现在正文里时，卡片会自动带入 AI 上下文。",
+        if (shown.isEmpty()) Text(tr(R.string.lore_008, LoreType.entries.firstOrNull { it.id == type }?.label ?: tr(R.string.lore_007)),
             style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 28.dp, vertical = 12.dp))
         else LingCard(Modifier.padding(horizontal = 16.dp)) {
             shown.forEachIndexed { i, card ->
@@ -152,18 +159,18 @@ fun LoreLibrary(bookId: Long, nav: NavHostController, initialType: String = "", 
                     Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(card.name, style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.onSurface)
-                        val sub = listOf(t.label, card.role, card.aliases.takeIf { it.isNotBlank() }?.let { "又名 $it" }).filter { !it.isNullOrBlank() }.joinToString(" · ")
+                        val sub = listOf(trText(t.label), card.role, card.aliases.takeIf { it.isNotBlank() }?.let { tr(R.string.lore_009, it) }).filter { !it.isNullOrBlank() }.joinToString(" · ")
                         Text(sub, style = Ling.type.caption, color = c.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     when {
-                        card.pending -> Pill("AI 建议", PillKind.Amber, LingIcons.SparkleFilled)
-                        card.inject == "always" -> Pill("始终带入", PillKind.Primary)
-                        card.inject == "never" -> Pill("不带入", PillKind.Neutral)
+                        card.pending -> Pill(tr(R.string.lore_010), PillKind.Amber, LingIcons.SparkleFilled)
+                        card.inject == "always" -> Pill(tr(R.string.lore_011), PillKind.Primary)
+                        card.inject == "never" -> Pill(tr(R.string.lore_012), PillKind.Neutral)
                     }
                 }
             }
         }
-        LingButton("新建设定卡", BtnKind.Tonal, icon = LingIcons.Add, modifier = Modifier.padding(16.dp)) { creating = true }
+        LingButton(tr(R.string.lore_013), BtnKind.Tonal, icon = LingIcons.Add, modifier = Modifier.padding(16.dp)) { creating = true }
     }
     if (creating) CardEditSheet(null, bookId, defaultType = type.ifEmpty { "character" }, onDismiss = { creating = false }) { e ->
         scope.launch { val id = dao.insertCard(e); creating = false; if (onSelect != null) onSelect(id) else nav.navigate(com.lingwrite.app.ui.Routes.lore(bookId, id)) }
@@ -204,16 +211,16 @@ fun CardEditSheet(card: LoreCardEntity?, bookId: Long, defaultType: String = "ch
     var nameIdeas by remember { mutableStateOf<List<NameIdea>>(emptyList()) }
     var completing by remember { mutableStateOf(false) }
     var drafts by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    LingSheet(onDismiss, if (card == null) "新建设定卡" else "编辑 ${card.name}", layout = SheetLayout.Viewport) {
+    LingSheet(onDismiss, if (card == null) tr(R.string.lore_013) else tr(R.string.lore_014, card.name), layout = SheetLayout.Viewport) {
         Column(Modifier.heightIn(max = 600.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (card == null) LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(LoreType.entries) { t ->
                     LingChip(t == type, { type = t
-                        if (fields.all { it.v.isBlank() }) { fields.clear(); fields.addAll(defaultFields(t).map { Field(it, "") }) } }, t.label)
+                        if (fields.all { it.v.isBlank() }) { fields.clear(); fields.addAll(defaultFields(t).map { Field(it, "") }) } }, trText(t.label))
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                LingTextField(name, { name = it }, Modifier.weight(1f), label = "名称")
+                LingTextField(name, { name = it }, Modifier.weight(1f), label = tr(R.string.ideas_027))
                 // A4 起名入口：名字框右侧的 ✨
                 LingButton("✨", BtnKind.Text, height = 36.dp, onClick = { naming = !naming })
             }
@@ -226,11 +233,11 @@ fun CardEditSheet(card: LoreCardEntity?, bookId: Long, defaultType: String = "ch
                     onGenerate = {
                         namingBusy = true
                         scope.launch {
-                            val sameKind = AppGraph.db.lore().cardsOnce(bookId).filter { it.type == type.id }.take(30).joinToString("、") { it.name }
+                            val sameKind = AppGraph.db.lore().cardsOnce(bookId).filter { it.type == type.id }.take(30).joinToString(tr(R.string.data_043)) { it.name }
                             val bp = AppGraph.db.plan().bookOnce(bookId)
                             val bookTitle = AppGraph.db.books().get(bookId)?.title.orEmpty()
                             val genre = AppGraph.db.books().get(bookId)?.genre.orEmpty()
-                            LoreAi.suggestNames(bookTitle, genre, bp?.style.orEmpty(), sameKind, type.label, role, fields.joinToString("；") { "${it.k}=${it.v}" }, namingAsk)
+                            LoreAi.suggestNames(bookTitle, genre, bp?.style.orEmpty(), sameKind, type.label, role, fields.joinToString(tr(R.string.ask_panel_008)) { "${it.k}=${it.v}" }, namingAsk)
                                 .onSuccess { nameIdeas = it }.onFailure { nameIdeas = emptyList() }
                             namingBusy = false
                         }
@@ -238,17 +245,17 @@ fun CardEditSheet(card: LoreCardEntity?, bookId: Long, defaultType: String = "ch
                     onPick = { name = it.name; naming = false },
                 )
             }
-            LingTextField(aliases, { aliases = it }, label = "别名", placeholder = "用逗号分隔，例如：沈师姐，清禾", supporting = "名字或别名出现在正文里，就会自动识别并带入 AI 上下文")
-            LingTextField(role, { role = it }, label = "定位", placeholder = if (type == LoreType.Character) "主角 / 主要配角 / 反派…" else "一句话说明")
+            LingTextField(aliases, { aliases = it }, label = tr(R.string.lore_015), placeholder = tr(R.string.lore_016), supporting = tr(R.string.lore_017))
+            LingTextField(role, { role = it }, label = tr(R.string.lore_018), placeholder = if (type == LoreType.Character) tr(R.string.lore_019) else tr(R.string.lore_020))
             // A4 补全入口：字段区底部的“AI 补全空字段”
             val blanks = fields.filter { it.v.isBlank() && it.k.isNotBlank() }
             if (blanks.isNotEmpty()) {
-                LingButton(if (completing) "补全中…" else "AI 补全空字段（${blanks.size} 个）", BtnKind.Tonal, icon = LingIcons.Sparkle, height = 38.dp, enabled = !completing) {
+                LingButton(if (completing) tr(R.string.lore_021) else tr(R.string.lore_022, blanks.size), BtnKind.Tonal, icon = LingIcons.Sparkle, height = 38.dp, enabled = !completing) {
                     completing = true
                     scope.launch {
                         val bp = AppGraph.db.plan().bookOnce(bookId)
-                        val related = AppGraph.db.lore().cardsOnce(bookId).filter { it.name == name || it.allNames().contains(name) }.joinToString("；") { "${it.name}：${it.role}" }
-                        val fieldsText = fields.joinToString("；") { "${it.k}=${it.v.ifBlank { "（空）" }}" }
+                        val related = AppGraph.db.lore().cardsOnce(bookId).filter { it.name == name || it.allNames().contains(name) }.joinToString(tr(R.string.ask_panel_008)) { tr(R.string.lore_023, it.name, it.role) }
+                        val fieldsText = fields.joinToString(tr(R.string.ask_panel_008)) { "${it.k}=${it.v.ifBlank { tr(R.string.lore_024) }}" }
                         LoreAi.completeFields(bp?.synopsis.orEmpty(), related, "", fieldsText)
                             .onSuccess { m -> drafts = m.filterKeys { k -> blanks.any { it.k == k } } }
                         completing = false
@@ -266,15 +273,15 @@ fun CardEditSheet(card: LoreCardEntity?, bookId: Long, defaultType: String = "ch
                 LingTextField(f.v, { fields[i] = f.copy(v = it) }, label = f.k, singleLine = false, maxLines = 5)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                LingTextField(newKey, { newKey = it }, Modifier.weight(1f), placeholder = "自定义字段名")
+                LingTextField(newKey, { newKey = it }, Modifier.weight(1f), placeholder = tr(R.string.lore_025))
                 Spacer(Modifier.width(8.dp))
-                LingButton("添加字段", BtnKind.Tonal, enabled = newKey.isNotBlank()) { fields += Field(newKey.trim(), ""); newKey = "" }
+                LingButton(tr(R.string.lore_026), BtnKind.Tonal, enabled = newKey.isNotBlank()) { fields += Field(newKey.trim(), ""); newKey = "" }
             }
-            Text("带入 AI 上下文", style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
-            Segmented(listOf("提及时", "始终", "从不"), listOf("auto", "always", "never").indexOf(inject)) { inject = listOf("auto", "always", "never")[it] }
+            Text(tr(R.string.lore_027), style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant)
+            Segmented(listOf(tr(R.string.lore_028), tr(R.string.lore_029), tr(R.string.lore_030)), listOf("auto", "always", "never").indexOf(inject)) { inject = listOf("auto", "always", "never")[it] }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(vertical = 8.dp)) {
-                if (onDelete != null) LingButton("删除", BtnKind.Outlined, modifier = Modifier.weight(1f), height = 50.dp, onClick = onDelete)
-                LingButton(if (card?.pending == true) "确认采纳" else "保存", modifier = Modifier.weight(1f), height = 50.dp, enabled = name.isNotBlank()) {
+                if (onDelete != null) LingButton(tr(R.string.check_044), BtnKind.Outlined, modifier = Modifier.weight(1f), height = 50.dp, onClick = onDelete)
+                LingButton(if (card?.pending == true) tr(R.string.lore_031) else tr(R.string.check_046), modifier = Modifier.weight(1f), height = 50.dp, enabled = name.isNotBlank()) {
                     val base = card ?: LoreCardEntity(bookId = bookId, type = type.id, name = "")
                     onSave(base.copy(type = type.id, name = name.trim(), aliases = aliases.trim(), role = role.trim(), inject = inject,
                         fields = encodeFields(fields.filter { it.k.isNotBlank() }), pending = false, updatedAt = System.currentTimeMillis()))
@@ -308,18 +315,18 @@ fun LoreDetailRoute(cardId: Long, nav: NavHostController, atChapter: Int? = null
     val relUi = relationsAt(rels.filter { it.fromId == cd.id || it.toId == cd.id }, chapter).mapNotNull { r ->
         val other = cards.firstOrNull { it.id == (if (r.fromId == cd.id) r.toId else r.fromId) } ?: return@mapNotNull null
         val history = rels.filter { (it.fromId == r.fromId && it.toId == r.toId) || (it.fromId == r.toId && it.toId == r.fromId) }.filter { it.fromChapter <= chapter }.sortedBy { it.fromChapter }
-        val desc = history.map { it.label }.distinct().joinToString(" → ")
-        RelUi(other.name.take(1), avatarColor(other.id), other.name, desc, if (r.fromChapter == chapter && history.size > 1) "第 ${r.fromChapter} 章变化" else null, other.id)
+        val desc = history.map { trText(it.label) }.distinct().joinToString(" → ")
+        RelUi(other.name.take(1), avatarColor(other.id), other.name, desc, if (r.fromChapter == chapter && history.size > 1) tr(R.string.lore_032, r.fromChapter) else null, other.id)
     }
     val pills = buildList {
         if (cd.role.isNotBlank()) add(cd.role to PillKind.Primary)
-        resolved.firstOrNull { it.k in setOf("所属", "门派", "势力") }?.let { add(it.v to PillKind.Neutral) }
-        cd.firstChapter?.let { add("第 $it 章登场" to PillKind.Amber) }
-        if (cd.inject == "always") add("始终带入" to PillKind.Primary)
+        resolved.firstOrNull { it.k in setOf("所属", tr(R.string.lore_033), tr(R.string.lore_034)) }?.let { add(it.v to PillKind.Neutral) }
+        cd.firstChapter?.let { add(tr(R.string.lore_035, it) to PillKind.Amber) }
+        if (cd.inject == "always") add(tr(R.string.lore_011) to PillKind.Primary)
     }
     LoreScreen(
-        LoreDetailUi(t.label, cd.name, cd.name.take(1), avatarColor(cd.id).let { it to it.copy(red = it.red * 0.7f, green = it.green * 0.7f, blue = it.blue * 0.7f) },
-            pills, "第 $chapter 章时", resolved, relUi, fsList, cd.aliases, t == LoreType.Character),
+        LoreDetailUi(trText(t.label), cd.name, cd.name.take(1), avatarColor(cd.id).let { it to it.copy(red = it.red * 0.7f, green = it.green * 0.7f, blue = it.blue * 0.7f) },
+            pills, tr(R.string.lore_036, chapter), resolved, relUi, fsList, cd.aliases, t == LoreType.Character),
         onBack = { if (onBack != null) onBack() else nav.popBackStack() }, onHistory = { history = true }, onEdit = { edit = true }, onMore = { edit = true },
         onChapter = { pickChapter = true }, onField = { changeField = it }, onRelation = { relMenu = it },
         onAddRelation = { addRel = true }, onAddChange = { changeField = resolved.firstOrNull()?.k ?: "" },
@@ -332,27 +339,27 @@ fun LoreDetailRoute(cardId: Long, nav: NavHostController, atChapter: Int? = null
         var field by remember(f) { mutableStateOf(f) }
         var value by remember(f) { mutableStateOf("") }
         var from by remember(f) { mutableStateOf("$chapter") }
-        LingSheet({ changeField = null }, "记录状态变化") {
+        LingSheet({ changeField = null }, tr(R.string.lore_037)) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("例如境界突破、受伤、身份暴露、死亡。之后写到这一章及以后，AI 会按新状态理解人物。", style = Ling.type.body, color = Ling.colors.onSurfaceVariant)
-                LingTextField(field, { field = it }, label = "字段", placeholder = "境界 / 伤势 / 生死…")
-                LingTextField(value, { value = it }, label = "新的值", singleLine = false)
-                LingTextField(from, { from = it.filter(Char::isDigit) }, label = "从第几章起生效", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-                LingButton("保存", modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = field.isNotBlank() && value.isNotBlank()) {
+                Text(tr(R.string.lore_038), style = Ling.type.body, color = Ling.colors.onSurfaceVariant)
+                LingTextField(field, { field = it }, label = tr(R.string.lore_039), placeholder = tr(R.string.lore_040))
+                LingTextField(value, { value = it }, label = tr(R.string.lore_041), singleLine = false)
+                LingTextField(from, { from = it.filter(Char::isDigit) }, label = tr(R.string.lore_042), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                LingButton(tr(R.string.check_046), modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = field.isNotBlank() && value.isNotBlank()) {
                     scope.launch { dao.insertState(LoreStateEntity(cardId = cd.id, fromChapter = from.toIntOrNull() ?: chapter, field = field.trim(), value = value.trim())); changeField = null }
                 }
             }
         }
     }
-    if (history) LingSheet({ history = false }, "状态变化记录") {
-        if (states.isEmpty()) Text("还没有记录过变化。", style = Ling.type.body, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+    if (history) LingSheet({ history = false }, tr(R.string.lore_043)) {
+        if (states.isEmpty()) Text(tr(R.string.lore_044), style = Ling.type.body, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(24.dp))
         states.sortedByDescending { it.fromChapter }.forEach { s ->
             Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("第 ${s.fromChapter} 章起 · ${s.field}", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
+                    Text(tr(R.string.lore_045, s.fromChapter, s.field), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant)
                     Text(s.value, style = Ling.type.bodyLarge, color = Ling.colors.onSurface)
                 }
-                LingIconButton(LingIcons.Delete, "删除", tint = Ling.colors.onSurfaceVariant) { scope.launch { dao.deleteState(s.id) } }
+                LingIconButton(LingIcons.Delete, tr(R.string.check_044), tint = Ling.colors.onSurfaceVariant) { scope.launch { dao.deleteState(s.id) } }
             }
         }
     }
@@ -360,9 +367,9 @@ fun LoreDetailRoute(cardId: Long, nav: NavHostController, atChapter: Int? = null
         scope.launch { dao.insertRelation(r); addRel = false }
     }
     relMenu?.let { r ->
-        LingSheet({ relMenu = null }, "与 ${r.name} 的关系") {
-            SheetAction(LingIcons.Badge, "打开 ${r.name}") { relMenu = null; nav.navigate(com.lingwrite.app.ui.Routes.lore(cd.bookId, r.cardId)) }
-            SheetAction(LingIcons.TrendUp, "记录关系变化", sub = "从某一章起关系变成…") { relMenu = null; addRel = true }
+        LingSheet({ relMenu = null }, tr(R.string.lore_046, r.name)) {
+            SheetAction(LingIcons.Badge, tr(R.string.lore_047, r.name)) { relMenu = null; nav.navigate(com.lingwrite.app.ui.Routes.lore(cd.bookId, r.cardId)) }
+            SheetAction(LingIcons.TrendUp, tr(R.string.lore_048), sub = tr(R.string.lore_049)) { relMenu = null; addRel = true }
         }
     }
 }
@@ -372,7 +379,7 @@ object LoreHooks {
     var foreshadows: (Long) -> kotlinx.coroutines.flow.Flow<List<FsUi>> = { kotlinx.coroutines.flow.flowOf(emptyList()) }
 }
 
-val RelationTones = listOf("ally" to "同伴", "mentor" to "师徒", "family" to "亲属", "love" to "感情", "enemy" to "敌对", "neutral" to "其他")
+val RelationTones get() = listOf("ally" to tr(R.string.lore_050), "mentor" to tr(R.string.lore_051), "family" to tr(R.string.lore_052), "love" to tr(R.string.lore_053), "enemy" to tr(R.string.lore_054), "neutral" to tr(R.string.lore_055))
 
 @Composable
 fun RelationSheet(from: LoreCardEntity, others: List<LoreCardEntity>, chapter: Int, onDismiss: () -> Unit, onSave: (LoreRelationEntity) -> Unit) {
@@ -381,8 +388,8 @@ fun RelationSheet(from: LoreCardEntity, others: List<LoreCardEntity>, chapter: I
     var label by remember { mutableStateOf("") }
     var tone by remember { mutableStateOf("ally") }
     var at by remember { mutableStateOf("$chapter") }
-    LingSheet(onDismiss, "${from.name} 的关系") {
-        if (others.isEmpty()) { Text("先新建其他人物卡，才能添加关系。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp)); return@LingSheet }
+    LingSheet(onDismiss, tr(R.string.lore_056, from.name)) {
+        if (others.isEmpty()) { Text(tr(R.string.lore_057), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp)); return@LingSheet }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(others) { o -> LingChip(o == to, { to = o }, o.name) }
@@ -390,9 +397,9 @@ fun RelationSheet(from: LoreCardEntity, others: List<LoreCardEntity>, chapter: I
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(RelationTones) { (k, v) -> LingChip(k == tone, { tone = k }, v) }
             }
-            LingTextField(label, { label = it }, label = "关系", placeholder = "师弟、宿敌、暗恋…；填“断绝”表示从这章起不再有关系")
-            LingTextField(at, { at = it.filter(Char::isDigit) }, label = "从第几章起", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-            LingButton("保存", modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = to != null && label.isNotBlank()) {
+            LingTextField(label, { label = it }, label = tr(R.string.ask_panel_002), placeholder = tr(R.string.lore_058))
+            LingTextField(at, { at = it.filter(Char::isDigit) }, label = tr(R.string.lore_059), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+            LingButton(tr(R.string.check_046), modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = to != null && label.isNotBlank()) {
                 onSave(LoreRelationEntity(bookId = from.bookId, fromId = from.id, toId = to!!.id, label = label.trim(), fromChapter = at.toIntOrNull() ?: chapter, tone = tone))
             }
         }
@@ -402,10 +409,10 @@ fun RelationSheet(from: LoreCardEntity, others: List<LoreCardEntity>, chapter: I
 @Composable
 fun ChapterSliderSheet(current: Int, max: Int, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
     var v by remember { mutableFloatStateOf(current.toFloat()) }
-    LingSheet(onDismiss, "按章查看") {
-        Text("第 ${v.toInt()} 章时", style = Ling.type.headline, color = Ling.colors.primary, modifier = Modifier.padding(horizontal = 24.dp))
+    LingSheet(onDismiss, tr(R.string.lore_060)) {
+        Text(tr(R.string.lore_036, v.toInt()), style = Ling.type.headline, color = Ling.colors.primary, modifier = Modifier.padding(horizontal = 24.dp))
         Slider(v, { v = it }, valueRange = 1f..max.coerceAtLeast(2).toFloat(), steps = (max - 2).coerceIn(0, 200), modifier = Modifier.padding(horizontal = 20.dp),
             colors = SliderDefaults.colors(thumbColor = Ling.colors.primary, activeTrackColor = Ling.colors.primary))
-        LingButton("查看", modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), height = 50.dp) { onPick(v.toInt()) }
+        LingButton(tr(R.string.lore_061), modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), height = 50.dp) { onPick(v.toInt()) }
     }
 }

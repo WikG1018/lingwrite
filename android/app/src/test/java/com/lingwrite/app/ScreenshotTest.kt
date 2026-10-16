@@ -29,7 +29,7 @@ import java.io.File
 /** 412×915dp @2x，与 ui-hifi 高保真稿同尺寸，便于逐张对比。 */
 @RunWith(AndroidJUnit4::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w412dp-h915dp-xhdpi", application = android.app.Application::class)
+@Config(sdk = [34], qualifiers = "zh-rCN-w412dp-h915dp-xhdpi", application = android.app.Application::class)
 class ScreenshotTest {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
     private val dir = File(System.getProperty("lingwrite.shotDir") ?: "build/shots").apply { mkdirs() }

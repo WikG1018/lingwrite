@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.screens
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -55,8 +59,8 @@ fun ShelfScreen(
             if (books.isEmpty()) item { EmptyShelf(onNewBook, onSample) }
             if (books.isNotEmpty()) item {
                 Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 10.dp).enterStagger(1), verticalAlignment = Alignment.CenterVertically) {
-                    Text("全部作品", style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.weight(1f))
-                    Text("最近编辑", style = Ling.type.caption, color = c.onSurfaceVariant)
+                    Text(tr(R.string.shelf_021), style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.weight(1f))
+                    Text(tr(R.string.shelf_022), style = Ling.type.caption, color = c.onSurfaceVariant)
                     Icon(LingIcons.ExpandMore, null, Modifier.size(18.dp), tint = c.onSurfaceVariant)
                 }
             }
@@ -69,7 +73,7 @@ fun ShelfScreen(
                 }
             }
         }
-        if (books.isNotEmpty()) LingFab("新建作品", LingIcons.Add, Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 16.dp, bottom = 88.dp), onClick = onNewBook)
+        if (books.isNotEmpty()) LingFab(tr(R.string.shelf_015), LingIcons.Add, Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(end = 16.dp, bottom = 88.dp), onClick = onNewBook)
     }
 }
 
@@ -82,10 +86,10 @@ private fun ShelfHeader(count: Int, today: Int, onSearch: () -> Unit) {
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text("灵写", style = Ling.type.headline, color = c.onSurface)
-            Text(if (count == 0) "开始你的第一部作品" else "$count 部作品 · 今天写了 ${com.lingwrite.app.data.Words.grouped(today)} 字", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(tr(R.string.about_037), style = Ling.type.headline, color = c.onSurface)
+            Text(if (count == 0) tr(R.string.shelf_023) else tr(R.string.shelf_024, count, com.lingwrite.app.data.Words.grouped(today)), style = Ling.type.caption, color = c.onSurfaceVariant)
         }
-        LingIconButton(LingIcons.Search, "搜索", onClick = onSearch)
+        LingIconButton(LingIcons.Search, tr(R.string.shelf_025), onClick = onSearch)
     }
 }
 
@@ -105,7 +109,7 @@ private fun HeroCard(h: HeroInfo, modifier: Modifier, onContinue: () -> Unit) {
             .padding(start = 18.dp, end = 18.dp, top = 18.dp, bottom = 16.dp),
     ) {
         Box(Modifier.height(24.dp).clip(Radius.pill).background(Color.White.copy(alpha = 0.16f)).padding(horizontal = 10.dp), contentAlignment = Alignment.Center) {
-            Text("继续写作", style = Ling.type.micro.copy(fontSize = 12.sp), color = Color.White)
+            Text(tr(R.string.shelf_026), style = Ling.type.micro.copy(fontSize = 12.sp), color = Color.White)
         }
         Text(h.title, style = Ling.type.headline.copy(letterSpacing = (-0.2).sp), color = Color.White, modifier = Modifier.padding(top = 12.dp, bottom = 2.dp))
         Text(h.subline, style = Ling.type.caption, color = Color.White.copy(alpha = 0.78f))
@@ -124,7 +128,7 @@ private fun HeroCard(h: HeroInfo, modifier: Modifier, onContinue: () -> Unit) {
             modifier = Modifier.padding(top = 12.dp, bottom = 14.dp),
         )
         Row(verticalAlignment = Alignment.Bottom) {
-            Stat(h.words, h.wordsUnit); Spacer(Modifier.width(18.dp)); Stat("${h.chapters}", "章")
+            Stat(h.words, h.wordsUnit); Spacer(Modifier.width(18.dp)); Stat("${h.chapters}", tr(R.string.shelf_027))
             Spacer(Modifier.weight(1f))
             val bi = remember { MutableInteractionSource() }
             Row(
@@ -134,7 +138,7 @@ private fun HeroCard(h: HeroInfo, modifier: Modifier, onContinue: () -> Unit) {
             ) {
                 Icon(LingIcons.EditOutline, null, Modifier.size(20.dp), tint = Color(0xFF2E4870))
                 Spacer(Modifier.width(4.dp))
-                Text("继续写", style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = Color(0xFF2E4870))
+                Text(tr(R.string.shelf_028), style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = Color(0xFF2E4870))
             }
         }
     }
@@ -160,19 +164,19 @@ private fun BookRow(b: Book, onMenu: () -> Unit, onClick: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 Pill(b.genre)
                 when (b.status) {
-                    BookStatus.Serial -> Pill("连载中", PillKind.Neutral)
-                    BookStatus.Outline -> Pill("大纲中", PillKind.Neutral)
-                    BookStatus.Draft -> Pill("草稿", PillKind.Neutral)
-                    BookStatus.Done -> Pill("已完结", PillKind.Good)
-                    BookStatus.Wizard -> Pill("向导 ${b.wizardStep}/7", PillKind.Amber, LingIcons.SparkleFilled)
+                    BookStatus.Serial -> Pill(tr(R.string.shelf_029), PillKind.Neutral)
+                    BookStatus.Outline -> Pill(tr(R.string.shelf_030), PillKind.Neutral)
+                    BookStatus.Draft -> Pill(tr(R.string.shelf_031), PillKind.Neutral)
+                    BookStatus.Done -> Pill(tr(R.string.shelf_032), PillKind.Good)
+                    BookStatus.Wizard -> Pill(tr(R.string.shelf_033, b.wizardStep), PillKind.Amber, LingIcons.SparkleFilled)
                 }
-                if (b.overdueForeshadow > 0) Pill("伏笔超期 ${b.overdueForeshadow}", PillKind.Error, LingIcons.Schedule)
+                if (b.overdueForeshadow > 0) Pill(tr(R.string.shelf_034, b.overdueForeshadow), PillKind.Error, LingIcons.Schedule)
             }
             Spacer(Modifier.height(6.dp))
-            val meta = if (b.status == BookStatus.Wizard) "尚未开写 · ${b.edited}" else "${b.words} · ${b.chapter} · ${b.edited}"
+            val meta = if (b.status == BookStatus.Wizard) tr(R.string.shelf_035, b.edited) else "${b.words} · ${b.chapter} · ${b.edited}"
             Text(meta, style = Ling.type.caption, color = c.onSurfaceVariant)
         }
-        LingIconButton(LingIcons.More, "更多", tint = c.onSurfaceVariant, onClick = onMenu)
+        LingIconButton(LingIcons.More, tr(R.string.editor_059), tint = c.onSurfaceVariant, onClick = onMenu)
     }
 }
 
@@ -184,11 +188,11 @@ private fun EmptyShelf(onNew: () -> Unit, onSample: () -> Unit) {
             Box(Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)).background(c.primaryContainer), contentAlignment = Alignment.Center) {
                 Icon(LingIcons.Quill, null, Modifier.size(34.dp), tint = c.onPrimaryContainer)
             }
-            Text("书架还是空的", style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.padding(top = 16.dp))
-            Text("从一个灵感开始，向导会一步步陪你搭好设定、大纲和前三章。", style = Ling.type.body, color = c.onSurfaceVariant,
+            Text(tr(R.string.shelf_036), style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.padding(top = 16.dp))
+            Text(tr(R.string.shelf_037), style = Ling.type.body, color = c.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(top = 6.dp, bottom = 20.dp))
-            LingButton("新建作品", icon = LingIcons.Add, onClick = onNew)
-            LingButton("先看看示例作品", BtnKind.Text, modifier = Modifier.padding(top = 4.dp), onClick = onSample)
+            LingButton(tr(R.string.shelf_015), icon = LingIcons.Add, onClick = onNew)
+            LingButton(tr(R.string.shelf_038), BtnKind.Text, modifier = Modifier.padding(top = 4.dp), onClick = onSample)
         }
     }
 }

@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.components
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -82,7 +86,7 @@ fun DetailHost(inline: Boolean, title: String, onDismiss: () -> Unit, showBack: 
     if (inline) Column(Modifier.fillMaxSize().background(Ling.colors.surface)) {
         Row(Modifier.fillMaxWidth().padding(12.dp)) {
             Text(title, style = Ling.type.titleSmall, color = Ling.colors.onSurface, modifier = Modifier.weight(1f))
-            if (showBack) LingButton("返回列表", BtnKind.Text, height = 36.dp, onClick = onDismiss)
+            if (showBack) LingButton(tr(R.string.adaptive_workspace_001), BtnKind.Text, height = 36.dp, onClick = onDismiss)
         }
         Box(Modifier.weight(1f)) { content() }
     } else LingSheet(onDismiss, title, layout = SheetLayout.Viewport) { content() }

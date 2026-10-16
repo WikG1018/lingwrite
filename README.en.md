@@ -15,7 +15,7 @@ An Android app for writing serialized web fiction. It gives you a chapter editor
 <img src="docs/screenshots/04-lore-light.png" width="200" alt="Lore card">
 </p>
 
-> The app UI is currently in Chinese. Localization into English, Traditional Chinese and Japanese is in progress.
+> The app UI is available in Simplified Chinese, English, Traditional Chinese and Japanese. It follows the system language by default; change it in Settings › Appearance › Display language (or the system’s per-app language page on Android 13+). AI prompts stay in Chinese, and “AI output language” in Settings follows the work’s language by default.
 
 ## Features
 

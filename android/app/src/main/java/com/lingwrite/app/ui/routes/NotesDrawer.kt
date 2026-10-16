@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.lazy.itemsIndexed
 import com.lingwrite.app.ui.components.enterStagger
 import androidx.compose.animation.AnimatedVisibility
@@ -45,7 +50,7 @@ import kotlinx.coroutines.launch
 
 /** 便签种类（ui-spec §2）：方向 / 节拍 / 卡文 / 随手问 / 改法。 */
 private fun kindLabel(k: String) = when (k) {
-    "direction" -> "方向"; "beat" -> "节拍"; "stuck" -> "卡文"; "ask" -> "随手问"; "fix" -> "改法"; else -> k
+    "direction" -> tr(R.string.notes_drawer_001); "beat" -> tr(R.string.notes_drawer_002); "stuck" -> tr(R.string.notes_drawer_003); "ask" -> tr(R.string.ask_panel_018); "fix" -> tr(R.string.notes_drawer_004); else -> k
 }
 private fun kindPill(k: String) = when (k) { "direction" -> PillKind.Primary; "beat" -> PillKind.Amber; "stuck" -> PillKind.Error; else -> PillKind.Neutral }
 
@@ -78,19 +83,19 @@ fun NotesDrawer(chapterId: Long, open: Boolean, onClose: () -> Unit) {
                 Modifier.fillMaxHeight().width(drawerWidth).clip(RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)).background(c.surface).statusBarsPadding().navigationBarsPadding()
                     .clickable(enabled = false, onClick = {}),
             ) {
-                LingTopBar("本章便签", if (notes.isEmpty()) null else "${notes.count { !it.done }} 条未完成", onBack = onClose)
+                LingTopBar(tr(R.string.notes_drawer_005), if (notes.isEmpty()) null else tr(R.string.notes_drawer_006, notes.count { !it.done }), onBack = onClose)
                 if (tip) {
                     Row(
                         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).clip(RoundedCornerShape(12.dp)).background(c.primaryContainer).padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text("辅助模式下 AI 给的方向、节拍、改法都会存到这里，不会写进正文。", style = Ling.type.caption, color = c.onPrimaryContainer, modifier = Modifier.weight(1f))
-                        LingButton("知道了", BtnKind.Text, height = 30.dp) { scope.launch { AppGraph.prefs.update { it.copy(notesTipShown = true) } } }
+                        Text(tr(R.string.notes_drawer_007), style = Ling.type.caption, color = c.onPrimaryContainer, modifier = Modifier.weight(1f))
+                        LingButton(tr(R.string.editor_002), BtnKind.Text, height = 30.dp) { scope.launch { AppGraph.prefs.update { it.copy(notesTipShown = true) } } }
                     }
                 }
                 if (notes.isEmpty()) {
                     Text(
-                        "还没有便签。辅助模式下 AI 给的方向、节拍、改法都会存到这里，不进正文。",
+                        tr(R.string.notes_drawer_008),
                         style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp),
                     )
                 } else LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(vertical = 8.dp)) {
@@ -120,7 +125,7 @@ private fun NoteRow(n: ChapterNoteEntity, modifier: Modifier = Modifier, onDone:
                 .background(if (n.done) c.primary else c.surfaceContainer)
                 .clickable(onClick = onDone),
             contentAlignment = Alignment.Center,
-        ) { if (n.done) Icon(LingIcons.Check, "已完成", tint = c.onPrimary, modifier = Modifier.size(14.dp)) }
+        ) { if (n.done) Icon(LingIcons.Check, tr(R.string.notes_drawer_009), tint = c.onPrimary, modifier = Modifier.size(14.dp)) }
         Spacer(Modifier.width(10.dp))
         Text(
             n.text,
@@ -129,7 +134,7 @@ private fun NoteRow(n: ChapterNoteEntity, modifier: Modifier = Modifier, onDone:
             modifier = Modifier.weight(1f).padding(top = 1.dp),
             maxLines = 6, overflow = TextOverflow.Ellipsis,
         )
-        LingIconButton(LingIcons.Copy, "复制", tint = c.onSurfaceVariant, onClick = onCopy)
-        LingIconButton(LingIcons.Delete, "删除", tint = c.onSurfaceVariant, onClick = onDelete)
+        LingIconButton(LingIcons.Copy, tr(R.string.ai_components_005), tint = c.onSurfaceVariant, onClick = onCopy)
+        LingIconButton(LingIcons.Delete, tr(R.string.check_044), tint = c.onSurfaceVariant, onClick = onDelete)
     }
 }

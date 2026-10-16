@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import com.lingwrite.app.ui.components.enterStagger
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -62,7 +69,7 @@ object OutlineModule {
         }
         val prevMore = EditorHooks.moreItems
         EditorHooks.moreItems = { st, close, nav ->
-            SheetAction(LingIcons.EditNote, "本章章纲", sub = "核心事件 · 开篇钩子 · 章尾悬念") { Outline.editing = st.chapter.id; close() }
+            SheetAction(LingIcons.EditNote, tr(R.string.outline_001), sub = tr(R.string.outline_002)) { Outline.editing = st.chapter.id; close() }
             prevMore(this, st, close, nav)
         }
         val prevOverlay = EditorHooks.overlays
@@ -76,7 +83,7 @@ object OutlineModule {
         PromptHooks.context = { bookId, chapterId, cursor, text ->
             val base = prevCtx(bookId, chapterId, cursor, text)
             val plan = AppGraph.db.plan().chapterOnce(chapterId)?.takeIf { !it.isEmpty() }?.asPrompt()
-            if (plan == null || base.contains("【本章章纲】")) base else "【本章章纲】\n$plan\n\n$base"
+            if (plan == null || base.contains("【本章章纲】")) base else trZh(R.string.outline_003, plan, base)
         }
     }
 }
@@ -90,14 +97,14 @@ object Outline {
     /** 正文是否落实章纲（章纲为空或无模型时静默跳过）。 */
     suspend fun checkLanded(chapterId: Long): String? {
         val c = AppGraph.db.chapters().get(chapterId) ?: return null
-        val p = dao.chapterOnce(chapterId)?.takeIf { !it.isEmpty() } ?: return "这一章还没有章纲"
-        if (c.content.isBlank()) return "正文还是空的"
+        val p = dao.chapterOnce(chapterId)?.takeIf { !it.isEmpty() } ?: return tr(R.string.outline_004)
+        if (c.content.isBlank()) return tr(R.string.outline_005)
         val r = AppGraph.ai.complete("check", OutlinePrompts.SYS, OutlinePrompts.landed(p.asPrompt(), c.content), c.bookId, c.id, 300)
         return r.fold({ raw ->
-            val o = extractJson(raw, array = false) ?: return@fold "模型没有按格式返回"
+            val o = extractJson(raw, array = false) ?: return@fold tr(R.string.book_ai_018)
             AppGraph.db.withTransaction {
                 val latest = dao.chapterOnce(chapterId)
-                if (latest != p || AppGraph.db.chapters().get(chapterId)?.content != c.content) "正文或章纲已修改，请重新检查"
+                if (latest != p || AppGraph.db.chapters().get(chapterId)?.content != c.content) tr(R.string.outline_006)
                 else { dao.upsertChapter(latest.copy(landed = o.toString())); null }
             }
         }, { it.message })
@@ -132,29 +139,29 @@ fun OutlineTab(bookId: Long, nav: NavHostController, embedded: Boolean = false) 
     @Composable
     fun OutlineList() {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MiniEntry(LingIcons.Sparkle, "总纲工作台", Modifier.weight(1f)) { nav.navigate("chain/$bookId") }
-            MiniEntry(LingIcons.Graph, "多线视图", Modifier.weight(1f)) { nav.navigate("threads/$bookId") }
-            MiniEntry(LingIcons.FactCheck, "黄金三章", Modifier.weight(1f)) { nav.navigate("golden/$bookId") }
+            MiniEntry(LingIcons.Sparkle, tr(R.string.chain_001), Modifier.weight(1f)) { nav.navigate("chain/$bookId") }
+            MiniEntry(LingIcons.Graph, tr(R.string.outline_007), Modifier.weight(1f)) { nav.navigate("threads/$bookId") }
+            MiniEntry(LingIcons.FactCheck, tr(R.string.outline_008), Modifier.weight(1f)) { nav.navigate("golden/$bookId") }
         }
         // 总纲
         LingCard(Modifier.padding(horizontal = 16.dp)) {
             Column(Modifier.fillMaxWidth().rowClick { editSynopsis = true; editVolume = null; editChapter = null }.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("总纲", style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.weight(1f))
+                    Text(tr(R.string.outline_009), style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.weight(1f))
                     Icon(LingIcons.EditOutline, null, tint = c.onSurfaceVariant, modifier = Modifier.size(18.dp))
                 }
-                Text(bp.synopsis.ifBlank { "写下整本书的主线：主角要什么、挡在面前的是什么、最后会怎样。" }, style = Ling.type.body.copy(lineHeight = 22.sp),
+                Text(bp.synopsis.ifBlank { tr(R.string.outline_010) }, style = Ling.type.body.copy(lineHeight = 22.sp),
                     color = if (bp.synopsis.isBlank()) c.onSurfaceVariant else c.onSurface, maxLines = 6, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
                 // A7 独立入口：只有总纲也能直接拆卷纲（进总纲工作台第 ④ 步）
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingButton("AI 拆卷纲", BtnKind.Tonal, icon = LingIcons.Sparkle, height = 36.dp) { nav.navigate("chain/$bookId?step=4") }
-                    LingButton("总纲工作台", BtnKind.Text, icon = LingIcons.Book, height = 36.dp) { nav.navigate("chain/$bookId") }
+                    LingButton(tr(R.string.chain_051), BtnKind.Tonal, icon = LingIcons.Sparkle, height = 36.dp) { nav.navigate("chain/$bookId?step=4") }
+                    LingButton(tr(R.string.chain_001), BtnKind.Text, icon = LingIcons.Book, height = 36.dp) { nav.navigate("chain/$bookId") }
                 }
             }
         }
         Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton("章纲字段与线索", BtnKind.Tonal, icon = LingIcons.Settings, height = 36.dp) { config = true }
-            LingButton("模板", BtnKind.Tonal, icon = LingIcons.Book, height = 36.dp) { templates = true }
+            LingButton(tr(R.string.outline_011), BtnKind.Tonal, icon = LingIcons.Settings, height = 36.dp) { config = true }
+            LingButton(tr(R.string.outline_012), BtnKind.Tonal, icon = LingIcons.Book, height = 36.dp) { templates = true }
         }
         vols.forEachIndexed { vi, v ->
             val vp = vplans.firstOrNull { it.volumeId == v.id }
@@ -163,17 +170,17 @@ fun OutlineTab(bookId: Long, nav: NavHostController, embedded: Boolean = false) 
             Row(Modifier.fillMaxWidth().rowClick { collapsed = if (open) collapsed + v.id else collapsed - v.id }.padding(start = 24.dp, end = 8.dp, top = 14.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(LingIcons.ExpandMore, null, tint = c.primary, modifier = Modifier.size(20.dp).rotate(if (open) 0f else -90f))
                 Text(VolumeLabel.full(vi + 1, v.title), style = Ling.type.volumeHeader, color = c.primary, modifier = Modifier.padding(start = 4.dp).weight(1f))
-                Text("${list.count { it.state == "done" }}/${list.size} 章", style = Ling.type.caption, color = c.onSurfaceVariant)
-                if (vi > 0) Box(Modifier.rotate(180f)) { LingIconButton(LingIcons.ExpandMore, "上移卷", c.onSurfaceVariant) { scope.launch { repo.moveVolumeIn(bookId, v.id, -1) } } }
+                Text(tr(R.string.outline_013, list.count { it.state == "done" }, list.size), style = Ling.type.caption, color = c.onSurfaceVariant)
+                if (vi > 0) Box(Modifier.rotate(180f)) { LingIconButton(LingIcons.ExpandMore, tr(R.string.outline_014), c.onSurfaceVariant) { scope.launch { repo.moveVolumeIn(bookId, v.id, -1) } } }
             }
             if (open) LingCard(Modifier.padding(horizontal = 16.dp).enterStagger(vi).animateContentSize()) {
                 Column(Modifier.fillMaxWidth().rowClick { editVolume = v; editSynopsis = false; editChapter = null }.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                    Text("卷纲", style = Ling.type.caption.copy(fontWeight = FontWeight.SemiBold), color = c.onSurfaceVariant)
-                    Text(vp?.outline?.ifBlank { null } ?: "点这里写本卷要完成的事", style = Ling.type.body, color = if (vp?.outline.isNullOrBlank()) c.onSurfaceVariant else c.onSurface, maxLines = 4, overflow = TextOverflow.Ellipsis)
+                    Text(tr(R.string.outline_015), style = Ling.type.caption.copy(fontWeight = FontWeight.SemiBold), color = c.onSurfaceVariant)
+                    Text(vp?.outline?.ifBlank { null } ?: tr(R.string.outline_016), style = Ling.type.body, color = if (vp?.outline.isNullOrBlank()) c.onSurfaceVariant else c.onSurface, maxLines = 4, overflow = TextOverflow.Ellipsis)
                     Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        if (!vp?.goal.isNullOrBlank()) Pill("目标 · ${vp!!.goal}", PillKind.Primary)
-                        if (!vp?.climax.isNullOrBlank()) Pill("高潮 · ${vp!!.climax}", PillKind.Amber)
-                        if ((vp?.chapterCount ?: 0) > 0) Pill("约 ${vp!!.chapterCount} 章", PillKind.Neutral)
+                        if (!vp?.goal.isNullOrBlank()) Pill(tr(R.string.outline_017, vp!!.goal), PillKind.Primary)
+                        if (!vp?.climax.isNullOrBlank()) Pill(tr(R.string.outline_018, vp!!.climax), PillKind.Amber)
+                        if ((vp?.chapterCount ?: 0) > 0) Pill(tr(R.string.outline_019, vp!!.chapterCount), PillKind.Neutral)
                     }
                 }
                 list.forEach { ch ->
@@ -183,48 +190,48 @@ fun OutlineTab(bookId: Long, nav: NavHostController, embedded: Boolean = false) 
                 }
                 InsetDivider(16.dp)
                 Row(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    LingButton("加一章", BtnKind.Text, icon = LingIcons.Add, height = 36.dp) { scope.launch { editChapter = repo.addChapterTo(bookId, v.id, "") } }
-                    LingButton("AI 拆章纲", BtnKind.Text, icon = LingIcons.Sparkle, height = 36.dp) { split = v }
-                    LingButton("规划后续", BtnKind.Text, icon = LingIcons.Schedule, height = 36.dp) { rolling = v }
+                    LingButton(tr(R.string.outline_020), BtnKind.Text, icon = LingIcons.Add, height = 36.dp) { scope.launch { editChapter = repo.addChapterTo(bookId, v.id, "") } }
+                    LingButton(tr(R.string.chain_061), BtnKind.Text, icon = LingIcons.Sparkle, height = 36.dp) { split = v }
+                    LingButton(tr(R.string.outline_021), BtnKind.Text, icon = LingIcons.Schedule, height = 36.dp) { rolling = v }
                 }
             }
         }
-        if (vols.isEmpty()) Text("还没有分卷。写下第一章时会自动建立第一卷。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp))
+        if (vols.isEmpty()) Text(tr(R.string.outline_022), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp))
     }
     if (embedded && !editing) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) { OutlineList() }
     else AdaptiveMasterDetail(editing, if (embedded) Modifier.fillMaxWidth().height((androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp - 170).coerceAtLeast(400).dp) else Modifier.fillMaxSize(), master = {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = if (embedded) 12.dp else Space.dockClearance)) { OutlineList() }
     }, detail = {
         when {
-            editSynopsis -> key("synopsis") { TextEditSheet("总纲", bp.synopsis, { editSynopsis = false }, inline = true) { t -> scope.launch { AppGraph.db.withTransaction { dao.upsertBook((dao.bookOnce(bookId) ?: BookPlanEntity(bookId)).copy(synopsis = t)) } } } }
+            editSynopsis -> key("synopsis") { TextEditSheet(tr(R.string.outline_009), bp.synopsis, { editSynopsis = false }, inline = true) { t -> scope.launch { AppGraph.db.withTransaction { dao.upsertBook((dao.bookOnce(bookId) ?: BookPlanEntity(bookId)).copy(synopsis = t)) } } } }
             editVolume != null -> {
                 val v = editVolume!!
                 val existing = vplans.firstOrNull { it.volumeId == v.id } ?: VolumePlanEntity(v.id, bookId)
-                key(v.id) { TextEditSheet(v.title + " · 卷纲", existing.outline, { editVolume = null }, inline = true) { t -> scope.launch { AppGraph.db.withTransaction { dao.upsertVolume((dao.volumeOnce(v.id) ?: existing).copy(outline = t)) } } } }
+                key(v.id) { TextEditSheet(v.title + tr(R.string.outline_023), existing.outline, { editVolume = null }, inline = true) { t -> scope.launch { AppGraph.db.withTransaction { dao.upsertVolume((dao.volumeOnce(v.id) ?: existing).copy(outline = t)) } } } }
             }
             editChapter != null -> key(editChapter) { ChapterPlanSheet(bookId, editChapter!!, inline = true) { editChapter = null } }
-            else -> Text("选择总纲、卷纲或章纲，在这里规划故事。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+            else -> Text(tr(R.string.outline_024), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
         }
     })
     androidx.activity.compose.BackHandler((editSynopsis || editVolume != null) && editChapter == null && androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp < 720) { editSynopsis = false; editVolume = null; editChapter = null }
     split?.let { v -> SplitSheet(bookId, v, bp, presetN) { split = null } }
     rolling?.let { v ->
-        LingSheet({ rolling = null }, "AI 规划后续章纲 · ${VolumeLabel.full(vols.sortedBy { it.sort }.indexOf(v) + 1, v.title)}") {
-            Text("从这一卷最后一个有章纲的章节往后接着拆。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
-            listOf("3" to "3 章", "5" to "5 章").forEach { (n, label) ->
-                SheetAction(LingIcons.Sparkle, label, sub = "滚动规划，接着已有章纲往后") { presetN = n; rolling = null; split = v }
+        LingSheet({ rolling = null }, tr(R.string.outline_025, VolumeLabel.full(vols.sortedBy { it.sort }.indexOf(v) + 1, v.title))) {
+            Text(tr(R.string.outline_026), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+            listOf("3" to tr(R.string.outline_027), "5" to tr(R.string.outline_028)).forEach { (n, label) ->
+                SheetAction(LingIcons.Sparkle, label, sub = tr(R.string.outline_029)) { presetN = n; rolling = null; split = v }
             }
-            SheetAction(LingIcons.EditNote, "自定章数") { presetN = "5"; rolling = null; split = v }
-            Text("结果是建议，采纳前都可以改。", style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp))
+            SheetAction(LingIcons.EditNote, tr(R.string.outline_030)) { presetN = "5"; rolling = null; split = v }
+            Text(tr(R.string.outline_031), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp))
         }
     }
     if (config) PlanConfigSheet(bp) { config = false }
     val navHost = LocalNav.current
-    if (templates) LingSheet({ templates = false }, "网文模板") {
-        Text("套用后会给章纲加上对应字段，并在 AI 拆章纲时附上写法要求。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
+    if (templates) LingSheet({ templates = false }, tr(R.string.outline_032)) {
+        Text(tr(R.string.outline_033), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
         val on = bp.templates.split(',').filter { it.isNotBlank() }.toSet()
         OutlineTemplates.forEach { t ->
-            SheetAction(if (t.id in on) LingIcons.CheckCircle else LingIcons.Book, t.name + if (t.id in on) " · 已套用" else "", sub = t.desc) {
+            SheetAction(if (t.id in on) LingIcons.CheckCircle else LingIcons.Book, t.name + if (t.id in on) tr(R.string.outline_034) else "", sub = t.desc) {
                 scope.launch {
                     val ids = if (t.id in on) on - t.id else on + t.id
                     val fields = (parseList(bp.fields) + if (t.id in on) emptyList() else t.fields).distinct()
@@ -233,17 +240,17 @@ fun OutlineTab(bookId: Long, nav: NavHostController, embedded: Boolean = false) 
             }
         }
         // A12 拆文入口：拆一本书做模板（版权提示在拆文页）
-        SheetAction(LingIcons.Graph, "拆一本书做模板", sub = "只保存分析结果，不保存原文") {
+        SheetAction(LingIcons.Graph, tr(R.string.outline_035), sub = tr(R.string.breakdown_002)) {
             templates = false
             navHost.navigate(com.lingwrite.app.ui.Routes.breakdown(bookId))
         }
         // 已保存的拆文模板：点开可查看 / 套用到本书章纲 / 删除
         val saved by remember { AppGraph.db.breakdowns().all() }.collectAsState(initial = emptyList())
         if (saved.isNotEmpty()) {
-            Text("我的拆文模板", style = Ling.type.label, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 24.dp, top = 12.dp, bottom = 4.dp))
+            Text(tr(R.string.outline_036), style = Ling.type.label, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 24.dp, top = 12.dp, bottom = 4.dp))
             saved.forEach { b ->
                 val n = com.lingwrite.app.data.Breakdown.parseTemplate(b.template).size
-                SheetAction(LingIcons.Sparkle, b.name, sub = "$n 章结构 · 点开可套用到本书") {
+                SheetAction(LingIcons.Sparkle, b.name, sub = tr(R.string.outline_037, n)) {
                     templates = false
                     navHost.navigate(com.lingwrite.app.ui.Routes.breakdown(bookId, b.id))
                 }
@@ -276,22 +283,22 @@ private fun ChapterPlanRow(ch: ChapterEntity, p: ChapterPlanEntity?, onOpen: () 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ch.title, style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium, fontSize = 15.sp), color = c.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, false))
                 Spacer(Modifier.width(8.dp))
-                Pill(prog.label, when (prog) { PlanProgress.Done -> PillKind.Good; PlanProgress.Writing -> PillKind.Amber; else -> PillKind.Neutral })
+                Pill(trText(prog.label), when (prog) { PlanProgress.Done -> PillKind.Good; PlanProgress.Writing -> PillKind.Amber; else -> PillKind.Neutral })
             }
-            if (p == null || p.isEmpty()) Text("还没写章纲", style = Ling.type.caption, color = c.onSurfaceVariant)
+            if (p == null || p.isEmpty()) Text(tr(R.string.outline_038), style = Ling.type.caption, color = c.onSurfaceVariant)
             else {
                 if (p.event.isNotBlank()) Text(p.event, style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    LandDot("事件", p.event.isNotBlank(), landed?.event); LandDot("钩子", p.hook.isNotBlank(), landed?.hook); LandDot("悬念", p.cliff.isNotBlank(), landed?.cliff)
-                    if (p.fromAi) Pill("AI 拆解", PillKind.Amber)
+                    LandDot(tr(R.string.outline_039), p.event.isNotBlank(), landed?.event); LandDot(tr(R.string.outline_040), p.hook.isNotBlank(), landed?.hook); LandDot(tr(R.string.outline_041), p.cliff.isNotBlank(), landed?.cliff)
+                    if (p.fromAi) Pill(tr(R.string.outline_042), PillKind.Amber)
                 }
                 if (landed != null && landed.note.isNotBlank() && listOf(landed.event, landed.hook, landed.cliff).any { it == false })
-                    Text("偏离提醒：${landed.note}", style = Ling.type.caption, color = c.error, modifier = Modifier.padding(top = 4.dp))
+                    Text(tr(R.string.outline_043, landed.note), style = Ling.type.caption, color = c.error, modifier = Modifier.padding(top = 4.dp))
             }
         }
         Column {
-            Icon(LingIcons.ExpandMore, "上移", tint = c.onSurfaceVariant, modifier = Modifier.size(28.dp).clip(CircleShape).rowClick(onUp).padding(4.dp).graphicsRotate(180f))
-            Icon(LingIcons.ExpandMore, "下移", tint = c.onSurfaceVariant, modifier = Modifier.size(28.dp).clip(CircleShape).rowClick(onDown).padding(4.dp))
+            Icon(LingIcons.ExpandMore, tr(R.string.outline_044), tint = c.onSurfaceVariant, modifier = Modifier.size(28.dp).clip(CircleShape).rowClick(onUp).padding(4.dp).graphicsRotate(180f))
+            Icon(LingIcons.ExpandMore, tr(R.string.outline_045), tint = c.onSurfaceVariant, modifier = Modifier.size(28.dp).clip(CircleShape).rowClick(onDown).padding(4.dp))
         }
     }
 }
@@ -319,7 +326,7 @@ fun TextEditSheet(title: String, initial: String, onDismiss: () -> Unit, inline:
     DetailHost(inline, title, onDismiss) {
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             LingTextField(t, { t = it }, singleLine = false, minLines = 5, maxLines = 14)
-            LingButton("保存", modifier = Modifier.fillMaxWidth(), height = 50.dp) { onSave(t.trim()); onDismiss() }
+            LingButton(tr(R.string.check_046), modifier = Modifier.fillMaxWidth(), height = 50.dp) { onSave(t.trim()); onDismiss() }
         }
     }
 }
@@ -346,7 +353,7 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
     var checking by remember { mutableStateOf(false) }
     var msg by remember { mutableStateOf<String?>(null) }
     val fields = parseList(bp?.threads?.let { bp!!.fields } ?: "[]")
-    val allThreads = parseList(bp?.threads ?: "[\"主线\"]")
+    val allThreads = parseList(bp?.threads ?: tr(R.string.outline_046))
     fun current() = p0.copy(event = event.trim(), hook = hook.trim(), cliff = cliff.trim(), note = note.trim(), custom = encodeMap(custom.toMap()), threads = threads.joinToString(","))
     suspend fun persist() {
         val draft = current()
@@ -354,24 +361,24 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
             val latest = dao.chapterOnce(chapterId) ?: p0
             fun merge(before: String, ours: String, theirs: String): String {
                 if (ours == before) return theirs
-                check(theirs == before || theirs == ours) { "章纲已被其他操作修改，请返回列表后重新打开。草稿仍在此页。" }
+                check(theirs == before || theirs == ours) { tr(R.string.outline_047) }
                 return ours
             }
             dao.upsertChapter(latest.copy(event = merge(p0.event, draft.event, latest.event), hook = merge(p0.hook, draft.hook, latest.hook), cliff = merge(p0.cliff, draft.cliff, latest.cliff), note = merge(p0.note, draft.note, latest.note), custom = merge(p0.custom, draft.custom, latest.custom), threads = merge(p0.threads, draft.threads, latest.threads)))
             loaded = dao.chapterOnce(chapterId)
         }
     }
-    fun save(close: Boolean) { scope.launch { runCatching { persist() }.onSuccess { if (close) onDismiss() else msg = "已保存" }.onFailure { msg = it.message } } }
+    fun save(close: Boolean) { scope.launch { runCatching { persist() }.onSuccess { if (close) onDismiss() else msg = tr(R.string.outline_048) }.onFailure { msg = it.message } } }
     androidx.activity.compose.BackHandler(inline && returnToList && LocalPaneVisible.current) { save(true) }
-    DetailHost(inline, ch?.let { "${ChapterLabel.short(it.number)} · 章纲" } ?: "章纲", { save(true) }, showBack = returnToList) {
+    DetailHost(inline, ch?.let { tr(R.string.outline_049, ChapterLabel.short(it.number)) } ?: tr(R.string.outline_050), { save(true) }, showBack = returnToList) {
         Column(Modifier.padding(horizontal = 20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            LingTextField(event, { event = it }, label = "核心事件", singleLine = false, minLines = 2)
-            LingTextField(hook, { hook = it }, label = "开篇钩子", singleLine = false)
-            LingTextField(cliff, { cliff = it }, label = "章尾悬念", singleLine = false)
+            LingTextField(event, { event = it }, label = tr(R.string.outline_051), singleLine = false, minLines = 2)
+            LingTextField(hook, { hook = it }, label = tr(R.string.outline_052), singleLine = false)
+            LingTextField(cliff, { cliff = it }, label = tr(R.string.outline_053), singleLine = false)
             fields.forEach { f -> LingTextField(custom[f].orEmpty(), { customJson = encodeMap(custom + (f to it)) }, label = f, singleLine = false) }
-            LingTextField(note, { note = it }, label = "备注（可选）", singleLine = false)
+            LingTextField(note, { note = it }, label = tr(R.string.outline_054), singleLine = false)
             if (allThreads.isNotEmpty()) {
-                Text("本章推进的线索", style = Ling.type.caption, color = c.onSurfaceVariant)
+                Text(tr(R.string.outline_055), style = Ling.type.caption, color = c.onSurfaceVariant)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     allThreads.forEach { t -> LingChip(t in threads, { threadCsv = (if (t in threads) threads - t else threads + t).joinToString(",") }, t) }
                 }
@@ -379,23 +386,23 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
             parseLanded(p0.landed)?.let { l ->
                 LingCard(color = c.surfaceContainer) {
                     Column(Modifier.padding(12.dp)) {
-                        Text("落实检查", style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface)
-                        Text(listOf("核心事件" to l.event, "开篇钩子" to l.hook, "章尾悬念" to l.cliff).joinToString("  ") { (k, v) -> k + when (v) { true -> " ✓"; false -> " ✗"; else -> " –" } }, style = Ling.type.caption, color = c.onSurfaceVariant)
+                        Text(tr(R.string.outline_056), style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface)
+                        Text(listOf(tr(R.string.outline_051) to l.event, tr(R.string.outline_052) to l.hook, tr(R.string.outline_053) to l.cliff).joinToString("  ") { (k, v) -> k + when (v) { true -> " ✓"; false -> " ✗"; else -> " –" } }, style = Ling.type.caption, color = c.onSurfaceVariant)
                         if (l.note.isNotBlank()) Text(l.note, style = Ling.type.caption, color = c.onSurface)
                         if (listOf(l.event, l.hook, l.cliff).any { it == false }) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 6.dp)) {
-                            LingButton("忽略", BtnKind.Text, height = 34.dp) { scope.launch { runCatching { persist(); AppGraph.db.withTransaction { dao.chapterOnce(chapterId)?.let { dao.upsertChapter(it.copy(landed = "")) }; loaded = dao.chapterOnce(chapterId) } }.onFailure { msg = it.message } } }
-                            Text("或直接改上面的章纲，让它和正文一致", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically))
+                            LingButton(tr(R.string.check_066), BtnKind.Text, height = 34.dp) { scope.launch { runCatching { persist(); AppGraph.db.withTransaction { dao.chapterOnce(chapterId)?.let { dao.upsertChapter(it.copy(landed = "")) }; loaded = dao.chapterOnce(chapterId) } }.onFailure { msg = it.message } } }
+                            Text(tr(R.string.outline_057), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically))
                         }
                     }
                 }
             }
             msg?.let { Text(it, style = Ling.type.caption, color = if (it == "已保存") c.good else c.error) }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
-                LingButton(if (checking) "检查中…" else "检查正文是否落实", BtnKind.Tonal, icon = LingIcons.FactCheck, enabled = !checking, modifier = Modifier.weight(1f)) {
+                LingButton(if (checking) tr(R.string.outline_058) else tr(R.string.outline_059), BtnKind.Tonal, icon = LingIcons.FactCheck, enabled = !checking, modifier = Modifier.weight(1f)) {
                     checking = true; msg = null
                     scope.launch { runCatching { persist(); Outline.checkLanded(chapterId) }.onSuccess { msg = it }.onFailure { msg = it.message }; checking = false }
                 }
-                LingButton("保存", modifier = Modifier.weight(1f)) { save(!inline) }
+                LingButton(tr(R.string.check_046), modifier = Modifier.weight(1f)) { save(!inline) }
             }
         }
     }
@@ -411,23 +418,23 @@ private fun SplitSheet(bookId: Long, v: VolumeEntity, bp: BookPlanEntity, preset
     var err by remember { mutableStateOf<String?>(null) }
     val sugg = remember { mutableStateListOf<PlanSuggestion>() }
     val fields = parseList(bp.fields)
-    LingSheet(onDismiss, "AI 拆章纲 · ${v.title}", layout = SheetLayout.Viewport) {
+    LingSheet(onDismiss, tr(R.string.outline_060, v.title), layout = SheetLayout.Viewport) {
         Column(Modifier.padding(horizontal = 20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (sugg.isEmpty()) {
-                Text("根据总纲和本卷卷纲，接着已有章纲往后拆。结果是建议，采纳前都可以改。", style = Ling.type.body, color = c.onSurfaceVariant)
-                LingTextField(n, { n = it.filter(Char::isDigit).take(2) }, label = "拆几章（建议 3–5 章滚动规划）", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                Text(tr(R.string.outline_061), style = Ling.type.body, color = c.onSurfaceVariant)
+                LingTextField(n, { n = it.filter(Char::isDigit).take(2) }, label = tr(R.string.outline_062), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
                 err?.let { Text(it, style = Ling.type.caption, color = c.error) }
-                LingButton(if (busy) "正在拆…" else "开始", icon = LingIcons.SparkleFilled, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) {
+                LingButton(if (busy) tr(R.string.outline_063) else tr(R.string.outline_064), icon = LingIcons.SparkleFilled, enabled = !busy, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) {
                     busy = true; err = null
                     scope.launch {
                         val dao = AppGraph.db.plan()
                         val vo = dao.volumeOnce(v.id)?.outline.orEmpty()
-                        if (vo.isBlank() && bp.synopsis.isBlank()) { err = "先写总纲或本卷卷纲"; busy = false; return@launch }
+                        if (vo.isBlank() && bp.synopsis.isBlank()) { err = tr(R.string.outline_065); busy = false; return@launch }
                         val chs = AppGraph.db.chapters().chaptersOnce(bookId).filter { it.volumeId == v.id }
                         val hint = OutlineTemplates.filter { it.id in bp.templates.split(',') }.joinToString(" ") { it.hint }
                         // 走 ChainRunner：带真实已有章纲 + 解析失败重发一次（与总纲工作台第 ⑤ 步同一套）
                         val drafts = com.lingwrite.app.data.ChainRunner.chapters(bookId, v.id, n.toIntOrNull()?.coerceIn(1, 20) ?: 5, hint)
-                        if (drafts.isEmpty()) err = "模型两次都没有按格式返回，重试或换个模型"
+                        if (drafts.isEmpty()) err = tr(R.string.outline_066)
                         else sugg += drafts.map { PlanSuggestion(it.title, it.event, it.hook, it.cliff, it.custom) }
                         busy = false
                     }
@@ -439,22 +446,22 @@ private fun SplitSheet(bookId: Long, v: VolumeEntity, bp: BookPlanEntity, preset
                     LingCard(color = if (take) c.surface else c.surfaceContainer, modifier = Modifier.border(1.dp, if (take) c.primary.copy(alpha = .4f) else Color.Transparent, RoundedCornerShape(14.dp))) {
                         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(s.title.ifBlank { "新章 ${i + 1}" }, style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface, modifier = Modifier.weight(1f))
+                                Text(s.title.ifBlank { tr(R.string.chain_059, i + 1) }, style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface, modifier = Modifier.weight(1f))
                                 Checkbox(take, { take = it; s.take = it })
                             }
-                            LingTextField(e, { e = it; s.event = it }, label = "核心事件", singleLine = false)
-                            LingTextField(h, { h = it; s.hook = it }, label = "开篇钩子", singleLine = false)
-                            LingTextField(cl, { cl = it; s.cliff = it }, label = "章尾悬念", singleLine = false)
+                            LingTextField(e, { e = it; s.event = it }, label = tr(R.string.outline_051), singleLine = false)
+                            LingTextField(h, { h = it; s.hook = it }, label = tr(R.string.outline_052), singleLine = false)
+                            LingTextField(cl, { cl = it; s.cliff = it }, label = tr(R.string.outline_053), singleLine = false)
                         }
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
-                    LingButton("重拆", BtnKind.Tonal, modifier = Modifier.weight(1f)) { sugg.clear() }
-                    LingButton("采纳 ${sugg.count { it.take }} 章", modifier = Modifier.weight(1f), enabled = sugg.any { it.take }) {
+                    LingButton(tr(R.string.outline_067), BtnKind.Tonal, modifier = Modifier.weight(1f)) { sugg.clear() }
+                    LingButton(tr(R.string.outline_068, sugg.count { it.take }), modifier = Modifier.weight(1f), enabled = sugg.any { it.take }) {
                         scope.launch {
                             sugg.filter { it.take }.forEach { s ->
                                 val id = AppGraph.books.addChapterTo(bookId, v.id, Naming.stripChapter(s.title))
-                                AppGraph.db.plan().upsertChapter(ChapterPlanEntity(id, bookId, s.event, s.hook, s.cliff, custom = encodeMap(s.custom), threads = "主线", fromAi = true))
+                                AppGraph.db.plan().upsertChapter(ChapterPlanEntity(id, bookId, s.event, s.hook, s.cliff, custom = encodeMap(s.custom), threads = tr(R.string.outline_069), fromAi = true))
                             }
                             onDismiss()
                         }
@@ -473,15 +480,15 @@ private fun PlanConfigSheet(bp: BookPlanEntity, onDismiss: () -> Unit) {
     val threads = remember { mutableStateListOf<String>().apply { addAll(parseList(bp.threads)) } }
     var nf by remember { mutableStateOf("") }; var nt by remember { mutableStateOf("") }
     var gap by remember { mutableStateOf(bp.gapThreshold.toString()) }
-    LingSheet({ scope.launch { AppGraph.db.plan().upsertBook(bp.copy(fields = encodeList(fields), threads = encodeList(threads), gapThreshold = gap.toIntOrNull() ?: 8)); onDismiss() } }, "章纲字段与线索", layout = SheetLayout.Viewport) {
+    LingSheet({ scope.launch { AppGraph.db.plan().upsertBook(bp.copy(fields = encodeList(fields), threads = encodeList(threads), gapThreshold = gap.toIntOrNull() ?: 8)); onDismiss() } }, tr(R.string.outline_011), layout = SheetLayout.Viewport) {
         Column(Modifier.padding(horizontal = 20.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("自定义字段（全书统一，每章填写）", style = Ling.type.label, color = c.primary)
-            Text("固定字段：核心事件、开篇钩子、章尾悬念", style = Ling.type.caption, color = c.onSurfaceVariant)
-            ChipEditor(fields, nf, { nf = it }, "例如：爽点、情绪、字数目标")
-            Text("线索", style = Ling.type.label, color = c.primary, modifier = Modifier.padding(top = 8.dp))
-            ChipEditor(threads, nt, { nt = it }, "例如：感情线、复仇线")
-            LingTextField(gap, { gap = it.filter(Char::isDigit) }, label = "线索中断超过几章时提醒", keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-            LingButton("完成", modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) {
+            Text(tr(R.string.outline_070), style = Ling.type.label, color = c.primary)
+            Text(tr(R.string.outline_071), style = Ling.type.caption, color = c.onSurfaceVariant)
+            ChipEditor(fields, nf, { nf = it }, tr(R.string.outline_072))
+            Text(tr(R.string.outline_073), style = Ling.type.label, color = c.primary, modifier = Modifier.padding(top = 8.dp))
+            ChipEditor(threads, nt, { nt = it }, tr(R.string.outline_074))
+            LingTextField(gap, { gap = it.filter(Char::isDigit) }, label = tr(R.string.outline_075), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+            LingButton(tr(R.string.lore_visual_012), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) {
                 scope.launch { AppGraph.db.plan().upsertBook(bp.copy(fields = encodeList(fields), threads = encodeList(threads), gapThreshold = gap.toIntOrNull() ?: 8)); onDismiss() }
             }
         }
@@ -491,12 +498,12 @@ private fun PlanConfigSheet(bp: BookPlanEntity, onDismiss: () -> Unit) {
 @Composable
 private fun ChipEditor(list: MutableList<String>, input: String, onInput: (String) -> Unit, hint: String) {
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        list.toList().forEach { f -> InputChip(true, { list.remove(f) }, { Text(f, style = Ling.type.label) }, trailingIcon = { Icon(LingIcons.Close, "删除", Modifier.size(16.dp)) }) }
+        list.toList().forEach { f -> InputChip(true, { list.remove(f) }, { Text(f, style = Ling.type.label) }, trailingIcon = { Icon(LingIcons.Close, tr(R.string.check_044), Modifier.size(16.dp)) }) }
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
         LingTextField(input, onInput, Modifier.weight(1f), placeholder = hint)
         Spacer(Modifier.width(8.dp))
-        LingButton("添加", BtnKind.Tonal, enabled = input.isNotBlank() && input.trim() !in list) { list += input.trim(); onInput("") }
+        LingButton(tr(R.string.models_034), BtnKind.Tonal, enabled = input.isNotBlank() && input.trim() !in list) { list += input.trim(); onInput("") }
     }
 }
 
@@ -509,7 +516,7 @@ fun ThreadsRoute(bookId: Long, nav: NavHostController) {
     val chs by remember(bookId) { AppGraph.books.chapterHeaders(bookId) }.collectAsState(emptyList())
     val plans by remember(bookId) { dao.chapters(bookId) }.collectAsState(emptyList())
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("多线视图", "每条线索在哪些章推进", onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.outline_007), tr(R.string.outline_076), onBack = { nav.popBackStack() })
         ThreadsView(parseList((bp ?: BookPlanEntity(bookId)).threads), chs.sortedBy { it.number }, plans, bp?.gapThreshold ?: 8)
     }
 }
@@ -523,10 +530,10 @@ fun ThreadsView(threads: List<String>, chs: List<ChapterEntity>, plans: List<Cha
     Column(Modifier.verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
         gaps.filter { it.gap > threshold }.forEach { g ->
             LingCard(Modifier.padding(horizontal = 16.dp, vertical = 4.dp), color = c.errorContainer) {
-                Text("「${g.thread}」已经 ${g.gap} 章没有推进" + (g.lastAt?.let { "（上次在第 $it 章）" } ?: "（还没开始）"), style = Ling.type.body, color = c.onErrorContainer, modifier = Modifier.padding(14.dp))
+                Text(tr(R.string.outline_077, g.thread, g.gap) + (g.lastAt?.let { tr(R.string.outline_078, it) } ?: tr(R.string.outline_079)), style = Ling.type.body, color = c.onErrorContainer, modifier = Modifier.padding(14.dp))
             }
         }
-        if (chs.isEmpty() || threads.isEmpty()) { Text("先在大纲里给章纲关联线索。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp)); return@Column }
+        if (chs.isEmpty() || threads.isEmpty()) { Text(tr(R.string.outline_080), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(28.dp)); return@Column }
         LingCard(Modifier.padding(16.dp).fillMaxWidth()) {
             Row(Modifier.padding(vertical = 12.dp)) {
                 Column(Modifier.padding(start = 14.dp, top = 22.dp)) {
@@ -550,7 +557,7 @@ fun ThreadsView(threads: List<String>, chs: List<ChapterEntity>, plans: List<Cha
                 }
             }
         }
-        Text("圆点表示该章推进了这条线；中断超过 $threshold 章会标红，可在“章纲字段与线索”里调整。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 28.dp))
+        Text(tr(R.string.outline_081, threshold), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 28.dp))
     }
 }
 
@@ -567,19 +574,19 @@ fun GoldenRoute(bookId: Long, nav: NavHostController) {
     var err by remember { mutableStateOf<String?>(null) }
     var edit by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("黄金三章检查", "针对第 1–3 章，每项附原文依据", onBack = { nav.popBackStack() }) { LingIconButton(LingIcons.EditOutline, "编辑检查项") { edit = true } }
+        LingTopBar(tr(R.string.outline_082), tr(R.string.outline_083), onBack = { nav.popBackStack() }) { LingIconButton(LingIcons.EditOutline, tr(R.string.outline_084)) { edit = true } }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             GoldenList(items, parseGolden(bp.goldenResult))
             err?.let { Text(it, style = Ling.type.caption, color = c.error, modifier = Modifier.padding(horizontal = 28.dp)) }
         }
-        LingButton(if (busy) "AI 正在审读前三章…" else "检查前三章", icon = LingIcons.FactCheck, enabled = !busy, height = 50.dp, modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)) {
+        LingButton(if (busy) tr(R.string.outline_085) else tr(R.string.outline_086), icon = LingIcons.FactCheck, enabled = !busy, height = 50.dp, modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp)) {
             busy = true; err = null
             scope.launch {
                 val chs = AppGraph.db.chapters().chaptersOnce(bookId).filter { it.number <= 3 && it.content.isNotBlank() }
-                if (chs.isEmpty()) { err = "前三章还没有正文"; busy = false; return@launch }
+                if (chs.isEmpty()) { err = tr(R.string.outline_087); busy = false; return@launch }
                 AppGraph.ai.complete("check", OutlinePrompts.SYS, OutlinePrompts.golden(items, chs), bookId, null, 1500).onSuccess { raw ->
                     val arr = extractJson(raw)?.let { runCatching { it.jsonArray }.getOrNull() }
-                    if (arr == null) err = "模型没有按格式返回"
+                    if (arr == null) err = tr(R.string.book_ai_018)
                     else dao.upsertBook(bp.copy(goldenAt = System.currentTimeMillis(), goldenResult = encodeGolden(arr.map { e ->
                         val o = e.jsonObject
                         GoldenResult(o.str("item"), o.str("pass") == "true", o.str("evidence"), o.str("chapter").toIntOrNull() ?: 0)
@@ -592,19 +599,19 @@ fun GoldenRoute(bookId: Long, nav: NavHostController) {
     if (edit) {
         val list = remember { mutableStateListOf<String>().apply { addAll(items) } }
         var input by remember { mutableStateOf("") }
-        LingSheet({ scope.launch { dao.upsertBook(bp.copy(golden = encodeList(list))); edit = false } }, "编辑检查项") {
+        LingSheet({ scope.launch { dao.upsertBook(bp.copy(golden = encodeList(list))); edit = false } }, tr(R.string.outline_084)) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 list.toList().forEach { s ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(s, style = Ling.type.body, color = c.onSurface, modifier = Modifier.weight(1f))
-                        LingIconButton(LingIcons.Close, "删除", c.onSurfaceVariant) { list.remove(s) }
+                        LingIconButton(LingIcons.Close, tr(R.string.check_044), c.onSurfaceVariant) { list.remove(s) }
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    LingTextField(input, { input = it }, Modifier.weight(1f), placeholder = "新增检查项")
-                    Spacer(Modifier.width(8.dp)); LingButton("添加", BtnKind.Tonal, enabled = input.isNotBlank()) { list += input.trim(); input = "" }
+                    LingTextField(input, { input = it }, Modifier.weight(1f), placeholder = tr(R.string.outline_088))
+                    Spacer(Modifier.width(8.dp)); LingButton(tr(R.string.models_034), BtnKind.Tonal, enabled = input.isNotBlank()) { list += input.trim(); input = "" }
                 }
-                LingButton("恢复默认", BtnKind.Text) { list.clear(); list.addAll(DEFAULT_GOLDEN) }
+                LingButton(tr(R.string.outline_089), BtnKind.Text) { list.clear(); list.addAll(DEFAULT_GOLDEN) }
                 Spacer(Modifier.height(12.dp))
             }
         }
@@ -625,7 +632,7 @@ fun GoldenList(items: List<String>, results: List<GoldenResult>) {
                 }
                 Column(Modifier.padding(start = 14.dp).weight(1f)) {
                     Text(it, style = Ling.type.bodyLarge.copy(fontSize = 15.sp), color = c.onSurface)
-                    if (r != null) Text((if (r.pass) "通过" else "待改") + (if (r.chapter > 0) " · 第 ${r.chapter} 章" else "") + if (r.evidence.isNotBlank()) "：${r.evidence}" else "",
+                    if (r != null) Text((if (r.pass) tr(R.string.outline_090) else tr(R.string.outline_091)) + (if (r.chapter > 0) tr(R.string.outline_092, r.chapter) else "") + if (r.evidence.isNotBlank()) tr(R.string.outline_093, r.evidence) else "",
                         style = Ling.type.caption.copy(lineHeight = 18.sp), color = if (r.pass) c.onSurfaceVariant else c.error)
                 }
             }

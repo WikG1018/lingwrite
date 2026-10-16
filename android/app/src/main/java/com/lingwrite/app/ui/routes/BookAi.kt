@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -66,21 +71,21 @@ object BookAiPrompts {
     const val SYS = "你是资深网文策划，熟悉起点、番茄、晋江等平台的上架包装。严格只输出 JSON。"
 
     fun pitch(synopsis: String, volumeOutline: String, recentSummaries: String, title: String, blurb: String, platform: String): String = buildString {
-        if (synopsis.isNotBlank()) append("【总纲】").append(synopsis).append('\n')
-        if (volumeOutline.isNotBlank()) append("【卷纲（已写到的卷）】").append(volumeOutline).append('\n')
-        if (recentSummaries.isNotBlank()) append("【最近 10 章摘要】\n").append(recentSummaries).append('\n')
-        if (title.isNotBlank()) append("【当前书名】").append(title).append('\n')
-        if (blurb.isNotBlank()) append("【当前简介】").append(blurb).append('\n')
-        append("【平台】").append(platform.ifBlank { "起点" }).append('\n')
-        append("输出：{\"titles\":[5 个书名],\"blurbs\":[3 版简介，每版≤150字，开头一句抓人],\"pitch\":{\"oneLine\":\"≤25字一句话卖点\",\"tags\":[3 条标签],\"recommend\":\"≤120字推荐语\"}}")
+        if (synopsis.isNotBlank()) append(trZh(R.string.book_ai_001)).append(synopsis).append('\n')
+        if (volumeOutline.isNotBlank()) append(trZh(R.string.book_ai_002)).append(volumeOutline).append('\n')
+        if (recentSummaries.isNotBlank()) append(trZh(R.string.book_ai_003)).append(recentSummaries).append('\n')
+        if (title.isNotBlank()) append(trZh(R.string.book_ai_004)).append(title).append('\n')
+        if (blurb.isNotBlank()) append(trZh(R.string.book_ai_005)).append(blurb).append('\n')
+        append(trZh(R.string.book_ai_006)).append(platform.ifBlank { trZh(R.string.book_ai_007) }).append('\n')
+        append(trZh(R.string.book_ai_008))
     }
 
     fun cover(title: String, genre: String, synopsis: String, blurb: String) = buildString {
-        append("为下面这本书设计封面配色和画面，不要另起书名，书名保持「").append(title.ifBlank { "未命名" }).append("」。\n")
-        if (genre.isNotBlank()) append("【类型】").append(genre).append('\n')
-        if (synopsis.isNotBlank()) append("【总纲】").append(synopsis.take(400)).append('\n')
-        if (blurb.isNotBlank()) append("【简介】").append(blurb.take(200)).append('\n')
-        append("输出：{\"top\":\"#RRGGBB\",\"bottom\":\"#RRGGBB\",\"accent\":\"#RRGGBB\",\"motif\":\"两个字的意象\",\"line\":\"不超过八个字的气氛句，不要写成新书名\"}")
+        append(trZh(R.string.book_ai_009)).append(title.ifBlank { trZh(R.string.book_ai_010) }).append(trZh(R.string.book_ai_011))
+        if (genre.isNotBlank()) append(trZh(R.string.book_ai_012)).append(genre).append('\n')
+        if (synopsis.isNotBlank()) append(trZh(R.string.book_ai_001)).append(synopsis.take(400)).append('\n')
+        if (blurb.isNotBlank()) append(trZh(R.string.book_ai_013)).append(blurb.take(200)).append('\n')
+        append(trZh(R.string.book_ai_014))
     }
 }
 
@@ -90,21 +95,21 @@ data class BookPitch(val titles: List<String>, val blurbs: List<String>, val one
 object BookAi {
     suspend fun generate(bookId: Long, platform: String): Result<BookPitch> = runCatching {
         val db = AppGraph.db
-        val b = db.books().get(bookId) ?: error("作品不存在")
+        val b = db.books().get(bookId) ?: error(tr(R.string.book_ai_015))
         val bp = db.plan().bookOnce(bookId)
         val vols = db.chapters().volumesOnce(bookId)
         val vplans = db.plan().volumes(bookId).first()
         val volOutline = vplans.joinToString("\n") { v ->
             val name = vols.firstOrNull { it.id == v.volumeId }?.title.orEmpty()
-            if (v.outline.isBlank()) "" else "【$name】${v.outline}"
+            if (v.outline.isBlank()) "" else trZh(R.string.book_ai_016, name, v.outline)
         }
         val chs = db.chapters().chaptersOnce(bookId).sortedBy { it.number }.takeLast(10)
         val sums = db.context().summaries(bookId).associateBy { it.chapterId }
-        val recent = chs.mapNotNull { c -> sums[c.id]?.let { "第 ${c.number} 章：${it.text}" } }.joinToString("\n")
+        val recent = chs.mapNotNull { c -> sums[c.id]?.let { trZh(R.string.book_ai_017, c.number, it.text) } }.joinToString("\n")
         val raw = AppGraph.ai.complete("wizard", BookAiPrompts.SYS,
             BookAiPrompts.pitch(bp?.synopsis.orEmpty(), volOutline, recent, b.title, b.blurb, platform), bookId, null, 1500).getOrThrow()
         val o = (JsonReply.parse(raw, array = false) as? JsonReply.Result.Ok)?.json as? kotlinx.serialization.json.JsonObject
-            ?: extractJson(raw, array = false)?.jsonObject ?: error("模型没有按格式返回")
+            ?: extractJson(raw, array = false)?.jsonObject ?: error(tr(R.string.book_ai_018))
         val titles = o["titles"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
         val blurbs = o["blurbs"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
         val pitch = o["pitch"]?.jsonObject
@@ -140,12 +145,12 @@ fun renderCover(look: CoverLook, title: String): Bitmap {
     paint.color = look.accent
     paint.typeface = Typeface.DEFAULT_BOLD
     paint.textSize = 88f
-    canvas.drawText(look.motif.take(2).ifBlank { "卷" }, 64f, 300f, paint)
+    canvas.drawText(look.motif.take(2).ifBlank { tr(R.string.book_ai_019) }, 64f, 300f, paint)
     paint.textSize = 28f
     canvas.drawText(look.line.take(8), 64f, 360f, paint)
     paint.color = android.graphics.Color.WHITE
     paint.textSize = 42f
-    canvas.drawText(title.ifBlank { "未命名" }.take(10), 56f, h - 78f, paint)
+    canvas.drawText(title.ifBlank { trZh(R.string.book_ai_010) }.take(10), 56f, h - 78f, paint)
     return bmp
 }
 
@@ -153,7 +158,7 @@ suspend fun generateCoverLook(book: BookEntity): Result<CoverLook> = runCatching
     val bp = AppGraph.db.plan().bookOnce(book.id)
     val raw = AppGraph.ai.complete("wizard", BookAiPrompts.SYS, BookAiPrompts.cover(book.title, book.genre, bp?.synopsis.orEmpty(), book.blurb), book.id, null, 400).getOrThrow()
     val o = (JsonReply.parse(raw, array = false) as? JsonReply.Result.Ok)?.json as? kotlinx.serialization.json.JsonObject
-        ?: extractJson(raw, array = false)?.jsonObject ?: error("模型没有按格式返回")
+        ?: extractJson(raw, array = false)?.jsonObject ?: error(tr(R.string.book_ai_018))
     CoverLook(
         top = coverColor(o.str("top"), 0xFF4F6E9C.toInt()),
         bottom = coverColor(o.str("bottom"), 0xFF2E4870.toInt()),
@@ -172,24 +177,24 @@ fun BookCoverSheet(book: BookEntity, onDismiss: () -> Unit) {
     var busy by remember { mutableStateOf(false) }
     var err by remember { mutableStateOf<String?>(null) }
     var preview by remember { mutableStateOf<Bitmap?>(null) }
-    LingSheet(onDismiss, "AI 生成书面") {
+    LingSheet(onDismiss, tr(R.string.book_ai_020)) {
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("书名沿用「${book.title.ifBlank { "未命名" }}」。按总纲和简介配封面，不另起书名。", style = Ling.type.body, color = c.onSurfaceVariant)
+            Text(tr(R.string.book_ai_021, book.title.ifBlank { trZh(R.string.book_ai_010) }), style = Ling.type.body, color = c.onSurfaceVariant)
             preview?.let { Image(it.asImageBitmap(), book.title, Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.FillWidth) }
-            if (busy) com.lingwrite.app.ui.ai.AiThinking("正在配书面…")
-            LingButton(if (busy) "生成中…" else if (preview == null) "生成书面" else "换一张", BtnKind.Tonal, icon = LingIcons.Sparkle, enabled = !busy) {
+            if (busy) com.lingwrite.app.ui.ai.AiThinking(tr(R.string.book_ai_022))
+            LingButton(if (busy) tr(R.string.ai_components_003) else if (preview == null) tr(R.string.book_ai_023) else tr(R.string.book_ai_024), BtnKind.Tonal, icon = LingIcons.Sparkle, enabled = !busy) {
                 busy = true
                 err = null
                 scope.launch {
                     generateCoverLook(book).fold(
                         { preview = withContext(Dispatchers.Default) { renderCover(it, book.title) } },
-                        { err = it.message ?: "生成失败" },
+                        { err = it.message ?: tr(R.string.book_ai_025) },
                     )
                     busy = false
                 }
             }
-            err?.let { Text("没拿到结果：$it", style = Ling.type.caption, color = c.error) }
-            if (preview != null) LingButton("用这张", modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = !busy) {
+            err?.let { Text(tr(R.string.ai_components_011, it), style = Ling.type.caption, color = c.error) }
+            if (preview != null) LingButton(tr(R.string.book_ai_026), modifier = Modifier.fillMaxWidth(), height = 50.dp, enabled = !busy) {
                 val bmp = preview ?: return@LingButton
                 busy = true
                 scope.launch {
@@ -200,7 +205,7 @@ fun BookCoverSheet(book: BookEntity, onDismiss: () -> Unit) {
                     onDismiss()
                 }
             }
-            if (BookCovers.file(ctx, book.id).isFile) LingButton("恢复纯色封面", BtnKind.Text, enabled = !busy) {
+            if (BookCovers.file(ctx, book.id).isFile) LingButton(tr(R.string.book_ai_027), BtnKind.Text, enabled = !busy) {
                 BookCovers.file(ctx, book.id).delete()
                 CoverReload.bump()
                 preview = null
@@ -215,7 +220,7 @@ fun PitchCard(p: BookPitch, onCopy: () -> Unit) {
     val c = Ling.colors
     LingCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp)) {
-            Text("一句话卖点", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(tr(R.string.book_ai_028), style = Ling.type.caption, color = c.onSurfaceVariant)
             Text(p.oneLine, style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface)
             if (p.tags.isNotEmpty()) {
                 Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -223,10 +228,10 @@ fun PitchCard(p: BookPitch, onCopy: () -> Unit) {
                 }
             }
             if (p.recommend.isNotBlank()) {
-                Text("推荐语", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+                Text(tr(R.string.book_ai_029), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
                 Text(p.recommend, style = Ling.type.body.copy(lineHeight = 22.sp), color = c.onSurface)
             }
-            LingButton("复制上架文案", BtnKind.Tonal, height = 36.dp, modifier = Modifier.padding(top = 10.dp), onClick = onCopy)
+            LingButton(tr(R.string.book_ai_030), BtnKind.Tonal, height = 36.dp, modifier = Modifier.padding(top = 10.dp), onClick = onCopy)
         }
     }
 }
@@ -245,12 +250,12 @@ fun TitleChips(titles: List<String>, onPick: (String) -> Unit, modifier: Modifie
 @Composable
 fun BlurbCandidates(blurbs: List<String>, selected: Int, onSelect: (Int) -> Unit, onUse: () -> Unit, modifier: Modifier = Modifier) {
     com.lingwrite.app.ui.ai.AiCandidateCard(
-        header = "简介候选 · ${blurbs.size} 版",
+        header = tr(R.string.book_ai_031, blurbs.size),
         candidates = blurbs.map { com.lingwrite.app.ui.ai.Candidate(it) },
         selected = selected,
         modifier = modifier,
         onSelect = onSelect,
         onAccept = onUse,
-        acceptLabel = "用这版",
+        acceptLabel = tr(R.string.book_ai_032),
     )
 }

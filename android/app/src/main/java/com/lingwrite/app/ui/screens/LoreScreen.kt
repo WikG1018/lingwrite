@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.screens
 
+import com.lingwrite.app.i18n.tr
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -29,12 +33,12 @@ data class LoreDetailUi(
     val chapterLabel: String, val fields: List<com.lingwrite.app.data.ResolvedField>, val relations: List<RelUi>, val foreshadows: List<FsUi>,
     val aliases: String, val isCharacter: Boolean = true,
 )
-val DemoLore = LoreDetailUi("人物", "沈清禾", "沈", Color(0xFF5B79A8) to Color(0xFF2E4870),
-    listOf("主要配角" to PillKind.Primary, "青云宗 · 内门" to PillKind.Neutral, "出场 64 章" to PillKind.Amber), "第 118 章时",
-    listOf(com.lingwrite.app.data.ResolvedField("境界", "筑基后期", 96, "筑基中期"), com.lingwrite.app.data.ResolvedField("性格", "话少，观察细，护短；对宗门规矩有怀疑但不明说", null, null),
-        com.lingwrite.app.data.ResolvedField("当前目标", "查清十年前师父失踪与断剑的关系", null, null)),
-    listOf(RelUi("林", Color(0xFF3E5C8A), "林砚", "师弟 · 起疑 → 试探", "第 118 章变化"), RelUi("顾", Color(0xFFA8691A), "顾长庚", "师父 · 已失踪")),
-    listOf(FsUi("左腕红绳的来历", "第 12 章埋下 · 计划第 110 章前回收", "超期 8 章", true)), "")
+val DemoLore get() = LoreDetailUi(tr(R.string.editor_063), tr(R.string.editor_053), tr(R.string.lore_062), Color(0xFF5B79A8) to Color(0xFF2E4870),
+    listOf(tr(R.string.lore_063) to PillKind.Primary, tr(R.string.lore_064) to PillKind.Neutral, tr(R.string.lore_065) to PillKind.Amber), tr(R.string.lore_066),
+    listOf(com.lingwrite.app.data.ResolvedField(tr(R.string.lore_067), tr(R.string.lore_068), 96, tr(R.string.lore_069)), com.lingwrite.app.data.ResolvedField(tr(R.string.wizard_025), tr(R.string.lore_070), null, null),
+        com.lingwrite.app.data.ResolvedField(tr(R.string.wizard_026), tr(R.string.lore_071), null, null)),
+    listOf(RelUi(tr(R.string.lore_072), Color(0xFF3E5C8A), tr(R.string.editor_052), tr(R.string.lore_073), tr(R.string.lore_074)), RelUi(tr(R.string.lore_075), Color(0xFFA8691A), tr(R.string.lore_076), tr(R.string.lore_077))),
+    listOf(FsUi(tr(R.string.lore_078), tr(R.string.lore_079), tr(R.string.lore_080), true)), "")
 
 @Composable
 fun LoreScreen(
@@ -44,7 +48,7 @@ fun LoreScreen(
     val c = Ling.colors
     Column(Modifier.fillMaxSize().background(c.background).verticalScroll(rememberScrollState()).statusBarsPadding().padding(bottom = Space.dockClearance)) {
         LingTopBar(ui.typeLabel, onBack = onBack, titleStyle = Ling.type.titleSmall) {
-            LingIconButton(LingIcons.History, "状态变化", onClick = onHistory); LingIconButton(LingIcons.EditOutline, "编辑", onClick = onEdit); LingIconButton(LingIcons.More, "更多", onClick = onMore)
+            LingIconButton(LingIcons.History, tr(R.string.lore_suggest_005), onClick = onHistory); LingIconButton(LingIcons.EditOutline, tr(R.string.lore_081), onClick = onEdit); LingIconButton(LingIcons.More, tr(R.string.editor_059), onClick = onMore)
         }
         Row(Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 16.dp).enterStagger(0), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(64.dp).clip(RoundedCornerShape(20.dp)).background(Brush.linearGradient(listOf(ui.avatar.first, ui.avatar.second))), contentAlignment = Alignment.Center) {
@@ -55,29 +59,29 @@ fun LoreScreen(
                 Text(ui.name, style = Ling.type.headline.copy(fontSize = 23.sp), color = c.onSurface)
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) { ui.pills.take(3).forEach { (t, k) -> Pill(t, k) } }
-                if (ui.aliases.isNotBlank()) Text("又名 " + ui.aliases, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                if (ui.aliases.isNotBlank()) Text(tr(R.string.lore_082) + ui.aliases, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
             }
         }
         LingCard(Modifier.padding(horizontal = 16.dp).enterStagger(1)) {
             Row(Modifier.fillMaxWidth().rowClick(onChapter).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(LingIcons.Schedule, null, Modifier.size(20.dp), tint = c.primary)
                 Spacer(Modifier.width(8.dp))
-                Text("按章查看：", style = Ling.type.label.copy(fontWeight = FontWeight.Normal), color = c.onSurface)
+                Text(tr(R.string.lore_083), style = Ling.type.label.copy(fontWeight = FontWeight.Normal), color = c.onSurface)
                 Text(ui.chapterLabel, style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface, modifier = Modifier.weight(1f))
-                Text("切换", style = Ling.type.label.copy(fontWeight = FontWeight.Normal), color = c.primary)
+                Text(tr(R.string.lore_084), style = Ling.type.label.copy(fontWeight = FontWeight.Normal), color = c.primary)
                 Icon(LingIcons.Chevron, null, Modifier.size(18.dp), tint = c.primary)
             }
         }
-        SectionLabel("基本设定", Modifier.enterStagger(2))
+        SectionLabel(tr(R.string.lore_085), Modifier.enterStagger(2))
         LingCard(Modifier.padding(horizontal = 16.dp).enterStagger(2)) {
-            if (ui.fields.isEmpty()) Text("还没有填写设定。点右上角编辑。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(16.dp))
+            if (ui.fields.isEmpty()) Text(tr(R.string.lore_086), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(16.dp))
             ui.fields.forEachIndexed { i, f ->
                 if (i > 0) InsetDivider(16.dp, 16.dp)
-                Field(f.k, f.v, change = f.changedAt?.let { at -> "第 $at 章起" + (f.previous?.let { "（原：$it）" } ?: "") }) { onField(f.k) }
+                Field(f.k, f.v, change = f.changedAt?.let { at -> tr(R.string.lore_087, at) + (f.previous?.let { tr(R.string.lore_088, it) } ?: "") }) { onField(f.k) }
             }
         }
-        Row(Modifier.padding(start = 16.dp, top = 4.dp)) { LingButton("记录一次状态变化", BtnKind.Text, icon = LingIcons.TrendUp, onClick = onAddChange) }
-        if (ui.isCharacter) SectionLabel("人物关系", Modifier.enterStagger(3))
+        Row(Modifier.padding(start = 16.dp, top = 4.dp)) { LingButton(tr(R.string.lore_089), BtnKind.Text, icon = LingIcons.TrendUp, onClick = onAddChange) }
+        if (ui.isCharacter) SectionLabel(tr(R.string.lore_090), Modifier.enterStagger(3))
         if (ui.isCharacter) LingCard(Modifier.padding(horizontal = 16.dp).enterStagger(3)) {
             ui.relations.forEachIndexed { i, r ->
                 if (i > 0) InsetDivider(64.dp)
@@ -85,10 +89,10 @@ fun LoreScreen(
             }
             if (ui.relations.isNotEmpty()) InsetDivider(64.dp)
             Row(Modifier.fillMaxWidth().rowClick(onAddRelation).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(LingIcons.Add, null, tint = c.primary); Spacer(Modifier.width(12.dp)); Text("添加关系", style = Ling.type.label, color = c.primary)
+                Icon(LingIcons.Add, null, tint = c.primary); Spacer(Modifier.width(12.dp)); Text(tr(R.string.lore_091), style = Ling.type.label, color = c.primary)
             }
         }
-        if (ui.foreshadows.isNotEmpty()) SectionLabel("相关伏笔", Modifier.enterStagger(4))
+        if (ui.foreshadows.isNotEmpty()) SectionLabel(tr(R.string.lore_092), Modifier.enterStagger(4))
         ui.foreshadows.forEach { fs -> LingCard(Modifier.padding(horizontal = 16.dp, vertical = 4.dp).enterStagger(4)) {
             Row(Modifier.fillMaxWidth().rowClick {}.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Tile(LingIcons.Key, if (fs.overdue) c.errorContainer else c.tertiaryContainer, if (fs.overdue) c.onErrorContainer else c.onTertiaryContainer)

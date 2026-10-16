@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<!-- 应用内语言（Android 13+ 系统「应用语言」页也读这里）。默认简体中文。 -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="zh-CN" />
+    <locale android:name="en" />
+    <locale android:name="zh-TW" />
+    <locale android:name="ja" />
+</locale-config>

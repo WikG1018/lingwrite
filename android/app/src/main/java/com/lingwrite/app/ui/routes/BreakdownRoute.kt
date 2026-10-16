@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.compose.foundation.lazy.itemsIndexed
 import com.lingwrite.app.ui.components.enterStagger
 import androidx.compose.foundation.Canvas
@@ -81,43 +86,43 @@ fun BreakdownRoute(bookId: Long, viewId: Long, nav: NavHostController) {
     }
 
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("拆文", "只保存分析结果，不保存原文", onBack = { nav.popBackStack() })
+        LingTopBar(tr(R.string.breakdown_001), tr(R.string.breakdown_002), onBack = { nav.popBackStack() })
         if (result == null) {
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // 版权提示横幅（ui-spec §10：errorContainer 底）
                 Row(Modifier.fillMaxWidth().background(c.errorContainer).padding(12.dp), verticalAlignment = Alignment.Top) {
                     Text(
-                        "请只使用你有权使用的文本。点击分析会将样章发给你配置的 AI 服务商，并可能产生费用。灵写本机只保存分析结果；服务商的数据政策请自行确认。",
+                        tr(R.string.breakdown_003),
                         style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onErrorContainer,
                     )
                 }
-                Text("第 1 步 · 贴入样章", style = Ling.type.label, color = c.primary)
+                Text(tr(R.string.breakdown_004), style = Ling.type.label, color = c.primary)
                 LingTextField(text, { text = it }, Modifier.fillMaxWidth(), singleLine = false, minLines = 8, maxLines = 14,
-                    placeholder = "粘贴 1–10 章样章，章节之间用「第X章」或空行分隔")
+                    placeholder = tr(R.string.breakdown_005))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LingButton(if (busy) "分析中…" else "开始分析", height = 46.dp, enabled = text.isNotBlank() && !busy, icon = LingIcons.Sparkle) {
+                    LingButton(if (busy) tr(R.string.breakdown_006) else tr(R.string.breakdown_007), height = 46.dp, enabled = text.isNotBlank() && !busy, icon = LingIcons.Sparkle) {
                         busy = true; err = null
                         scope.launch {
                             val chapters = splitChapters(text)
                             // A12：先把样章里的人名列出来，输出里统一换成「主角 / 对手 / 配角N」
                             val names = Breakdown.extractNames(text)
                             recognized = names.size
-                            val res = runCatching { Breakdown.analyze("样章", chapters, names) }.getOrNull()
-                            res?.let { result = it.getOrNull() } ?: run { err = "模型没有按格式返回" }
-                            if (result == null && err == null) err = "没有拿到分析结果"
+                            val res = runCatching { Breakdown.analyze(tr(R.string.breakdown_008), chapters, names) }.getOrNull()
+                            res?.let { result = it.getOrNull() } ?: run { err = tr(R.string.book_ai_018) }
+                            if (result == null && err == null) err = tr(R.string.breakdown_009)
                             busy = false
                         }
                     }
-                    LingButton("重置", BtnKind.Text, height = 46.dp, enabled = !busy) { text = ""; result = null; err = null }
+                    LingButton(tr(R.string.breakdown_010), BtnKind.Text, height = 46.dp, enabled = !busy) { text = ""; result = null; err = null }
                 }
-                err?.let { Text("没拿到结果：$it", style = Ling.type.caption, color = c.error) }
+                err?.let { Text(tr(R.string.ai_components_011, it), style = Ling.type.caption, color = c.error) }
                 // MO2：分析要跑一会儿，首屏先给骨架（150ms 阈值，避免闪一下）
                 if (com.lingwrite.app.ui.components.rememberDelayedVisible(busy)) {
                     com.lingwrite.app.ui.components.SkeletonCard(4)
                 }
                 Text(
-                    if (recognized > 0) "已识别 $recognized 个疑似专名，结果会进行本地脱名处理；这不改变样章会发给所选服务商的事实。"
-                    else "在本机分章，再由所选 AI 分析；本机只保存结构结果，不保存样章。",
+                    if (recognized > 0) tr(R.string.breakdown_011, recognized)
+                    else tr(R.string.breakdown_012),
                     style = Ling.type.caption, color = c.onSurfaceVariant,
                 )
             }
@@ -127,9 +132,9 @@ fun BreakdownRoute(bookId: Long, viewId: Long, nav: NavHostController) {
                 item {
                     LingCard(Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(14.dp)) {
-                            Text("节奏曲线（冲突强度 1–5）", style = Ling.type.label, color = c.primary)
+                            Text(tr(R.string.breakdown_013), style = Ling.type.label, color = c.primary)
                             CurveChart(r.curve, Modifier.fillMaxWidth().height(120.dp).padding(top = 10.dp))
-                            Text("强度最高：第 ${(r.curve.indices.maxByOrNull { r.curve[it] } ?: 0) + 1} 章", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
+                            Text(tr(R.string.breakdown_014, (r.curve.indices.maxByOrNull { r.curve[it] } ?: 0) + 1), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
                         }
                     }
                 }
@@ -137,24 +142,24 @@ fun BreakdownRoute(bookId: Long, viewId: Long, nav: NavHostController) {
                     LingCard(Modifier.fillMaxWidth().enterStagger(idx)) {
                         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Pill("第 ${ch.n} 章", PillKind.Neutral)
+                                Pill(tr(R.string.breakdown_015, ch.n), PillKind.Neutral)
                                 Spacer(Modifier.width(8.dp))
-                                Pill("强度 ${ch.intensity}", if (ch.intensity >= 4) PillKind.Amber else PillKind.Neutral)
+                                Pill(tr(R.string.breakdown_016, ch.intensity), if (ch.intensity >= 4) PillKind.Amber else PillKind.Neutral)
                             }
-                            if (ch.event.isNotBlank()) Text("事件：${ch.event}", style = Ling.type.body, color = c.onSurface)
-                            if (ch.hook.isNotBlank()) Text("钩子：${ch.hook}", style = Ling.type.caption, color = c.onSurfaceVariant)
-                            if (ch.cool.isNotBlank()) Text("爽点：${ch.cool}", style = Ling.type.caption, color = c.onSurfaceVariant)
-                            if (ch.cliff.isNotBlank()) Text("章尾：${ch.cliff}", style = Ling.type.caption, color = c.onSurfaceVariant)
-                            if (ch.pattern.isNotBlank()) Text("结构：${ch.pattern}", style = Ling.type.caption.copy(color = c.primary))
+                            if (ch.event.isNotBlank()) Text(tr(R.string.breakdown_017, ch.event), style = Ling.type.body, color = c.onSurface)
+                            if (ch.hook.isNotBlank()) Text(tr(R.string.breakdown_018, ch.hook), style = Ling.type.caption, color = c.onSurfaceVariant)
+                            if (ch.cool.isNotBlank()) Text(tr(R.string.breakdown_019, ch.cool), style = Ling.type.caption, color = c.onSurfaceVariant)
+                            if (ch.cliff.isNotBlank()) Text(tr(R.string.breakdown_020, ch.cliff), style = Ling.type.caption, color = c.onSurfaceVariant)
+                            if (ch.pattern.isNotBlank()) Text(tr(R.string.breakdown_021, ch.pattern), style = Ling.type.caption.copy(color = c.primary))
                         }
                     }
                 }
                 item {
                     LingCard(Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("结构模板（已抹去人名设定）", style = Ling.type.label, color = c.primary)
+                            Text(tr(R.string.breakdown_022), style = Ling.type.label, color = c.primary)
                             r.template.forEach { t ->
-                                Text("第 ${t.chapter} 章：${t.pattern}", style = Ling.type.body, color = c.onSurface)
+                                Text(tr(R.string.book_ai_017, t.chapter, t.pattern), style = Ling.type.body, color = c.onSurface)
                             }
                             r.notes.forEach { Text("· $it", style = Ling.type.caption, color = c.onSurfaceVariant) }
                         }
@@ -162,27 +167,27 @@ fun BreakdownRoute(bookId: Long, viewId: Long, nav: NavHostController) {
                 }
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (applied >= 0) Text("✓ 已把模板填进 $applied 个还没章纲的章节，去大纲页可以再改。", style = Ling.type.body, color = c.good)
+                        if (applied >= 0) Text(tr(R.string.breakdown_023, applied), style = Ling.type.body, color = c.good)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (bookId > 0 && r.template.isNotEmpty()) {
-                                LingButton("套用到本书章纲", height = 42.dp, enabled = applied < 0) { applyAsk = true }
+                                LingButton(tr(R.string.breakdown_024), height = 42.dp, enabled = applied < 0) { applyAsk = true }
                             }
                             if (!saved) {
-                                LingButton("存为我的模板", BtnKind.Tonal, height = 42.dp) {
+                                LingButton(tr(R.string.breakdown_025), BtnKind.Tonal, height = 42.dp) {
                                     scope.launch { Breakdown.save(r, bookId.takeIf { it > 0 }); saved = true }
                                 }
                             }
                             if (viewing) {
-                                LingButton("删除此模板", BtnKind.Text, height = 42.dp) {
+                                LingButton(tr(R.string.breakdown_026), BtnKind.Text, height = 42.dp) {
                                     scope.launch {
                                         AppGraph.db.breakdowns().delete(viewId)
                                         nav.popBackStack()
                                     }
                                 }
                             }
-                            if (!viewing) LingButton("再拆一本", BtnKind.Text, height = 42.dp) { text = ""; result = null; saved = false }
+                            if (!viewing) LingButton(tr(R.string.breakdown_027), BtnKind.Text, height = 42.dp) { text = ""; result = null; saved = false }
                         }
-                        if (bookId > 0) Text("套用只填还没有章纲的章节，已有的不动；填入的都是建议，可在大纲页改。", style = Ling.type.caption, color = c.onSurfaceVariant)
+                        if (bookId > 0) Text(tr(R.string.breakdown_028), style = Ling.type.caption, color = c.onSurfaceVariant)
                     }
                 }
             }
@@ -191,8 +196,8 @@ fun BreakdownRoute(bookId: Long, viewId: Long, nav: NavHostController) {
 
     if (applyAsk) {
         com.lingwrite.app.ui.components.LingConfirm(
-            title = "套用结构模板",
-            text = "把这份模板按顺序填进还没有章纲的章节（已有的章纲不动），填入的都是建议。",
+            title = tr(R.string.breakdown_029),
+            text = tr(R.string.breakdown_030),
             onDismiss = { applyAsk = false },
             onConfirm = {
                 applyAsk = false

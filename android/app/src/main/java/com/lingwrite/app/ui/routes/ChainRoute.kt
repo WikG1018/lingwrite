@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import com.lingwrite.app.ui.components.enterStagger
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -64,8 +71,8 @@ fun ChainRoute(bookId: Long, nav: NavHostController, startStep: Int = 0) {
     fun done(adoptedStep: Int) { justAdopted = adoptedStep; step = (adoptedStep + 1).coerceAtMost(6) }
 
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("总纲工作台", book?.title, onBack = { nav.popBackStack() }) {
-            LingIconButton(LingIcons.Book, "大纲页", onClick = { nav.navigate(Routes.work(bookId)) })
+        LingTopBar(tr(R.string.chain_001), book?.title, onBack = { nav.popBackStack() }) {
+            LingIconButton(LingIcons.Book, tr(R.string.chain_002), onClick = { nav.navigate(Routes.work(bookId)) })
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             (1..6).forEach { s ->
@@ -90,7 +97,7 @@ fun ChainRoute(bookId: Long, nav: NavHostController, startStep: Int = 0) {
         // 底部固定条：链路进度与用量
         Box(Modifier.fillMaxWidth().height(44.dp).border(1.dp, c.outlineVariant)) {
             Text(
-                if (bp.chainStep >= 6) "链路完成 · 从大纲页或书架进入第一章继续写作" else "已完成 ${bp.chainStep}/6 步 · 每一步都可以跳过，手写也能继续",
+                if (bp.chainStep >= 6) tr(R.string.chain_003) else tr(R.string.chain_004, bp.chainStep),
                 style = Ling.type.caption.copy(fontSize = 12.sp), color = c.onSurfaceVariant, modifier = Modifier.align(Alignment.Center).padding(horizontal = 16.dp),
             )
         }
@@ -98,12 +105,12 @@ fun ChainRoute(bookId: Long, nav: NavHostController, startStep: Int = 0) {
 }
 
 private fun stepSummary(bp: BookPlanEntity, s: Int, volumeCount: Int): String = when (s) {
-    1 -> bp.logline.ifBlank { bp.idea.ifBlank { "一句话灵感开始" } }
-    2 -> parseList(bp.sellingPoints).firstOrNull() ?: "卖点、主角、世界观"
-    3 -> bp.synopsis.take(40).ifBlank { "主线 · 阶段 · 结局" }
-    4 -> if (volumeCount > 0) "$volumeCount 卷" else "拆卷、目标与高潮"
-    5 -> "本卷前 N 章章纲"
-    else -> "节拍与第一章"
+    1 -> bp.logline.ifBlank { bp.idea.ifBlank { tr(R.string.chain_005) } }
+    2 -> parseList(bp.sellingPoints).firstOrNull() ?: tr(R.string.chain_006)
+    3 -> bp.synopsis.take(40).ifBlank { tr(R.string.chain_007) }
+    4 -> if (volumeCount > 0) tr(R.string.chain_008, volumeCount) else tr(R.string.chain_009)
+    5 -> tr(R.string.chain_010)
+    else -> tr(R.string.chain_011)
 }
 
 /** 时间线节点（ui-spec §4）。[flash] = 刚采纳完成，用一次 amber 描边闪一下（motion §22）。 */
@@ -136,7 +143,7 @@ private fun TimelineRow(step: Int, current: Int, done: Boolean, label: String, s
         Column(Modifier.weight(1f).padding(start = 6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(label, style = Ling.type.label, color = if (done || current == step) c.onSurface else c.onSurfaceVariant)
-                if (changed) Text("上游已改，可重新生成", style = Ling.type.caption.copy(fontSize = 12.sp), color = c.tertiary, modifier = Modifier.padding(start = 8.dp))
+                if (changed) Text(tr(R.string.chain_012), style = Ling.type.caption.copy(fontSize = 12.sp), color = c.tertiary, modifier = Modifier.padding(start = 8.dp))
             }
             Text(summary, style = Ling.type.caption, color = c.onSurfaceVariant, maxLines = 1)
         }
@@ -151,20 +158,20 @@ private fun StepIdea(bookId: Long, bp: BookPlanEntity, bookGenre: String, busy: 
     val scope = rememberCoroutineScope()
     var idea by remember(bp.idea) { mutableStateOf(bp.idea) }
     var genre by remember(bookGenre) { mutableStateOf(bookGenre) }
-    var platform by remember { mutableStateOf("起点") }
+    var platform by remember { mutableStateOf(tr(R.string.book_ai_007)) }
     // 未采纳的候选不从内存里丢：重新进来时从 book_plans.chain 恢复
     var cands by remember(bp.chain) {
         mutableStateOf(ChainState.parse(bp.chain).cands[1]?.let { ChainPrompts.parsePitches(it) } ?: emptyList())
     }
     var pick by remember { mutableStateOf(-1) }
-    StepCard("① 创意 → 梗概") {
-        LingTextField(idea, { idea = it }, label = "一句话灵感（必填）", placeholder = "比如：断剑少年潜入宗门，只为查十年前的灭门案")
+    StepCard(tr(R.string.chain_013)) {
+        LingTextField(idea, { idea = it }, label = tr(R.string.chain_014), placeholder = tr(R.string.chain_015))
         Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingTextField(genre, { genre = it }, Modifier.weight(1f), label = "题材（可选）")
-            LingTextField(platform, { platform = it }, Modifier.weight(1f), label = "目标平台")
+            LingTextField(genre, { genre = it }, Modifier.weight(1f), label = tr(R.string.chain_016))
+            LingTextField(platform, { platform = it }, Modifier.weight(1f), label = tr(R.string.chain_017))
         }
         if (error != null) AiErrorCard(error, modifier = Modifier.padding(top = 10.dp), onRetry = { onError(null) })
-        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking("正在想 3 个方向…") }
+        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking(tr(R.string.chain_018)) }
         cands.forEachIndexed { i, (title, logline, hook) ->
             val on = i == pick
             LingCard(
@@ -183,22 +190,22 @@ private fun StepIdea(bookId: Long, bp: BookPlanEntity, bookGenre: String, busy: 
         }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LingButton(
-                if (busy) "生成中…" else if (cands.isEmpty()) "AI 生成 3 个梗概" else "换一批", icon = LingIcons.Sparkle,
+                if (busy) tr(R.string.ai_components_003) else if (cands.isEmpty()) tr(R.string.chain_019) else tr(R.string.ai_components_008), icon = LingIcons.Sparkle,
                 enabled = !busy && idea.isNotBlank(), onClick = {
                     scope.launch {
                         onBusy(true); onError(null)
                         val r = ChainRunner.pitches(bookId, idea, genre, platform)
-                        if (r.isEmpty()) onError("模型两次都没有按格式返回") else { cands = r; pick = -1 }
+                        if (r.isEmpty()) onError(tr(R.string.chain_020)) else { cands = r; pick = -1 }
                         onBusy(false)
                     }
                 },
             )
-            if (cands.isNotEmpty()) LingButton("手写梗概继续", BtnKind.Text, enabled = idea.isNotBlank(), onClick = {
+            if (cands.isNotEmpty()) LingButton(tr(R.string.chain_021), BtnKind.Text, enabled = idea.isNotBlank(), onClick = {
                 scope.launch { save(bookId, idea = idea, genre = genre, chainStep = 1); ChainStore.markAdopted(bookId, 1); onDone() }
             })
         }
         if (pick >= 0) LingButton(
-            "采纳并继续", modifier = Modifier.padding(top = 8.dp).fillMaxWidth().height(50.dp),
+            tr(R.string.chain_022), modifier = Modifier.padding(top = 8.dp).fillMaxWidth().height(50.dp),
         ) {
             val t = cands[pick]
             scope.launch {
@@ -221,10 +228,10 @@ private fun StepCore(bookId: Long, bp: BookPlanEntity, busy: Boolean, error: Str
         mutableStateOf(ChainState.parse(bp.chain).cands[2]?.let { ChainPrompts.parseListReply(it) } ?: emptyList())
     }
     val taken = remember(cands) { cands.map { mutableStateOf(true) } }
-    StepCard("② 核心设定") {
-        Text("卖点、主角卡和世界观可以在这里生成，也可以直接在创作向导或设定库里维护。", style = Ling.type.caption, color = c.onSurfaceVariant)
+    StepCard(tr(R.string.chain_023)) {
+        Text(tr(R.string.chain_024), style = Ling.type.caption, color = c.onSurfaceVariant)
         if (error != null) AiErrorCard(error, modifier = Modifier.padding(top = 10.dp), onRetry = { onError(null) })
-        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking("正在提炼卖点…") }
+        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking(tr(R.string.chain_025)) }
         cands.forEachIndexed { i, s ->
             Row(Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(c.surfaceContainer).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                 androidx.compose.material3.Checkbox(taken[i].value, { taken[i].value = it })
@@ -232,15 +239,15 @@ private fun StepCore(bookId: Long, bp: BookPlanEntity, busy: Boolean, error: Str
             }
         }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton(if (busy) "生成中…" else "生成卖点", icon = LingIcons.Sparkle, enabled = !busy, onClick = {
+            LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.chain_026), icon = LingIcons.Sparkle, enabled = !busy, onClick = {
                 scope.launch {
                     onBusy(true); onError(null)
                     val r = ChainRunner.sellingPoints(bookId)
-                    if (r.isEmpty()) onError("模型两次都没有按格式返回") else cands = r
+                    if (r.isEmpty()) onError(tr(R.string.chain_020)) else cands = r
                     onBusy(false)
                 }
             })
-            LingButton("采纳并继续", enabled = cands.any { it.isNotBlank() }, onClick = {
+            LingButton(tr(R.string.chain_022), enabled = cands.any { it.isNotBlank() }, onClick = {
                 val chosen = cands.filterIndexed { i, _ -> taken.getOrNull(i)?.value ?: true }
                 scope.launch { save(bookId, sellingPoints = chosen, chainStep = 2); ChainStore.markAdopted(bookId, 2); onDone() }
             })
@@ -258,30 +265,30 @@ private fun StepSynopsis(bookId: Long, bp: BookPlanEntity, busy: Boolean, error:
     var spine by remember(bp.synopsis) { mutableStateOf(parsed.first) }
     var stages by remember(bp.synopsis) { mutableStateOf(parsed.second) }
     var ending by remember(bp.synopsis) { mutableStateOf(parsed.third) }
-    StepCard("③ 总纲") {
-        LingTextField(spine, { spine = it }, label = "主线（≤40 字）", singleLine = false)
+    StepCard(tr(R.string.chain_027)) {
+        LingTextField(spine, { spine = it }, label = tr(R.string.chain_028), singleLine = false)
         stages.forEachIndexed { i, s ->
             Column(Modifier.padding(top = 10.dp)) {
-                Text("阶段 ${i + 1}", style = Ling.type.caption, color = c.onSurfaceVariant)
-                LingTextField(s.name, { st -> stages = stages.toMutableList().also { it[i] = s.copy(name = st) } }, label = "阶段名")
-                LingTextField(s.goal, { st -> stages = stages.toMutableList().also { it[i] = s.copy(goal = st) } }, label = "目标")
-                LingTextField(s.conflict, { st -> stages = stages.toMutableList().also { it[i] = s.copy(conflict = st) } }, label = "主要冲突")
-                LingTextField(s.end, { st -> stages = stages.toMutableList().also { it[i] = s.copy(end = st) } }, label = "阶段结局")
+                Text(tr(R.string.chain_029, i + 1), style = Ling.type.caption, color = c.onSurfaceVariant)
+                LingTextField(s.name, { st -> stages = stages.toMutableList().also { it[i] = s.copy(name = st) } }, label = tr(R.string.chain_030))
+                LingTextField(s.goal, { st -> stages = stages.toMutableList().also { it[i] = s.copy(goal = st) } }, label = tr(R.string.chain_031))
+                LingTextField(s.conflict, { st -> stages = stages.toMutableList().also { it[i] = s.copy(conflict = st) } }, label = tr(R.string.chain_032))
+                LingTextField(s.end, { st -> stages = stages.toMutableList().also { it[i] = s.copy(end = st) } }, label = tr(R.string.chain_033))
             }
         }
-        LingTextField(ending, { ending = it }, Modifier.padding(top = 10.dp), label = "结局走向（≤120 字）", singleLine = false, minLines = 3)
+        LingTextField(ending, { ending = it }, Modifier.padding(top = 10.dp), label = tr(R.string.chain_034), singleLine = false, minLines = 3)
         if (error != null) AiErrorCard(error, modifier = Modifier.padding(top = 10.dp), onRetry = { onError(null) })
-        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking("正在排主线和阶段…") }
+        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking(tr(R.string.chain_035)) }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton(if (busy) "生成中…" else "AI 写总纲", icon = LingIcons.Sparkle, enabled = !busy, onClick = {
+            LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.chain_036), icon = LingIcons.Sparkle, enabled = !busy, onClick = {
                 scope.launch {
                     onBusy(true); onError(null)
                     val r = ChainRunner.synopsis(bookId)
-                    if (r == null) onError("模型两次都没有按格式返回") else { spine = r.first; stages = r.second; ending = r.third }
+                    if (r == null) onError(tr(R.string.chain_020)) else { spine = r.first; stages = r.second; ending = r.third }
                     onBusy(false)
                 }
             })
-            LingButton("采纳并继续", enabled = spine.isNotBlank() || stages.isNotEmpty(), onClick = {
+            LingButton(tr(R.string.chain_022), enabled = spine.isNotBlank() || stages.isNotEmpty(), onClick = {
                 scope.launch {
                     save(bookId, synopsis = SynopsisFormat.build(spine, stages, ending), chainStep = 3)
                     ChainStore.markAdopted(bookId, 3)
@@ -305,47 +312,47 @@ private fun StepVolumes(bookId: Long, bp: BookPlanEntity, vplans: List<VolumePla
     }
     val taken = remember(cands) { cands.map { mutableStateOf(true) } }
     var overwrite by remember { mutableStateOf(false) }
-    StepCard("④ 卷纲") {
+    StepCard(tr(R.string.chain_037)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingTextField("$n", { n = it.filter(Char::isDigit).toIntOrNull() ?: 4 }, Modifier.weight(1f), label = "卷数（1–12）")
-            LingTextField(perVolume, { perVolume = it.filter(Char::isDigit) }, Modifier.weight(1f), label = "每卷预计章数")
+            LingTextField("$n", { n = it.filter(Char::isDigit).toIntOrNull() ?: 4 }, Modifier.weight(1f), label = tr(R.string.chain_038))
+            LingTextField(perVolume, { perVolume = it.filter(Char::isDigit) }, Modifier.weight(1f), label = tr(R.string.chain_039))
         }
         if (error != null) AiErrorCard(error, modifier = Modifier.padding(top = 10.dp), onRetry = { onError(null) })
-        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking("正在拆卷…") }
+        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking(tr(R.string.chain_040)) }
         cands.forEachIndexed { i, v ->
             Column(Modifier.padding(top = 10.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.surfaceContainer).padding(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     androidx.compose.material3.Checkbox(taken[i].value, { taken[i].value = it })
                     Text(VolumeLabel.full(i + 1, v.name), style = Ling.type.subhead, color = c.onSurface, modifier = Modifier.weight(1f))
-                    Pill("${v.chapters} 章", PillKind.Neutral)
+                    Pill(tr(R.string.chain_041, v.chapters), PillKind.Neutral)
                 }
-                if (v.goal.isNotBlank()) Text("目标：${v.goal}", style = Ling.type.body, color = c.onSurface, modifier = Modifier.padding(start = 12.dp))
-                if (v.climax.isNotBlank()) Text("高潮：${v.climax}", style = Ling.type.body, color = c.onSurface, modifier = Modifier.padding(start = 12.dp))
+                if (v.goal.isNotBlank()) Text(tr(R.string.chain_042, v.goal), style = Ling.type.body, color = c.onSurface, modifier = Modifier.padding(start = 12.dp))
+                if (v.climax.isNotBlank()) Text(tr(R.string.chain_043, v.climax), style = Ling.type.body, color = c.onSurface, modifier = Modifier.padding(start = 12.dp))
                 if (v.outline.isNotBlank()) Text(v.outline, style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp, top = 2.dp))
             }
         }
         // 已有卷时的落法：覆盖同序号（保留卷内章节）或追加在后面
         if (cands.isNotEmpty()) {
             Text(
-                if (vplans.isEmpty()) "落法：追加在后面" else "已有 ${vplans.size} 卷，选落法：",
+                if (vplans.isEmpty()) tr(R.string.chain_044) else tr(R.string.chain_045, vplans.size),
                 style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 10.dp),
             )
             Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LingButton(if (overwrite) "✓ 覆盖同序号" else "覆盖同序号", if (overwrite) BtnKind.Tonal else BtnKind.Outlined, height = 34.dp) { overwrite = true }
-                LingButton(if (!overwrite) "✓ 追加在后面" else "追加在后面", if (!overwrite) BtnKind.Tonal else BtnKind.Outlined, height = 34.dp) { overwrite = false }
+                LingButton(if (overwrite) tr(R.string.chain_046) else tr(R.string.chain_047), if (overwrite) BtnKind.Tonal else BtnKind.Outlined, height = 34.dp) { overwrite = true }
+                LingButton(if (!overwrite) tr(R.string.chain_048) else tr(R.string.chain_049), if (!overwrite) BtnKind.Tonal else BtnKind.Outlined, height = 34.dp) { overwrite = false }
             }
-            if (overwrite) Text("覆盖只改卷纲（目标 / 高潮 / 章数 / 卷名），卷内已有章节保留。", style = Ling.type.caption.copy(fontSize = 11.5.sp), color = c.onSurfaceVariant)
+            if (overwrite) Text(tr(R.string.chain_050), style = Ling.type.caption.copy(fontSize = 11.5.sp), color = c.onSurfaceVariant)
         }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton(if (busy) "生成中…" else "AI 拆卷纲", icon = LingIcons.Sparkle, enabled = !busy, onClick = {
+            LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.chain_051), icon = LingIcons.Sparkle, enabled = !busy, onClick = {
                 scope.launch {
                     onBusy(true); onError(null)
                     val r = ChainRunner.volumes(bookId, n.coerceIn(1, 12))
-                    if (r.isEmpty()) onError("模型两次都没有按格式返回") else cands = r
+                    if (r.isEmpty()) onError(tr(R.string.chain_020)) else cands = r
                     onBusy(false)
                 }
             })
-            if (cands.isNotEmpty()) LingButton("采纳勾选的卷", enabled = taken.any { it.value }, onClick = {
+            if (cands.isNotEmpty()) LingButton(tr(R.string.chain_052), enabled = taken.any { it.value }, onClick = {
                 scope.launch {
                     val chosen = cands.filterIndexed { i, _ -> taken[i].value }
                     ChainRunner.adoptVolumes(bookId, chosen, overwrite, cands.indices.filter { taken[it].value })
@@ -372,48 +379,48 @@ private fun StepChapters(bookId: Long, bp: BookPlanEntity, vplans: List<VolumePl
     }
     val taken = remember(cands) { cands.map { mutableStateOf(true) } }
     val vol = vols.getOrNull(volIdx)
-    StepCard("⑤ 章纲") {
-        Text("选一卷拆前 N 章，或接着已有章纲往后拆（滚动规划）。", style = Ling.type.caption, color = c.onSurfaceVariant)
-        if (vols.isEmpty()) Text("先在 ④ 里拆卷，或去作品页新建分卷。", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+    StepCard(tr(R.string.chain_053)) {
+        Text(tr(R.string.chain_054), style = Ling.type.caption, color = c.onSurfaceVariant)
+        if (vols.isEmpty()) Text(tr(R.string.chain_055), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
         else {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
                 vols.forEachIndexed { i, v -> LingButton(VolumeLabel.short(i + 1), if (i == volIdx) BtnKind.Tonal else BtnKind.Text, enabled = !busy, height = 36.dp) {
                     volIdx = i; cands = emptyList(); onError(null)
                 } }
             }
-            LingTextField(n, { n = it.filter(Char::isDigit) }, Modifier.padding(top = 10.dp), label = "拆几章（本卷前 N 章用 10，滚动规划用 3 / 5）")
+            LingTextField(n, { n = it.filter(Char::isDigit) }, Modifier.padding(top = 10.dp), label = tr(R.string.chain_056))
             Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("3", "5", "10").forEach { k ->
-                    LingButton(if (n == k) "✓ $k 章" else "$k 章", if (n == k) BtnKind.Tonal else BtnKind.Outlined, height = 32.dp) { n = k }
+                    LingButton(if (n == k) tr(R.string.chain_057, k) else tr(R.string.chain_041, k), if (n == k) BtnKind.Tonal else BtnKind.Outlined, height = 32.dp) { n = k }
                 }
             }
         }
         if (error != null) AiErrorCard(error, modifier = Modifier.padding(top = 10.dp), onRetry = { onError(null) })
-        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking("正在拆章纲…") }
+        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking(tr(R.string.chain_058)) }
         cands.forEachIndexed { i, s ->
             Column(Modifier.padding(top = 8.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     androidx.compose.material3.Checkbox(taken[i].value, { taken[i].value = it })
-                    Text(s.title.ifBlank { "新章 ${i + 1}" }, style = Ling.type.label, color = c.onSurface, modifier = Modifier.weight(1f))
+                    Text(s.title.ifBlank { tr(R.string.chain_059, i + 1) }, style = Ling.type.label, color = c.onSurface, modifier = Modifier.weight(1f))
                 }
-                Text("事件：${s.event}\n钩子：${s.hook}\n悬念：${s.cliff}", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp))
+                Text(tr(R.string.chain_060, s.event, s.hook, s.cliff), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp))
             }
         }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton(if (busy) "生成中…" else "AI 拆章纲", icon = LingIcons.Sparkle, enabled = !busy && vol != null, onClick = {
+            LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.chain_061), icon = LingIcons.Sparkle, enabled = !busy && vol != null, onClick = {
                 scope.launch {
                     onBusy(true); onError(null)
                     val v = vol ?: return@launch
                     val hint = OutlineTemplates.filter { it.id in bp.templates.split(',') }.joinToString(" ") { it.hint }
                     val r = ChainRunner.chapters(bookId, v.id, n.toIntOrNull() ?: 10, hint)
-                    if (r.isEmpty()) onError("模型两次都没有按格式返回") else cands = r
+                    if (r.isEmpty()) onError(tr(R.string.chain_020)) else cands = r
                     onBusy(false)
                 }
             })
-            if (cands.isNotEmpty()) LingButton("采纳 N 章", enabled = taken.any { it.value }, onClick = {
+            if (cands.isNotEmpty()) LingButton(tr(R.string.chain_062), enabled = taken.any { it.value }, onClick = {
                 scope.launch {
                     val v = vol ?: return@launch
-                    if (ChainState.parse(AppGraph.db.plan().bookOnce(bookId)?.chain.orEmpty()).chapterVolumeId != v.id) { onError("候选属于另一卷，请在当前卷重新生成。"); return@launch }
+                    if (ChainState.parse(AppGraph.db.plan().bookOnce(bookId)?.chain.orEmpty()).chapterVolumeId != v.id) { onError(tr(R.string.chain_063)); return@launch }
                     val chosen = cands.filterIndexed { i, _ -> taken[i].value }
                     ChainRunner.adoptChapters(bookId, v.id, chosen)
                     save(bookId, chainStep = 5)
@@ -440,13 +447,13 @@ private fun StepFirst(bookId: Long, bp: BookPlanEntity, vplans: List<VolumePlanE
     var openings by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     val chs by remember(bookId) { AppGraph.books.chapterHeaders(bookId) }.collectAsState(emptyList())
     val first = chs.firstOrNull()
-    StepCard("⑥ 第一章 · ${mode.value.label}模式") {
+    StepCard(tr(R.string.chain_064, trText(mode.value.label))) {
         Text(
-            if (mode.value == WriteMode.Assist) "生成节拍清单和开篇示意：只进本章便签，不进正文。" else "先确认节拍，再起草整章：草稿分段采纳，带 AI 标记。",
+            if (mode.value == WriteMode.Assist) tr(R.string.chain_065) else tr(R.string.chain_066),
             style = Ling.type.caption, color = c.onSurfaceVariant,
         )
         if (error != null) AiErrorCard(error, modifier = Modifier.padding(top = 10.dp), onRetry = { onError(null) })
-        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking("正在排节拍…") }
+        if (busy) Box(Modifier.padding(top = 12.dp)) { AiThinking(tr(R.string.chain_067)) }
         beats.forEachIndexed { i, b -> Text("${i + 1}. $b", style = Ling.type.bodyLarge.copy(lineHeight = 26.sp), color = c.onSurface, modifier = Modifier.padding(top = 6.dp)) }
         openings.forEach { (t, e) ->
             Column(Modifier.padding(top = 8.dp).clip(RoundedCornerShape(12.dp)).background(c.surfaceContainer).padding(12.dp)) {
@@ -455,16 +462,16 @@ private fun StepFirst(bookId: Long, bp: BookPlanEntity, vplans: List<VolumePlanE
             }
         }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            LingButton(if (busy) "生成中…" else "生成节拍", icon = LingIcons.Sparkle, enabled = !busy && first != null, onClick = {
+            LingButton(if (busy) tr(R.string.ai_components_003) else tr(R.string.chain_068), icon = LingIcons.Sparkle, enabled = !busy && first != null, onClick = {
                 scope.launch {
                     onBusy(true); onError(null)
                     val ch = first ?: return@launch
                     val r = ChainRunner.beats(bookId, ch.id)
-                    if (r.isEmpty()) onError("模型两次都没有按格式返回") else beats = r
+                    if (r.isEmpty()) onError(tr(R.string.chain_020)) else beats = r
                     onBusy(false)
                 }
             })
-            if (mode.value == WriteMode.Assist && beats.isNotEmpty()) LingButton("生成开篇示意", BtnKind.Text, enabled = !busy, onClick = {
+            if (mode.value == WriteMode.Assist && beats.isNotEmpty()) LingButton(tr(R.string.chain_069), BtnKind.Text, enabled = !busy, onClick = {
                 scope.launch {
                     onBusy(true); onError(null)
                     openings = ChainRunner.openings(bookId, beats)
@@ -473,7 +480,7 @@ private fun StepFirst(bookId: Long, bp: BookPlanEntity, vplans: List<VolumePlanE
             })
         }
         if (beats.isNotEmpty()) LingButton(
-            if (mode.value == WriteMode.Assist) "存节拍到本章便签并完成" else "存节拍，去编辑器起草",
+            if (mode.value == WriteMode.Assist) tr(R.string.chain_070) else tr(R.string.chain_071),
             modifier = Modifier.padding(top = 8.dp).fillMaxWidth().height(50.dp),
         ) {
             scope.launch {
@@ -484,7 +491,7 @@ private fun StepFirst(bookId: Long, bp: BookPlanEntity, vplans: List<VolumePlanE
                 onOpen(chId)
             }
         }
-        if (first != null && mode.value == WriteMode.Generate) LingButton("打开第一章起草", BtnKind.Text, modifier = Modifier.padding(top = 6.dp), onClick = { onOpen(first.id) })
+        if (first != null && mode.value == WriteMode.Generate) LingButton(tr(R.string.chain_072), BtnKind.Text, modifier = Modifier.padding(top = 6.dp), onClick = { onOpen(first.id) })
     }
 }
 

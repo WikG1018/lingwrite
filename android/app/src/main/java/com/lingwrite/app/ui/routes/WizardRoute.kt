@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+
+import com.lingwrite.app.i18n.tr
+import com.lingwrite.app.i18n.trZh
+
+import com.lingwrite.app.R
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -53,15 +60,15 @@ object WizardModule {
 }
 
 private data class StepInfo(val title: String, val desc: String, val example: String)
-private val Steps = listOf(
-    StepInfo("灵感", "一句话写下你想写的故事，AI 扩展成 3 个方向不同的梗概，选一个或自己组合。", "例：一个只能看见别人寿命的捕快，发现师父的寿命停在了三年前。"),
-    StepInfo("类型与文风", "选题材、网文模板和目标读者；可以上传自己写的样章，生成一份文风卡。", "样章建议 3–5 章，只存在本机。"),
-    StepInfo("主角和核心人物", "AI 按梗概生成人物卡，勾选要保留的，存入设定库。", "姓名、身份、性格、动机、金手指"),
-    StepInfo("世界观", "力量体系、势力、地点，各自生成设定卡存入设定库。", "例：境界划分、宗门、王朝、关键城市"),
-    StepInfo("总纲和第一卷", "生成全书总纲和第一卷卷纲，写入三级大纲。", "总纲写清主线、阶段目标与结局走向"),
-    StepInfo("书名和简介", "AI 给 5 个书名和 3 版简介，选一个再改；之后随时能改。", "简介开头一句要抓人"),
-    StepInfo("前三章章纲", "按核心事件 / 开篇钩子 / 章尾悬念生成前三章章纲，并对照黄金三章检查表。", "第一章 500 字内出现钩子"),
-    StepInfo("第一章", "按第一章章纲生成场景节拍；辅助模式给开篇示意（只进便签），生成模式在编辑器起草。", "第一条 300 字内抛出钩子"),
+private val Steps get() = listOf(
+    StepInfo(tr(R.string.ai_components_001), tr(R.string.wizard_001), tr(R.string.wizard_002)),
+    StepInfo(tr(R.string.wizard_003), tr(R.string.wizard_004), tr(R.string.wizard_005)),
+    StepInfo(tr(R.string.wizard_006), tr(R.string.wizard_007), tr(R.string.wizard_008)),
+    StepInfo(tr(R.string.wizard_009), tr(R.string.wizard_010), tr(R.string.wizard_011)),
+    StepInfo(tr(R.string.wizard_012), tr(R.string.wizard_013), tr(R.string.wizard_014)),
+    StepInfo(tr(R.string.wizard_015), tr(R.string.wizard_016), tr(R.string.wizard_017)),
+    StepInfo(tr(R.string.wizard_018), tr(R.string.wizard_019), tr(R.string.wizard_020)),
+    StepInfo(tr(R.string.wizard_021), tr(R.string.wizard_022), tr(R.string.wizard_023)),
 )
 
 @Composable
@@ -109,7 +116,7 @@ internal suspend fun adopt(bookId: Long, step: Int, d: WizardData) {
             val have = lore.cardsOnce(bookId).map { it.name }.toSet()
             d.chars.filter { it.take && it.name.isNotBlank() && it.name !in have }.forEach { ch ->
                 lore.insertCard(LoreCardEntity(bookId = bookId, type = "character", name = ch.name, aliases = ch.aliases, role = ch.role,
-                    fields = encodeFields(listOf(Field("身份", ch.identity), Field("性格", ch.personality), Field("当前目标", ch.motive), Field("金手指", ch.cheat)).filter { it.v.isNotBlank() }),
+                    fields = encodeFields(listOf(Field(tr(R.string.wizard_024), ch.identity), Field(tr(R.string.wizard_025), ch.personality), Field(tr(R.string.wizard_026), ch.motive), Field(tr(R.string.wizard_027), ch.cheat)).filter { it.v.isNotBlank() }),
                     inject = if (ch.role.contains("主角")) "always" else "auto"))
             }
             // 核心设定（②）完成 → chainStep 记到 2
@@ -120,7 +127,7 @@ internal suspend fun adopt(bookId: Long, step: Int, d: WizardData) {
             val have = lore.cardsOnce(bookId).map { it.name }.toSet()
             d.world.filter { it.take && it.name.isNotBlank() && it.name !in have }.forEach { w ->
                 val t = LoreType.of(w.type)
-                lore.insertCard(LoreCardEntity(bookId = bookId, type = t.id, name = w.name, fields = encodeFields(listOf(Field(defaultFields(t).last().let { if (t == LoreType.Power) "规则" else "要点" }, w.desc))), inject = if (t == LoreType.Power) "always" else "auto"))
+                lore.insertCard(LoreCardEntity(bookId = bookId, type = t.id, name = w.name, fields = encodeFields(listOf(Field(defaultFields(t).last().let { if (t == LoreType.Power) tr(R.string.wizard_028) else tr(R.string.wizard_029) }, w.desc))), inject = if (t == LoreType.Power) "always" else "auto"))
             }
             plan.upsertBook(bp.copy(chainStep = maxOf(bp.chainStep, 2)))
             com.lingwrite.app.data.ChainStore.markAdopted(bookId, 2)
@@ -140,7 +147,7 @@ internal suspend fun adopt(bookId: Long, step: Int, d: WizardData) {
             val vol = AppGraph.db.chapters().volumesOnce(bookId).firstOrNull()?.id ?: AppGraph.books.addVolume(bookId, Naming.stripVolume(d.volumeTitle))
             d.chapters.take(3).forEachIndexed { i, cd ->
                 val id = chs.getOrNull(i)?.also { AppGraph.books.renameChapter(it.id, cd.title.ifBlank { it.title }) }?.id ?: AppGraph.books.addChapterTo(bookId, vol, cd.title)
-                plan.upsertChapter(ChapterPlanEntity(id, bookId, cd.event, cd.hook, cd.cliff, threads = "主线", fromAi = true))
+                plan.upsertChapter(ChapterPlanEntity(id, bookId, cd.event, cd.hook, cd.cliff, threads = tr(R.string.outline_069), fromAi = true))
             }
             plan.upsertBook(bp.copy(chainStep = maxOf(bp.chainStep, 5)))
             com.lingwrite.app.data.ChainStore.markAdopted(bookId, 5, plan.volumes(bookId).first())
@@ -162,7 +169,7 @@ internal suspend fun adopt(bookId: Long, step: Int, d: WizardData) {
 }
 
 internal suspend fun finish(bookId: Long, d: WizardData, adopted: Boolean) {
-    AppGraph.db.books().get(bookId)?.let { AppGraph.books.updateBook(it.copy(status = "outline", wizardStep = 8, title = it.title.ifBlank { d.title.ifBlank { d.pitches.firstOrNull()?.title ?: "未命名作品" } })) }
+    AppGraph.db.books().get(bookId)?.let { AppGraph.books.updateBook(it.copy(status = "outline", wizardStep = 8, title = it.title.ifBlank { d.title.ifBlank { d.pitches.firstOrNull()?.title ?: tr(R.string.wizard_030) } })) }
     if (AppGraph.db.chapters().chaptersOnce(bookId).isEmpty()) AppGraph.books.nextChapter(bookId)
 }
 
@@ -179,13 +186,13 @@ fun WizardScreen(step: Int, d: WizardData, onChange: (WizardData) -> Unit, onBac
             AppGraph.ai.complete("wizard", WizardPrompts.SYS, prompt, bookId, null, max, Slot.Writing).onSuccess { raw ->
                 val j = extractJson(raw, array = raw.trimStart().let { s -> s.indexOf('[').let { a -> a >= 0 && (s.indexOf('{') < 0 || a < s.indexOf('{')) } })
                 val nd = j?.let { runCatching { apply(it) }.getOrNull() }
-                if (nd == null) err = "模型没有按格式返回，重试或换个模型" else onChange(nd)
+                if (nd == null) err = tr(R.string.wizard_031) else onChange(nd)
             }.onFailure { err = it.message }
             busy = false
         }
     }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
-        LingTopBar("创作向导", "第 ${step + 1} 步 / 共 8 步", onBack = onBack) { LingIconButton(LingIcons.Close, "稍后继续", onClick = onClose) }
+        LingTopBar(tr(R.string.editor_ai_024), tr(R.string.wizard_032, step + 1), onBack = onBack) { LingIconButton(LingIcons.Close, tr(R.string.wizard_033), onClick = onClose) }
         Row(Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             repeat(8) { i -> Box(Modifier.weight(1f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(if (i <= step) c.primary else c.surfaceContainer)) }
         }
@@ -208,8 +215,8 @@ fun WizardScreen(step: Int, d: WizardData, onChange: (WizardData) -> Unit, onBac
             }
         }
         Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            LingButton("跳过", BtnKind.Outlined, height = 50.dp, modifier = Modifier.weight(1f)) { onSkip() }
-            LingButton(if (step == 7) "采纳并去写第一章" else "采纳并继续", height = 50.dp, enabled = !busy && canAdopt(step, d), modifier = Modifier.weight(2f)) { onAdopt() }
+            LingButton(tr(R.string.stuck_002), BtnKind.Outlined, height = 50.dp, modifier = Modifier.weight(1f)) { onSkip() }
+            LingButton(if (step == 7) tr(R.string.wizard_034) else tr(R.string.chain_022), height = 50.dp, enabled = !busy && canAdopt(step, d), modifier = Modifier.weight(2f)) { onAdopt() }
         }
     }
 }
@@ -241,13 +248,13 @@ private fun StepFirstChapter(bookId: Long, d: WizardData) {
     }
     LingCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("第一章 · ${mode.value.label}模式", style = Ling.type.label, color = c.primary)
+            Text(tr(R.string.wizard_035, trText(mode.value.label)), style = Ling.type.label, color = c.primary)
             Text(
-                if (mode.value == WriteMode.Assist) "生成节拍清单和开篇示意：只进本章便签，正文由你写。"
-                else "先生成节拍，进编辑器后按节拍起草整章（草稿区分段采纳）。",
+                if (mode.value == WriteMode.Assist) tr(R.string.wizard_036)
+                else tr(R.string.wizard_037),
                 style = Ling.type.caption, color = c.onSurfaceVariant,
             )
-            if (busy) com.lingwrite.app.ui.ai.AiThinking("正在排节拍…")
+            if (busy) com.lingwrite.app.ui.ai.AiThinking(tr(R.string.chain_067))
             beats.forEachIndexed { i, b -> Text("${i + 1}. $b", style = Ling.type.bodyLarge.copy(lineHeight = 24.sp), color = c.onSurface) }
             openings.forEach { (t, e) ->
                 Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(c.surfaceContainer).padding(10.dp)) {
@@ -257,11 +264,11 @@ private fun StepFirstChapter(bookId: Long, d: WizardData) {
             }
             err?.let { Text(it, style = Ling.type.caption, color = c.error) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LingButton(if (busy) "生成中…" else if (beats.isEmpty()) "生成节拍" else "换一批节拍", BtnKind.Tonal, icon = LingIcons.SparkleFilled, enabled = !busy && chapterId != 0L, height = 40.dp) {
+                LingButton(if (busy) tr(R.string.ai_components_003) else if (beats.isEmpty()) tr(R.string.chain_068) else tr(R.string.wizard_038), BtnKind.Tonal, icon = LingIcons.SparkleFilled, enabled = !busy && chapterId != 0L, height = 40.dp) {
                     busy = true; err = null
                     scope.launch {
                         val r = com.lingwrite.app.data.ChainRunner.beats(bookId, chapterId)
-                        if (r.isEmpty()) err = "模型两次都没有按格式返回" else {
+                        if (r.isEmpty()) err = tr(R.string.chain_020) else {
                             beats = r
                             // 立刻写进 chapter_plans.beats（生成模式进编辑器就能按节拍起草）
                             com.lingwrite.app.data.ChainRunner.adoptBeats(bookId, chapterId, beats, emptyList(), assistMode = false)
@@ -269,7 +276,7 @@ private fun StepFirstChapter(bookId: Long, d: WizardData) {
                         busy = false
                     }
                 }
-                if (mode.value == WriteMode.Assist && beats.isNotEmpty()) LingButton("生成开篇示意", BtnKind.Text, height = 40.dp, enabled = !busy) {
+                if (mode.value == WriteMode.Assist && beats.isNotEmpty()) LingButton(tr(R.string.chain_069), BtnKind.Text, height = 40.dp, enabled = !busy) {
                     busy = true; err = null
                     scope.launch {
                         openings = com.lingwrite.app.data.ChainRunner.openings(bookId, beats)
@@ -279,14 +286,14 @@ private fun StepFirstChapter(bookId: Long, d: WizardData) {
                     }
                 }
             }
-            Text("下一步：点「采纳并去写第一章」进编辑器。辅助模式正文由你写；生成模式点「起草本章」按节拍起草。", style = Ling.type.caption, color = c.onSurfaceVariant)
+            Text(tr(R.string.wizard_039), style = Ling.type.caption, color = c.onSurfaceVariant)
         }
     }
 }
 
 @Composable
 private fun AiButton(text: String, busy: Boolean, again: Boolean, onClick: () -> Unit) =
-    LingButton(if (busy) "AI 正在想…" else if (again) "换一批" else text, if (again) BtnKind.Tonal else BtnKind.Filled, icon = LingIcons.SparkleFilled, enabled = !busy, modifier = Modifier.fillMaxWidth(), onClick = onClick)
+    LingButton(if (busy) tr(R.string.wizard_040) else if (again) tr(R.string.ai_components_008) else text, if (again) BtnKind.Tonal else BtnKind.Filled, icon = LingIcons.SparkleFilled, enabled = !busy, modifier = Modifier.fillMaxWidth(), onClick = onClick)
 
 @Composable
 private fun Choice(selected: Boolean, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
@@ -299,15 +306,15 @@ private fun Choice(selected: Boolean, onClick: () -> Unit, content: @Composable 
 @Composable
 private fun StepIdea(d: WizardData, onChange: (WizardData) -> Unit, busy: Boolean, gen: () -> Unit) {
     val c = Ling.colors
-    LingTextField(d.idea, { onChange(d.copy(idea = it)) }, label = "一句话灵感", singleLine = false, minLines = 2)
-    AiButton("扩展成 3 个梗概", busy || d.idea.isBlank(), d.pitches.isNotEmpty(), gen)
+    LingTextField(d.idea, { onChange(d.copy(idea = it)) }, label = tr(R.string.wizard_041), singleLine = false, minLines = 2)
+    AiButton(tr(R.string.wizard_042), busy || d.idea.isBlank(), d.pitches.isNotEmpty(), gen)
     d.pitches.forEach { p ->
         Choice(d.premise == p.logline, { onChange(d.copy(premise = p.logline)) }) {
             Text(p.title, style = Ling.type.titleSmall, color = c.onSurface)
             Text(p.logline, style = Ling.type.body.copy(lineHeight = 22.sp), color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
         }
     }
-    if (d.pitches.isNotEmpty() || d.premise.isNotBlank()) LingTextField(d.premise, { onChange(d.copy(premise = it)) }, label = "最终梗概（可以组合、改写）", singleLine = false, minLines = 3)
+    if (d.pitches.isNotEmpty() || d.premise.isNotBlank()) LingTextField(d.premise, { onChange(d.copy(premise = it)) }, label = tr(R.string.wizard_043), singleLine = false, minLines = 3)
 }
 
 @Composable
@@ -321,16 +328,16 @@ private fun StepStyle(d: WizardData, onChange: (WizardData) -> Unit, busy0: Bool
         busy = true; onErr(null)
         scope.launch {
             val text = withContext(Dispatchers.IO) { uris.joinToString("\n\n") { u -> ctx.contentResolver.openInputStream(u)?.bufferedReader()?.readText().orEmpty() } }
-            AppGraph.ai.complete("style", "你是文风分析师。", WizardPrompts.style(text), bookId, null, 600, Slot.Writing)
+            AppGraph.ai.complete("style", trZh(R.string.style_009), WizardPrompts.style(text), bookId, null, 600, Slot.Writing)
                 .onSuccess { onChange(d.copy(style = it.trim())) }.onFailure { onErr(it.message) }
             busy = false
         }
     }
-    Text("题材", style = Ling.type.label, color = c.primary)
+    Text(tr(R.string.wizard_044), style = Ling.type.label, color = c.primary)
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Genres.forEach { g -> LingChip(d.genre == g, { onChange(d.copy(genre = if (d.genre == g) "" else g)) }, g) }
     }
-    Text("网文模板", style = Ling.type.label, color = c.primary)
+    Text(tr(R.string.outline_032), style = Ling.type.label, color = c.primary)
     OutlineTemplates.forEach { t ->
         val on = t.id in d.templates
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).rowClick { onChange(d.copy(templates = if (on) d.templates - t.id else d.templates + t.id)) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -338,16 +345,16 @@ private fun StepStyle(d: WizardData, onChange: (WizardData) -> Unit, busy0: Bool
             Column { Text(t.name, style = Ling.type.bodyLarge, color = c.onSurface); Text(t.desc, style = Ling.type.caption, color = c.onSurfaceVariant) }
         }
     }
-    Text("目标读者", style = Ling.type.label, color = c.primary)
+    Text(tr(R.string.wizard_045), style = Ling.type.label, color = c.primary)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("男频", "女频", "通用").forEach { r -> LingChip(d.reader == r, { onChange(d.copy(reader = if (d.reader == r) "" else r)) }, r) }
+        listOf(tr(R.string.wizard_046), tr(R.string.wizard_047), tr(R.string.wizard_048)).forEach { r -> LingChip(d.reader == r, { onChange(d.copy(reader = if (d.reader == r) "" else r)) }, r) }
     }
-    Text("文风卡（可选）", style = Ling.type.label, color = c.primary)
-    LingButton(if (busy) "正在学习样章…" else "上传样章（txt，可多选）", BtnKind.Tonal, icon = LingIcons.Add, enabled = !busy && !busy0, modifier = Modifier.fillMaxWidth()) { picker.launch("text/*") }
-    if (d.style.isNotBlank()) LingTextField(d.style, { onChange(d.copy(style = it)) }, label = "文风卡（可编辑，会附在写作提示词里）", singleLine = false, minLines = 4)
+    Text(tr(R.string.wizard_049), style = Ling.type.label, color = c.primary)
+    LingButton(if (busy) tr(R.string.wizard_050) else tr(R.string.wizard_051), BtnKind.Tonal, icon = LingIcons.Add, enabled = !busy && !busy0, modifier = Modifier.fillMaxWidth()) { picker.launch("text/*") }
+    if (d.style.isNotBlank()) LingTextField(d.style, { onChange(d.copy(style = it)) }, label = tr(R.string.wizard_052), singleLine = false, minLines = 4)
     // A12 入口（ai-features §12）：从样章学结构 → 拆文页
     val navHost = LocalNav.current
-    LingButton("从样章学结构（拆文）", BtnKind.Outlined, icon = LingIcons.Graph, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+    LingButton(tr(R.string.wizard_053), BtnKind.Outlined, icon = LingIcons.Graph, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
         navHost.navigate(com.lingwrite.app.ui.Routes.breakdown(bookId))
     }
 }
@@ -355,7 +362,7 @@ private fun StepStyle(d: WizardData, onChange: (WizardData) -> Unit, busy0: Bool
 @Composable
 private fun StepChars(d: WizardData, onChange: (WizardData) -> Unit, busy: Boolean, gen: () -> Unit) {
     val c = Ling.colors
-    AiButton("生成人物卡", busy, d.chars.isNotEmpty(), gen)
+    AiButton(tr(R.string.wizard_054), busy, d.chars.isNotEmpty(), gen)
     d.chars.forEachIndexed { i, ch ->
         fun up(n: CharDraft) = onChange(d.copy(chars = d.chars.toMutableList().also { it[i] = n }))
         Choice(ch.take, { up(ch.copy(take = !ch.take)) }) {
@@ -369,9 +376,9 @@ private fun StepChars(d: WizardData, onChange: (WizardData) -> Unit, busy: Boole
             }
             if (ch.take) {
                 Spacer(Modifier.height(8.dp))
-                LingTextField(ch.personality, { up(ch.copy(personality = it)) }, label = "性格", singleLine = false)
-                LingTextField(ch.motive, { up(ch.copy(motive = it)) }, label = "动机", singleLine = false)
-                if (ch.cheat.isNotBlank() || ch.role.contains("主角")) LingTextField(ch.cheat, { up(ch.copy(cheat = it)) }, label = "金手指", singleLine = false)
+                LingTextField(ch.personality, { up(ch.copy(personality = it)) }, label = tr(R.string.wizard_025), singleLine = false)
+                LingTextField(ch.motive, { up(ch.copy(motive = it)) }, label = tr(R.string.wizard_055), singleLine = false)
+                if (ch.cheat.isNotBlank() || ch.role.contains("主角")) LingTextField(ch.cheat, { up(ch.copy(cheat = it)) }, label = tr(R.string.wizard_027), singleLine = false)
             }
         }
     }
@@ -380,14 +387,14 @@ private fun StepChars(d: WizardData, onChange: (WizardData) -> Unit, busy: Boole
 @Composable
 private fun StepWorld(d: WizardData, onChange: (WizardData) -> Unit, busy: Boolean, gen: () -> Unit) {
     val c = Ling.colors
-    AiButton("生成世界观设定", busy, d.world.isNotEmpty(), gen)
+    AiButton(tr(R.string.wizard_056), busy, d.world.isNotEmpty(), gen)
     d.world.forEachIndexed { i, w ->
         fun up(n: WorldDraft) = onChange(d.copy(world = d.world.toMutableList().also { it[i] = n }))
         Choice(w.take, { up(w.copy(take = !w.take)) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Tile(typeIcon(LoreType.of(w.type)), c.surfaceContainer, c.onSurfaceVariant, 34.dp)
                 Text(w.name, style = Ling.type.titleSmall, color = c.onSurface, modifier = Modifier.padding(start = 12.dp).weight(1f))
-                Pill(LoreType.of(w.type).label, PillKind.Neutral)
+                Pill(trText(LoreType.of(w.type).label), PillKind.Neutral)
                 Checkbox(w.take, { up(w.copy(take = it)) })
             }
             if (w.take) LingTextField(w.desc, { up(w.copy(desc = it)) }, Modifier.padding(top = 8.dp), singleLine = false)
@@ -397,53 +404,53 @@ private fun StepWorld(d: WizardData, onChange: (WizardData) -> Unit, busy: Boole
 
 @Composable
 private fun StepSynopsis(d: WizardData, onChange: (WizardData) -> Unit, busy: Boolean, gen: () -> Unit) {
-    AiButton("生成总纲和第一卷卷纲", busy, d.synopsis.isNotBlank(), gen)
+    AiButton(tr(R.string.wizard_057), busy, d.synopsis.isNotBlank(), gen)
     if (d.synopsis.isNotBlank()) {
-        LingTextField(d.synopsis, { onChange(d.copy(synopsis = it)) }, label = "总纲", singleLine = false, minLines = 5)
-        LingTextField(d.volumeTitle, { onChange(d.copy(volumeTitle = it)) }, label = "第一卷卷名（可空）", placeholder = "比如：山门初入，不用写“第一卷”")
-        LingTextField(d.volumeOutline, { onChange(d.copy(volumeOutline = it)) }, label = "第一卷卷纲", singleLine = false, minLines = 4)
+        LingTextField(d.synopsis, { onChange(d.copy(synopsis = it)) }, label = tr(R.string.outline_009), singleLine = false, minLines = 5)
+        LingTextField(d.volumeTitle, { onChange(d.copy(volumeTitle = it)) }, label = tr(R.string.wizard_058), placeholder = tr(R.string.wizard_059))
+        LingTextField(d.volumeOutline, { onChange(d.copy(volumeOutline = it)) }, label = tr(R.string.wizard_060), singleLine = false, minLines = 4)
     }
 }
 
 @Composable
 private fun StepTitles(d: WizardData, onChange: (WizardData) -> Unit, busy: Boolean, gen: () -> Unit) {
     val c = Ling.colors
-    AiButton("生成书名和简介", busy, d.titles.isNotEmpty(), gen)
+    AiButton(tr(R.string.wizard_061), busy, d.titles.isNotEmpty(), gen)
     if (d.titles.isNotEmpty()) {
-        Text("书名", style = Ling.type.label, color = c.primary)
+        Text(tr(R.string.wizard_062), style = Ling.type.label, color = c.primary)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             d.titles.forEach { t -> LingChip(d.title == t, { onChange(d.copy(title = t)) }, t) }
         }
     }
-    LingTextField(d.title, { onChange(d.copy(title = it)) }, label = "书名")
-    if (d.blurbs.isNotEmpty()) Text("简介", style = Ling.type.label, color = c.primary)
+    LingTextField(d.title, { onChange(d.copy(title = it)) }, label = tr(R.string.wizard_062))
+    if (d.blurbs.isNotEmpty()) Text(tr(R.string.wizard_063), style = Ling.type.label, color = c.primary)
     d.blurbs.forEachIndexed { i, b ->
         Choice(d.blurb == b, { onChange(d.copy(blurb = b)) }) {
-            Text("第 ${i + 1} 版", style = Ling.type.caption, color = c.primary)
+            Text(tr(R.string.wizard_064, i + 1), style = Ling.type.caption, color = c.primary)
             Text(b, style = Ling.type.body.copy(lineHeight = 22.sp), color = c.onSurface)
         }
     }
-    if (d.blurb.isNotBlank() || d.blurbs.isNotEmpty()) LingTextField(d.blurb, { onChange(d.copy(blurb = it)) }, label = "最终简介", singleLine = false, minLines = 3)
+    if (d.blurb.isNotBlank() || d.blurbs.isNotEmpty()) LingTextField(d.blurb, { onChange(d.copy(blurb = it)) }, label = tr(R.string.wizard_065), singleLine = false, minLines = 3)
 }
 
 @Composable
 private fun StepChapters(d: WizardData, onChange: (WizardData) -> Unit, busy: Boolean, gen: () -> Unit) {
     val c = Ling.colors
-    AiButton("生成前三章章纲", busy, d.chapters.isNotEmpty(), gen)
+    AiButton(tr(R.string.wizard_066), busy, d.chapters.isNotEmpty(), gen)
     d.chapters.forEachIndexed { i, cd ->
         fun up(n: ChapterDraft) = onChange(d.copy(chapters = d.chapters.toMutableList().also { it[i] = n }))
         LingCard {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("第 ${i + 1} 章", style = Ling.type.caption, color = c.primary)
-                LingTextField(cd.title, { up(cd.copy(title = it)) }, label = "章名")
-                LingTextField(cd.event, { up(cd.copy(event = it)) }, label = "核心事件", singleLine = false)
-                LingTextField(cd.hook, { up(cd.copy(hook = it)) }, label = "开篇钩子", singleLine = false)
-                LingTextField(cd.cliff, { up(cd.copy(cliff = it)) }, label = "章尾悬念", singleLine = false)
+                Text(tr(R.string.breakdown_015, i + 1), style = Ling.type.caption, color = c.primary)
+                LingTextField(cd.title, { up(cd.copy(title = it)) }, label = tr(R.string.wizard_067))
+                LingTextField(cd.event, { up(cd.copy(event = it)) }, label = tr(R.string.outline_051), singleLine = false)
+                LingTextField(cd.hook, { up(cd.copy(hook = it)) }, label = tr(R.string.outline_052), singleLine = false)
+                LingTextField(cd.cliff, { up(cd.copy(cliff = it)) }, label = tr(R.string.outline_053), singleLine = false)
             }
         }
     }
     if (d.chapters.isNotEmpty()) {
-        Text("黄金三章提示", style = Ling.type.label, color = c.primary)
+        Text(tr(R.string.wizard_068), style = Ling.type.label, color = c.primary)
         LingCard(color = c.surfaceContainer) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 val all = d.chapters.joinToString(" ") { it.event + it.hook + it.cliff }
@@ -456,7 +463,7 @@ private fun StepChapters(d: WizardData, onChange: (WizardData) -> Unit, busy: Bo
                     }
                     Text((when (hint) { true -> "✓ "; false -> "✗ "; else -> "· " }) + g, style = Ling.type.caption, color = if (hint == false) c.error else c.onSurfaceVariant)
                 }
-                Text("写完前三章后，可在 大纲 › 黄金三章 让 AI 对照正文逐项检查。", style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+                Text(tr(R.string.wizard_069), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
                 if (all.isBlank()) Spacer(Modifier)
             }
         }
