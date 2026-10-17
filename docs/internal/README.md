@@ -7,6 +7,10 @@
 |---|---|
 | [novel-app-plan.md](../../novel-app-plan.md) | 项目计划主文档：已决事项、MVP 17 项、创作流程、AI 能力、技术架构、里程碑 |
 | [author-research.md](../../author-research.md) | 真实作者写作流程与同类工具调研（附来源） |
+| [author-roadmap.md](../author-roadmap.md) | 作者视角功能路线图 v0.4–v0.6：痛点、优先级、版本门、指标与不做清单 |
+| [v0.4-plan.md](../v0.4-plan.md) | v0.4「能长期写」：长篇性能与数据安全、作品导入、导出+发布检查、专注、速查 |
+| [v0.5-plan.md](../v0.5-plan.md) | v0.5「写作闭环」：追读数据、大纲同步、一致性扩展+事件轴、AI 使用体检、听稿 |
+| [v0.6-plan.md](../v0.6-plan.md) | v0.6「差异化」：场景级协作流、伏笔回收日历、系列共享设定 |
 | [plan-review.md](../../plan-review.md) | 计划审查与待拍板 / 已决事项 |
 | [ui-plan.md](../../ui-plan.md) | 界面规划：页面结构、悬浮玻璃 dock、各页细节 |
 | [ui-hifi/](../../ui-hifi/) | 高保真界面稿（浅色 / 深色 PNG，412×915 @2x）及 HTML 源码 `src/`，`overview-light.png` 为总览 |
