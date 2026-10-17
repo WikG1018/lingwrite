@@ -1496,5 +1496,21 @@
 "outline_106": "次の 3–5 章を計画",
 "outline_107": "旧章綱",
 "outline_108": "新章綱",
-"outline_109": "項目：%1$s"
+"outline_109": "項目：%1$s",
+"timeline_001": "章イベント軸",
+"timeline_002": "すべて",
+"timeline_003": "人物",
+"timeline_004": "場所",
+"timeline_005": "物品",
+"timeline_006": "能力",
+"timeline_007": "伏線",
+"timeline_008": "章綱",
+"timeline_009": "章順です。作中時間は章綱の注記に従います。",
+"timeline_010": "イベントはまだありません",
+"timeline_011": "第 %1$d 章",
+"timeline_012": "設置",
+"timeline_013": "回収予定",
+"timeline_014": "設定変更",
+"timeline_015": "関係変更",
+"timeline_016": "章綱"
 }

@@ -1500,4 +1500,20 @@
     <string name="outline_107">Old outline</string>
     <string name="outline_108">New outline</string>
     <string name="outline_109" formatted="false">Fields: %1$s</string>
+    <string name="timeline_001">Chapter timeline</string>
+    <string name="timeline_002">All</string>
+    <string name="timeline_003">Characters</string>
+    <string name="timeline_004">Places</string>
+    <string name="timeline_005">Items</string>
+    <string name="timeline_006">Power</string>
+    <string name="timeline_007">Foreshadowing</string>
+    <string name="timeline_008">Outline</string>
+    <string name="timeline_009">Ordered by chapter; in-story time follows the outline note.</string>
+    <string name="timeline_010">No events yet</string>
+    <string name="timeline_011" formatted="false">Chapter %1$d</string>
+    <string name="timeline_012">Planted</string>
+    <string name="timeline_013">Planned payoff</string>
+    <string name="timeline_014">Lore change</string>
+    <string name="timeline_015">Relationship change</string>
+    <string name="timeline_016">Outline</string>
 </resources>

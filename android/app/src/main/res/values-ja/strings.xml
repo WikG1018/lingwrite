@@ -1500,4 +1500,20 @@
     <string name="outline_107">旧章綱</string>
     <string name="outline_108">新章綱</string>
     <string name="outline_109" formatted="false">項目：%1$s</string>
+    <string name="timeline_001">章イベント軸</string>
+    <string name="timeline_002">すべて</string>
+    <string name="timeline_003">人物</string>
+    <string name="timeline_004">場所</string>
+    <string name="timeline_005">物品</string>
+    <string name="timeline_006">能力</string>
+    <string name="timeline_007">伏線</string>
+    <string name="timeline_008">章綱</string>
+    <string name="timeline_009">章順です。作中時間は章綱の注記に従います。</string>
+    <string name="timeline_010">イベントはまだありません</string>
+    <string name="timeline_011" formatted="false">第 %1$d 章</string>
+    <string name="timeline_012">設置</string>
+    <string name="timeline_013">回収予定</string>
+    <string name="timeline_014">設定変更</string>
+    <string name="timeline_015">関係変更</string>
+    <string name="timeline_016">章綱</string>
 </resources>

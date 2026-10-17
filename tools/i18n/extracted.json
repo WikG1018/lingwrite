@@ -7864,6 +7864,86 @@
    "字段：%1$s",
    0,
    "OutlineRoute.kt"
+  ],
+  "timeline_001": [
+   "章节事件轴",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_002": [
+   "全部",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_003": [
+   "人物",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_004": [
+   "地点",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_005": [
+   "物品",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_006": [
+   "能力",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_007": [
+   "伏笔",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_008": [
+   "章纲",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_009": [
+   "按章节顺序；故事内时间以章纲标注为准。",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_010": [
+   "暂无事件",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_011": [
+   "第 %1$d 章",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_012": [
+   "埋设",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_013": [
+   "计划回收",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_014": [
+   "设定变化",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_015": [
+   "关系变化",
+   0,
+   "TimelineRoute.kt"
+  ],
+  "timeline_016": [
+   "章纲",
+   0,
+   "TimelineRoute.kt"
   ]
  },
  "skipped": [

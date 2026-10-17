@@ -1496,5 +1496,21 @@
 "outline_106": "Plan next 3–5 chapters",
 "outline_107": "Old outline",
 "outline_108": "New outline",
-"outline_109": "Fields: %1$s"
+"outline_109": "Fields: %1$s",
+"timeline_001": "Chapter timeline",
+"timeline_002": "All",
+"timeline_003": "Characters",
+"timeline_004": "Places",
+"timeline_005": "Items",
+"timeline_006": "Power",
+"timeline_007": "Foreshadowing",
+"timeline_008": "Outline",
+"timeline_009": "Ordered by chapter; in-story time follows the outline note.",
+"timeline_010": "No events yet",
+"timeline_011": "Chapter %1$d",
+"timeline_012": "Planted",
+"timeline_013": "Planned payoff",
+"timeline_014": "Lore change",
+"timeline_015": "Relationship change",
+"timeline_016": "Outline"
 }
