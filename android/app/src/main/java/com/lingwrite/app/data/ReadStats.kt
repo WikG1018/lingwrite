@@ -55,8 +55,17 @@ object ReadStats {
     fun parseTable(text: String): List<ReadPoint> {
         val lines = text.lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toList()
         if (lines.isEmpty()) return emptyList()
-        fun cells(line: String): List<String> = line.split('\t', ',', '，', ';', '；').map { it.trim() }.filter { it.isNotEmpty() }
-            .ifEmpty { line.split(Regex("\\s+")) }
+        fun cells(line: String): List<String> {
+            // 优先用制表符/分号；只有没有这些分隔符时才按逗号分，且不把 1,200 这种千分位拆开。
+            val parts = when {
+                line.contains('\t') -> line.split('\t')
+                line.contains('；') -> line.split('；')
+                line.contains(';') -> line.split(';')
+                line.contains('，') -> line.split('，')
+                else -> line.split(Regex(",(?![0-9]{3}(?:\\D|$))"))
+            }
+            return parts.map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { line.split(Regex("\\s+")) }
+        }
         val header = cells(lines.first())
         val hasHeader = header.any { it.contains("章") } && header.any { it.contains("追读") || it.contains("阅读") || it.contains("完读") }
         val idx = if (hasHeader) {
