@@ -189,7 +189,7 @@ private fun AddSeriesLoreSheet(seriesId: Long, onDismiss: () -> Unit) {
             LingTextField(fieldsText, { fieldsText = it }, label = tr(R.string.series_015), singleLine = false, minLines = 3)
             LingButton(tr(R.string.series_016), enabled = name.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 48.dp) {
                 val fields = fieldsText.lines().mapNotNull { line ->
-                    val i = line.indexOf('=', '：', ':')
+                    val i = line.indexOfFirst { it == '=' || it == '：' || it == ':' }
                     if (i <= 0) null else Field(line.substring(0, i).trim(), line.substring(i + 1).trim())
                 }
                 scope.launch {
