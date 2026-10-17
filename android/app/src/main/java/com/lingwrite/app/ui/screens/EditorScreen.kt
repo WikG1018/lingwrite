@@ -106,7 +106,7 @@ fun EditorScreen(
     directory: (@Composable () -> Unit)? = null,
     tools: (@Composable (Int) -> Unit)? = null,
     bottomPanel: @Composable ColumnScope.() -> Unit = { SuggestionCard(FakeData.suggestion, tr(R.string.editor_055)); ToolChips(0) {} },
-    focus: Boolean = false,
+    focusMode: Boolean = false,
     onExitFocus: () -> Unit = {},
     focusWords: Int = 0,
     focusTarget: Int = 2000,
@@ -122,7 +122,7 @@ fun EditorScreen(
     val responsive = directory != null && tools != null
     val tablet = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 720 && responsive
     val a = actions.copy(onAi = { toolTab = 3; toolsOpen = true; actions.onAi() })
-    if (focus) {
+    if (focusMode) {
         Column(Modifier.fillMaxSize().background(c.paper).imePadding().statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 LingIconButton(LingIcons.Close, tr(R.string.focus_002), onClick = onExitFocus)

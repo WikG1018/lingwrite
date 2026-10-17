@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -367,13 +368,13 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             onSave = { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) },
             onFocus = { focus = true },
         ),
-        focus = focus,
+        focusMode = focus,
         onExitFocus = { if (focusWords >= focusTarget) focus = false else exitFocusConfirm = true },
         focusWords = focusWords,
         focusTarget = focusTarget,
         focusElapsed = focusElapsed,
         focusPercent = focusPercent,
-        typewriter = p?.focusTypewriter ?: true,,
+        typewriter = p?.focusTypewriter ?: true,
         directory = { EditorDirectory(st, nav) },
         tools = { tab -> EditorInspector(st, nav, tab) },
         bottomPanel = { EditorHooks.aiPanel(this, st, aiOpen) },
