@@ -1516,4 +1516,18 @@
     <string name="timeline_014">設定変更</string>
     <string name="timeline_015">関係変更</string>
     <string name="timeline_016">章綱</string>
+    <string name="usage_001">AI 使用チェック</string>
+    <string name="usage_002">AI マーク文字率</string>
+    <string name="usage_003">採用率</string>
+    <string name="usage_004">章別</string>
+    <string name="usage_005">タスク別</string>
+    <string name="usage_006">レポートを書き出す</string>
+    <string name="usage_007">このアプリ内でマークされた AI 段落のみを集計します。手動修正や外部からの貼り付けは含みません。プラットフォームの判定ではなく、検出回避のためでもありません。</string>
+    <string name="usage_008" formatted="false">AI 生成 %1$d%% · 人手修正 %2$d%%</string>
+    <string name="usage_009" formatted="false">全 %1$d 字</string>
+    <string name="usage_010" formatted="false">%1$d 回呼び出し · %2$d 採用</string>
+    <string name="usage_011">AI 使用記録はまだありません</string>
+    <string name="usage_012">レポートを書き出しました</string>
+    <string name="usage_013" formatted="false">第 %1$d 章</string>
+    <string name="usage_014">タスク</string>
 </resources>

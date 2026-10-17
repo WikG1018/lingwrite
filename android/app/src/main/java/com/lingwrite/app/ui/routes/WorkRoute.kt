@@ -45,7 +45,7 @@ private fun TabPlaceholder(name: String) {
 }
 
 @Composable
-fun WorkRoute(bookId: Long, onBack: () -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onExport: (Long) -> Unit, onPublishCheck: (Long) -> Unit = {}, onReadStats: (Long) -> Unit = {}, onTimeline: (Long) -> Unit = {}, initialTab: Int = 0) {
+fun WorkRoute(bookId: Long, onBack: () -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onExport: (Long) -> Unit, onPublishCheck: (Long) -> Unit = {}, onReadStats: (Long) -> Unit = {}, onTimeline: (Long) -> Unit = {}, onAiUsage: (Long) -> Unit = {}, initialTab: Int = 0) {
     val repo = AppGraph.books
     val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     val scope = rememberCoroutineScope()
@@ -187,6 +187,7 @@ fun WorkRoute(bookId: Long, onBack: () -> Unit, onOpenChapter: (Long) -> Unit, o
         SheetAction(LingIcons.FactCheck, tr(R.string.publish_001), sub = tr(R.string.publish_015)) { onPublishCheck(bookId); bookMenu = false }
         SheetAction(LingIcons.Graph, tr(R.string.read_001), sub = tr(R.string.read_011)) { onReadStats(bookId); bookMenu = false }
         SheetAction(LingIcons.Schedule, tr(R.string.timeline_001), sub = tr(R.string.timeline_009)) { onTimeline(bookId); bookMenu = false }
+        SheetAction(LingIcons.Sparkle, tr(R.string.usage_001), sub = tr(R.string.usage_007)) { onAiUsage(bookId); bookMenu = false }
     }
     if (newVolume) {
         var t by remember { mutableStateOf("") }
