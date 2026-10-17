@@ -307,7 +307,7 @@ object Backup {
         return f
     }
 
-    fun autoBackups(ctx: Context): List<File> = File(ctx.filesDir, "backups").listFiles()?.sortedByDescending { it.name }.orEmpty()
+    fun autoBackups(ctx: Context): List<File> = File(ctx.filesDir, "backups").listFiles { f -> f.isFile && f.name.startsWith("auto-") }?.sortedByDescending { it.name }.orEmpty()
 }
 
 /** 文本导出。 */
