@@ -8169,6 +8169,41 @@
    "没有生成候选，请重试",
    0,
    "WriteFlowSheet.kt"
+  ],
+  "fc_001": [
+   "伏笔回收日历",
+   0,
+   "CheckRoute.kt"
+  ],
+  "fc_002": [
+   "逾期 %1$d 条",
+   0,
+   "CheckRoute.kt"
+  ],
+  "fc_003": [
+   "临期 %1$d 条",
+   0,
+   "CheckRoute.kt"
+  ],
+  "fc_004": [
+   "第 %1$d 章 · %2$d 条",
+   0,
+   "CheckRoute.kt"
+  ],
+  "fc_005": [
+   "按最近 7 天速度约 %1$d 天后",
+   0,
+   "CheckRoute.kt"
+  ],
+  "fc_006": [
+   "未定回收章 %1$d 条",
+   0,
+   "CheckRoute.kt"
+  ],
+  "fc_007": [
+   "最近 3 章没有新伏笔，建议补一条",
+   0,
+   "CheckRoute.kt"
   ]
  },
  "skipped": [

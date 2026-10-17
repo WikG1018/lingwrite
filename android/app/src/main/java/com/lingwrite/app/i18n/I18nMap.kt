@@ -1421,8 +1421,15 @@ private fun part5(m: HashMap<String, Int>) {
     m["AI 腔提示 %1\$d 处"] = R.string.wf_021
     m["写前先看章纲和前情；写后过一遍自查。只给候选，不写正文。"] = R.string.wf_022
     m["没有生成候选，请重试"] = R.string.wf_023
+    m["伏笔回收日历"] = R.string.fc_001
+    m["逾期 %1\$d 条"] = R.string.fc_002
+    m["临期 %1\$d 条"] = R.string.fc_003
+    m["第 %1\$d 章 · %2\$d 条"] = R.string.fc_004
+    m["按最近 7 天速度约 %1\$d 天后"] = R.string.fc_005
+    m["未定回收章 %1\$d 条"] = R.string.fc_006
+    m["最近 3 章没有新伏笔，建议补一条"] = R.string.fc_007
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2810).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2824).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh
