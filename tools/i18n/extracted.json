@@ -8014,6 +8014,46 @@
    "任务",
    0,
    "AiUsageRoute.kt"
+  ],
+  "tts_001": [
+   "朗读本章",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_002": [
+   "播放",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_003": [
+   "停止",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_004": [
+   "语速",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_005": [
+   "系统语音引擎不可用，或缺少中文语音包。",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_006": [
+   "正在初始化语音…",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_007": [
+   "从当前段开始",
+   0,
+   "TtsSheet.kt"
+  ],
+  "tts_008": [
+   "系统语音引擎可能联网，由系统设置决定；灵写不保存音频。",
+   0,
+   "TtsSheet.kt"
   ]
  },
  "skipped": [
