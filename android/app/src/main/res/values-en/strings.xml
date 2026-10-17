@@ -1538,4 +1538,27 @@
     <string name="tts_006">Initializing speech…</string>
     <string name="tts_007">Start from current paragraph</string>
     <string name="tts_008">The system speech engine may use the network depending on system settings; LingWrite stores no audio.</string>
+    <string name="wf_001">Write this chapter</string>
+    <string name="wf_002">Before</string>
+    <string name="wf_003">During</string>
+    <string name="wf_004">After</string>
+    <string name="wf_005">Chapter outline</string>
+    <string name="wf_006">Related foreshadowing</string>
+    <string name="wf_007">Recap</string>
+    <string name="wf_008">AI: 3 opening directions</string>
+    <string name="wf_009">Generating…</string>
+    <string name="wf_010">Copy</string>
+    <string name="wf_011">Copied</string>
+    <string name="wf_012">Stuck rescue</string>
+    <string name="wf_013">Quick ask</string>
+    <string name="wf_014">Keep writing</string>
+    <string name="wf_015">Chapter self-check</string>
+    <string name="wf_016" formatted="false">%1$d characters</string>
+    <string name="wf_017">Outline filled</string>
+    <string name="wf_018">Outline missing</string>
+    <string name="wf_019" formatted="false">Outline not landed: %1$s</string>
+    <string name="wf_020" formatted="false">%1$d open foreshadows</string>
+    <string name="wf_021" formatted="false">%1$d AI-tone hints</string>
+    <string name="wf_022">Check the outline and recap before writing; run the self-check after. Candidates only, never body text.</string>
+    <string name="wf_023">No candidates generated. Try again.</string>
 </resources>

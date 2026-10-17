@@ -8054,6 +8054,121 @@
    "系统语音引擎可能联网，由系统设置决定；灵写不保存音频。",
    0,
    "TtsSheet.kt"
+  ],
+  "wf_001": [
+   "写这一章",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_002": [
+   "写前",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_003": [
+   "写中",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_004": [
+   "写后",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_005": [
+   "本章章纲",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_006": [
+   "相关伏笔",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_007": [
+   "前情摘要",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_008": [
+   "AI 给 3 个开场方向",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_009": [
+   "生成中…",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_010": [
+   "复制",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_011": [
+   "已复制",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_012": [
+   "卡文急救",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_013": [
+   "随手问",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_014": [
+   "继续写",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_015": [
+   "本章自查",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_016": [
+   "字数 %1$d",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_017": [
+   "章纲已填",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_018": [
+   "章纲未填",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_019": [
+   "章纲未落实：%1$s",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_020": [
+   "未回收伏笔 %1$d 条",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_021": [
+   "AI 腔提示 %1$d 处",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_022": [
+   "写前先看章纲和前情；写后过一遍自查。只给候选，不写正文。",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_023": [
+   "没有生成候选，请重试",
+   0,
+   "WriteFlowSheet.kt"
   ]
  },
  "skipped": [

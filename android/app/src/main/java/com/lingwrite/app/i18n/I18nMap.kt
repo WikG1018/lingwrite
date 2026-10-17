@@ -1398,8 +1398,31 @@ private fun part5(m: HashMap<String, Int>) {
     m["正在初始化语音…"] = R.string.tts_006
     m["从当前段开始"] = R.string.tts_007
     m["系统语音引擎可能联网，由系统设置决定；灵写不保存音频。"] = R.string.tts_008
+    m["写这一章"] = R.string.wf_001
+    m["写前"] = R.string.wf_002
+    m["写中"] = R.string.wf_003
+    m["写后"] = R.string.wf_004
+    m["本章章纲"] = R.string.wf_005
+    m["相关伏笔"] = R.string.wf_006
+    m["前情摘要"] = R.string.wf_007
+    m["AI 给 3 个开场方向"] = R.string.wf_008
+    m["生成中…"] = R.string.wf_009
+    m["复制"] = R.string.wf_010
+    m["已复制"] = R.string.wf_011
+    m["卡文急救"] = R.string.wf_012
+    m["随手问"] = R.string.wf_013
+    m["继续写"] = R.string.wf_014
+    m["本章自查"] = R.string.wf_015
+    m["字数 %1\$d"] = R.string.wf_016
+    m["章纲已填"] = R.string.wf_017
+    m["章纲未填"] = R.string.wf_018
+    m["章纲未落实：%1\$s"] = R.string.wf_019
+    m["未回收伏笔 %1\$d 条"] = R.string.wf_020
+    m["AI 腔提示 %1\$d 处"] = R.string.wf_021
+    m["写前先看章纲和前情；写后过一遍自查。只给候选，不写正文。"] = R.string.wf_022
+    m["没有生成候选，请重试"] = R.string.wf_023
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2764).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2810).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

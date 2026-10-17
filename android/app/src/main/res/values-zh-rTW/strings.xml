@@ -1613,4 +1613,27 @@
     <string name="tts_006">正在初始化語音…</string>
     <string name="tts_007">從目前段落開始</string>
     <string name="tts_008">系統語音引擎可能連網，由系統設定決定；靈寫不儲存音訊。</string>
+    <string name="wf_001">寫這一章</string>
+    <string name="wf_002">寫前</string>
+    <string name="wf_003">寫中</string>
+    <string name="wf_004">寫後</string>
+    <string name="wf_005">本章章綱</string>
+    <string name="wf_006">相關伏筆</string>
+    <string name="wf_007">前情摘要</string>
+    <string name="wf_008">AI 給 3 個開場方向</string>
+    <string name="wf_009">生成中…</string>
+    <string name="wf_010">複製</string>
+    <string name="wf_011">已複製</string>
+    <string name="wf_012">卡文急救</string>
+    <string name="wf_013">隨手問</string>
+    <string name="wf_014">繼續寫</string>
+    <string name="wf_015">本章自查</string>
+    <string name="wf_016" formatted="false">字數 %1$d</string>
+    <string name="wf_017">章綱已填</string>
+    <string name="wf_018">章綱未填</string>
+    <string name="wf_019" formatted="false">章綱未落實：%1$s</string>
+    <string name="wf_020" formatted="false">未回收伏筆 %1$d 條</string>
+    <string name="wf_021" formatted="false">AI 腔提示 %1$d 處</string>
+    <string name="wf_022">寫前先看章綱和前情；寫後過一遍自查。只給候選，不寫正文。</string>
+    <string name="wf_023">沒有生成候選，請重試</string>
 </resources>

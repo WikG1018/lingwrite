@@ -1613,4 +1613,27 @@
     <string name="tts_006">正在初始化语音…</string>
     <string name="tts_007">从当前段开始</string>
     <string name="tts_008">系统语音引擎可能联网，由系统设置决定；灵写不保存音频。</string>
+    <string name="wf_001">写这一章</string>
+    <string name="wf_002">写前</string>
+    <string name="wf_003">写中</string>
+    <string name="wf_004">写后</string>
+    <string name="wf_005">本章章纲</string>
+    <string name="wf_006">相关伏笔</string>
+    <string name="wf_007">前情摘要</string>
+    <string name="wf_008">AI 给 3 个开场方向</string>
+    <string name="wf_009">生成中…</string>
+    <string name="wf_010">复制</string>
+    <string name="wf_011">已复制</string>
+    <string name="wf_012">卡文急救</string>
+    <string name="wf_013">随手问</string>
+    <string name="wf_014">继续写</string>
+    <string name="wf_015">本章自查</string>
+    <string name="wf_016" formatted="false">字数 %1$d</string>
+    <string name="wf_017">章纲已填</string>
+    <string name="wf_018">章纲未填</string>
+    <string name="wf_019" formatted="false">章纲未落实：%1$s</string>
+    <string name="wf_020" formatted="false">未回收伏笔 %1$d 条</string>
+    <string name="wf_021" formatted="false">AI 腔提示 %1$d 处</string>
+    <string name="wf_022">写前先看章纲和前情；写后过一遍自查。只给候选，不写正文。</string>
+    <string name="wf_023">没有生成候选，请重试</string>
 </resources>

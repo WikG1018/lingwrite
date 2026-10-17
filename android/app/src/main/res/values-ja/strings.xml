@@ -1538,4 +1538,27 @@
     <string name="tts_006">音声を初期化中…</string>
     <string name="tts_007">現在の段落から開始</string>
     <string name="tts_008">システムの音声エンジンは設定によりネットワークを使う場合があります。霊写は音声を保存しません。</string>
+    <string name="wf_001">この章を書く</string>
+    <string name="wf_002">書く前</string>
+    <string name="wf_003">書いている間</string>
+    <string name="wf_004">書いた後</string>
+    <string name="wf_005">この章の章綱</string>
+    <string name="wf_006">関連する伏線</string>
+    <string name="wf_007">前情要約</string>
+    <string name="wf_008">AI に冒頭案を 3 つ</string>
+    <string name="wf_009">生成中…</string>
+    <string name="wf_010">コピー</string>
+    <string name="wf_011">コピーしました</string>
+    <string name="wf_012">スランプ救急</string>
+    <string name="wf_013">クイック質問</string>
+    <string name="wf_014">書き続ける</string>
+    <string name="wf_015">この章のセルフチェック</string>
+    <string name="wf_016" formatted="false">%1$d 字</string>
+    <string name="wf_017">章綱あり</string>
+    <string name="wf_018">章綱なし</string>
+    <string name="wf_019" formatted="false">章綱が未反映：%1$s</string>
+    <string name="wf_020" formatted="false">未回収の伏線 %1$d 件</string>
+    <string name="wf_021" formatted="false">AI っぽさの指摘 %1$d 件</string>
+    <string name="wf_022">書く前に章綱と前情を確認し、書いた後にセルフチェック。候補のみで本文は書きません。</string>
+    <string name="wf_023">候補が生成されませんでした。再試行してください。</string>
 </resources>

@@ -140,6 +140,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     var notesOpen by remember { mutableStateOf(false) }
     var quickRef by remember { mutableStateOf(false) }
     var ttsOpen by remember { mutableStateOf(false) }
+    var writeFlow by remember { mutableStateOf(false) }
     val aiOpen = remember { mutableStateOf(false) }
     val prefs by remember { AppGraph.prefs.flow }.collectAsState(AppGraph.prefs.snapshot)
     val s = remember(chapterId) { sessionFor(chapterId) }
@@ -389,6 +390,8 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         extra = { Text(tr(R.string.focus_006), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant) },
     )
     if (ttsOpen) TtsSheet(st.value.text, st.value.selection.start, p?.ttsSpeed ?: 1f, onDismiss = { ttsOpen = false })
+    if (writeFlow) WriteFlowSheet(ch.bookId, chapterId, ch.number, onDismiss = { writeFlow = false },
+        onStuck = { writeFlow = false; stuck = true }, onAsk = { writeFlow = false; aiOpen.value = true })
     if (quickRef) EditorQuickRef(
         bookId = ch.bookId, chapterId = chapterId, chapterNumber = ch.number, text = st.value.text,
         onDismiss = { quickRef = false },
@@ -491,6 +494,9 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         }
         SheetAction(LingIcons.Article, tr(R.string.tts_001), sub = tr(R.string.tts_008)) {
             more = false; ttsOpen = true
+        }
+        SheetAction(LingIcons.EditNote, tr(R.string.wf_001), sub = tr(R.string.wf_022)) {
+            more = false; writeFlow = true
         }
         SheetAction(LingIcons.Help, tr(R.string.editor_ai_045), sub = tr(R.string.editor_033)) { more = false; stuck = true }
         // A16 读者试读：模拟反馈，仅供参考（ai-features §16）
