@@ -19,6 +19,7 @@ import com.lingwrite.app.data.WriteFlow
 import com.lingwrite.app.i18n.tr
 import com.lingwrite.app.ui.components.*
 import com.lingwrite.app.ui.theme.Ling
+import kotlinx.coroutines.launch
 
 /** 写前/写中/写后三段的轻量工作流；只给候选和清单，不自动写正文。 */
 @Composable
@@ -51,7 +52,7 @@ fun WriteFlowSheet(
             when (step) {
                 0 -> {
                     val b = before
-                    b?.plan?.takeIf { !it.isEmpty() }?.let { p ->
+                    b?.plan?.takeIf { it.event.isNotBlank() || it.hook.isNotBlank() || it.cliff.isNotBlank() || it.note.isNotBlank() }?.let { p ->
                         LingCard {
                             Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(tr(R.string.wf_005), style = Ling.type.label, color = c.primary)

@@ -59,7 +59,7 @@ object WriteFlow {
         val gaps = plan?.let { PlanSync.landedGaps(it) }.orEmpty()
         val open = db.checks().foreshadowsOnce(bookId).count { it.status == "open" }
         val p = AppGraph.prefs.flow.first()
-        val flags = c?.content?.let { Style.aiTaste(it, bannedList(p.bannedWords)).size } ?: 0
+        val flags = c?.content?.let { aiTaste(it, bannedList(p.bannedWords)).size } ?: 0
         return AfterStatus(
             wordCount = c?.wordCount ?: 0,
             planFilled = plan != null && (plan.event.isNotBlank() || plan.hook.isNotBlank() || plan.cliff.isNotBlank()),
