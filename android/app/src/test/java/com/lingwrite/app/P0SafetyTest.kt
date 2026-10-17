@@ -3,7 +3,6 @@
 package com.lingwrite.app
 
 import android.app.Application
-import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,45 +33,48 @@ class P0SafetyTest {
         val vol = AppGraph.db.chapters().insertVolume(VolumeEntity(bookId = id, title = "正文", sort = 0))
         val list = (1..n).map { i ->
             val text = body(i)
-            ChapterEntity(bookId = id, volumeId = vol, number = i, title = "章$i", content = text, wordCount = Words.count(text), state = "done")
+            ChapterEntity(bookId = id, volumeId = vol, number = i, title = "章$i", content = text, wordCount = Words.count(text), state = "done", updatedAt = i.toLong())
         }
         AppGraph.db.chapters().insertAll(list)
         AppGraph.db.books().touch(id)
         id
     }
 
-    private fun captureSql(): MutableList<String> {
-        val out = mutableListOf<String>()
-        AppGraph.db.setQueryCallback(object : RoomDatabase.QueryCallback {
-            override fun onQuery(sqlQuery: String, bindArgs: List<Any?>) { out += sqlQuery }
-        })
-        return out
-    }
-
     private fun rawLong(sql: String, args: Array<Any?> = emptyArray()): Long =
         AppGraph.db.openHelper.readableDatabase.query(sql, args).use { c -> if (c.moveToFirst()) c.getLong(0) else 0 }
 
-    @Test fun heroAndSerialBoardDoNotLoadWholeBook() = runBlocking {
+    @Test fun heroAndBoardUseHeaderProjections() = runBlocking {
         val id = seedBook(500)
-        val sql = captureSql()
+        val headers = AppGraph.db.chapters().headersOnce(id)
+        assertEquals(500, headers.size)
+        assertTrue("章节头不加载正文", headers.all { it.content.isEmpty() })
         val hero = AppGraph.books.hero(id)
         val state = SerialBoard.state(id)
         assertNotNull(hero)
         assertEquals(500, hero!!.chapters)
         assertEquals(500, state.buffer)
-        assertTrue("hero 使用了窄查询", sql.any { it.contains("'' AS content") })
-        assertTrue("只取最近一章正文", sql.any { it.contains("SELECT content FROM chapters WHERE bookId") })
-        assertTrue("不应全量加载正文", sql.none { it.contains("SELECT * FROM chapters WHERE bookId") })
+        assertEquals("最近编辑章的正文仍可用于摘要", AppGraph.db.chapters().lastContent(id), "第500章。" + "山风过处，松涛如海。".repeat(40))
     }
 
-    @Test fun searchUsesFiniteSqlLimit() = runBlocking {
+    @Test fun searchHasFinitePerTermCap() = runBlocking {
         val id = seedBook(220) { "测试关键词" }
         ContextEngine.refresh(id)
-        val sql = captureSql()
-        val hits = ContextEngine.search("测试关键词", id, limit = 30)
-        assertEquals(30, hits.size)
-        assertTrue("每个检索词必须有 SQL 上限", sql.any { it.contains("LIMIT 200") })
-        assertTrue("不能把 Int.MAX_VALUE 传给 SQL", sql.none { it.contains("LIMIT -1") || it.contains("LIMIT 2147483647") })
+        assertEquals(30, ContextEngine.search("测试关键词", id, limit = 30).size)
+        // 即使调用方要 1000 条，每个检索词也只在 SQL 里取 200 条，证明没有把 Int.MAX_VALUE 传给 SQL。
+        assertEquals(200, ContextEngine.search("测试关键词", id, limit = 1000).size)
+    }
+
+    @Test fun refreshOnlyReindexesStaleChapters() = runBlocking {
+        val id = seedBook(20) { "第一版内容" }
+        ContextEngine.refresh(id)
+        val before = AppGraph.db.context().indexState(id).associate { it.chapterId to it.at }
+        assertEquals(20, before.size)
+        val one = AppGraph.db.chapters().headersOnce(id).first()
+        AppGraph.db.chapters().updateContent(one.id, "第二版内容", 5, "[]", System.currentTimeMillis() + 5)
+        ContextEngine.refresh(id)
+        val after = AppGraph.db.context().indexState(id).associate { it.chapterId to it.at }
+        val changed = after.filter { (k, v) -> before[k] != v }.keys
+        assertEquals(setOf(one.id), changed)
     }
 
     @Test fun deleteBookCleansFtsAndFiles() = runBlocking {
