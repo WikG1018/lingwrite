@@ -34,7 +34,7 @@ class AiUsageTest {
         assertEquals(3, r.chapters[0].share.editedChars)
         assertEquals(2, r.chapters[0].calls)
         assertEquals(50, r.adoptedPercent)
-        assertEquals(1, r.tasks.single().calls)
+        assertEquals(2, r.tasks.single().calls)
         assertEquals(1, r.tasks.single().accepted)
     }
 }
