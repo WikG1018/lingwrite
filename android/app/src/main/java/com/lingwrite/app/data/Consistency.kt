@@ -64,7 +64,7 @@ object Consistency {
         val rels = relationsAt(db.lore().relationsOnce(c.bookId), c.number)
         val names = cards.associate { it.id to it.name }
         val sums = db.context().summaries(c.bookId).associateBy { it.chapterId }
-        val prev = db.chapters().chaptersOnce(c.bookId).filter { it.number < c.number }.takeLast(15)
+        val prev = db.chapters().previous(c.bookId, c.number, 15).reversed()
         return buildString {
             append("【设定（第 ${c.number} 章时）】\n")
             mentioned.forEach { k -> append("· ${k.name}：").append(resolveAt(k, states[k.id].orEmpty(), c.number).joinToString("；") { "${it.k}=${it.v}" + (it.changedAt?.let { a -> "（第 $a 章起）" } ?: "") }).append('\n') }

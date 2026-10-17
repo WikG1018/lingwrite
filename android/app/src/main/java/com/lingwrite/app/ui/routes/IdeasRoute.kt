@@ -139,7 +139,7 @@ fun IdeasRoute(nav: NavHostController) {
                                     "foreshadow" -> bookId?.let { AppGraph.db.checks().insertForeshadow(com.lingwrite.app.data.db.ForeshadowEntity(bookId = it, content = r.content, pending = false)) }
                                     "outline" -> bookId?.let { bid ->
                                         // 找到目标章（按号；越界就落最后一章），把 AI 建议追加进章纲备注，作者可再改
-                                        val chs = AppGraph.db.chapters().chaptersOnce(bid).sortedBy { it.number }
+                                        val chs = AppGraph.db.chapters().headersOnce(bid)
                                         val ch = chs.firstOrNull { it.number == r.chapter } ?: chs.lastOrNull()
                                         if (ch != null) {
                                             val cp = AppGraph.db.plan().chapterOnce(ch.id) ?: ChapterPlanEntity(ch.id, bid)
@@ -181,7 +181,7 @@ fun IdeasRoute(nav: NavHostController) {
                         val b = book!!
                         val body = i.text + if (i.answer.isNotBlank()) "\n" + i.answer else ""
                         if (kind == "card") AppGraph.db.lore().insertCard(LoreCardEntity(bookId = b, type = type, name = name.trim(), fields = encodeFields(listOf(Field(defaultFields(LoreType.of(type)).first(), body)))))
-                        else AppGraph.db.checks().insertForeshadow(ForeshadowEntity(bookId = b, content = body.take(200), plantNumber = currentChapter(AppGraph.db.chapters().chaptersOnce(b))))
+                        else AppGraph.db.checks().insertForeshadow(ForeshadowEntity(bookId = b, content = body.take(200), plantNumber = AppGraph.db.chapters().maxNumberWithWords(b) ?: 1))
                         if (i.id == 0L) dao.insertIdea(i.copy(usedAs = kind, bookId = b)) else dao.updateIdea(i.copy(usedAs = kind, bookId = b)); convert = null
                     }
                 }

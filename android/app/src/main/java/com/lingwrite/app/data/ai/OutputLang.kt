@@ -44,7 +44,7 @@ object OutputLang {
         val b = db.books().get(bookId) ?: return null
         val sample = buildString {
             append(b.title).append('\n').append(b.blurb).append('\n')
-            db.chapters().chaptersOnce(bookId).takeLast(3).forEach { append(it.content.take(800)) }
+            db.chapters().lastNContent(bookId, 3).reversed().forEach { append(it.take(800)) }
         }
         val lang = detect(sample)
         synchronized(cache) { cache[bookId] = now to lang }

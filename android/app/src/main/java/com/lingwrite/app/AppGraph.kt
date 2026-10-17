@@ -18,8 +18,10 @@ object AppGraph {
 
     fun init(context: Context, inMemory: Boolean = false) {
         if (ready && !inMemory) return
+        // Room 打开并迁移之前先留一份原始库快照；失败不阻塞启动。
+        if (!inMemory) com.lingwrite.app.data.UpgradeGuard.snapshotIfNeeded(context.applicationContext)
         db = LingDatabase.build(context.applicationContext, inMemory)
-        books = BookRepository(db)
+        books = BookRepository(db, context.applicationContext.filesDir)
         prefs = com.lingwrite.app.data.Prefs(context.applicationContext)
         com.lingwrite.app.data.RestoreHints.init(context.applicationContext)
         // 非 Composable 场景（通知、错误文案、统计聚合等）也需要取本地化字符串；MainActivity 会再覆盖成 Activity。
