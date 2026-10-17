@@ -141,7 +141,7 @@ object Backup {
         val j = json ?: error("不是灵写的备份文件")
         if (j.str("app") != "lingwrite") error("不是灵写的备份文件")
         if ((j["format"]?.jsonPrimitive?.intOrNull ?: 0) > FORMAT) error("备份来自更新的版本，请先升级灵写")
-        if ((j["schema"]?.jsonPrimitive?.intOrNull ?: 1) > 8) error("备份数据库来自更新的版本，请先升级灵写")
+        if ((j["schema"]?.jsonPrimitive?.intOrNull ?: 1) > com.lingwrite.app.data.db.DB_VERSION) error("备份数据库来自更新的版本，请先升级灵写")
         return Archive(j, files).also(::validate)
     }
 
