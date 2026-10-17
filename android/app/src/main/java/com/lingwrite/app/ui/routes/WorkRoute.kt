@@ -45,7 +45,7 @@ private fun TabPlaceholder(name: String) {
 }
 
 @Composable
-fun WorkRoute(bookId: Long, onBack: () -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onExport: (Long) -> Unit, initialTab: Int = 0) {
+fun WorkRoute(bookId: Long, onBack: () -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onExport: (Long) -> Unit, onPublishCheck: (Long) -> Unit = {}, initialTab: Int = 0) {
     val repo = AppGraph.books
     val clipboard = androidx.compose.ui.platform.LocalClipboardManager.current
     val scope = rememberCoroutineScope()
@@ -184,6 +184,7 @@ fun WorkRoute(bookId: Long, onBack: () -> Unit, onOpenChapter: (Long) -> Unit, o
             bookMenu = false
         }
         SheetAction(LingIcons.Share, tr(R.string.work_030)) { onExport(bookId); bookMenu = false }
+        SheetAction(LingIcons.FactCheck, tr(R.string.publish_001), sub = tr(R.string.publish_015)) { onPublishCheck(bookId); bookMenu = false }
     }
     if (newVolume) {
         var t by remember { mutableStateOf("") }

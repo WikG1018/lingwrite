@@ -1489,4 +1489,41 @@
     <string name="import_022">空檔案或無法辨識正文</string>
     <string name="import_023">重新選擇</string>
     <string name="import_024">序</string>
+    <string name="editor_81">複製正文</string>
+    <string name="editor_82">只複製正文</string>
+    <string name="editor_83">複製正文和標題</string>
+    <string name="editor_84">帶章節標題</string>
+    <string name="editor_85">複製書名、標題和正文</string>
+    <string name="editor_86">帶書名，方便存檔</string>
+    <string name="editor_87">已複製到剪貼簿</string>
+    <string name="data_54">匯出範本</string>
+    <string name="data_55">平台格式會變，匯出後請在平台後台預覽；範本不宣稱是官方格式。</string>
+    <string name="publish_001">發布前檢查</string>
+    <string name="publish_002">重新檢查</string>
+    <string name="publish_003">檢查中…</string>
+    <string name="publish_004">沒有發現問題</string>
+    <string name="publish_005">必須改</string>
+    <string name="publish_006">建議看</string>
+    <string name="publish_007">AI 標記佔比</string>
+    <string name="publish_008" formatted="false">AI 生成 %1$d%% · 人工修改 %2$d%%（共 %3$d 字）</string>
+    <string name="publish_009">風險詞表</string>
+    <string name="publish_010">未匯入詞表；只檢查格式、字數和 AI 標記。</string>
+    <string name="publish_011">編輯風險詞</string>
+    <string name="publish_012">儲存</string>
+    <string name="publish_013">去原文</string>
+    <string name="publish_014">匯出報告</string>
+    <string name="publish_015">本地檢查不構成平台合規保證，也不用於規避偵測。</string>
+    <string name="publish_016" formatted="false">檢查範圍：全書 %1$d 章</string>
+    <string name="publish_017">本章</string>
+    <string name="publish_018">詞表已儲存</string>
+    <string name="publish_019">報告已匯出</string>
+    <string name="publish_020" formatted="false">檢查失敗：%1$s</string>
+    <string name="focus_001">進入專注</string>
+    <string name="focus_002">退出專注</string>
+    <string name="focus_003" formatted="false">目標 %1$d 字</string>
+    <string name="focus_004" formatted="false">本次 %1$d 字</string>
+    <string name="focus_005">還沒到目標，仍要退出？</string>
+    <string name="focus_006">繼續寫</string>
+    <string name="focus_007">退出</string>
+    <string name="focus_008">打字機捲動</string>
 </resources>

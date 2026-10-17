@@ -16,9 +16,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
@@ -102,12 +106,21 @@ object EditorHooks {
 fun EditorRoute(chapterId: Long, nav: NavHostController) {
     val repo = AppGraph.books
     val scope = rememberCoroutineScope()
+    val clipboard = LocalClipboardManager.current
+    val ctx = LocalContext.current
     var state by remember { mutableStateOf<EditorState?>(null) }
     LaunchedEffect(chapterId) {
         val loaded = repo.editorChapter(chapterId)
         if (loaded == null) nav.popBackStack() else state = EditorState(loaded)
     }
     val st = state ?: return
+    // 检查结果「去原文」的一次性定位；不改变正文，只移动光标。
+    LaunchedEffect(chapterId, st) {
+        EditorJump.consume(chapterId)?.let { at ->
+            val len = st.value.text.length
+            st.value = st.value.copy(selection = TextRange(at.coerceIn(0, len)))
+        }
+    }
     val ch = st.chapter
     val live by remember(chapterId) { repo.chapter(chapterId) }.collectAsState(ch)
     // Metadata may change while this editor remains open; keep anchors on the current chapter number.
@@ -136,6 +149,11 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     LaunchedEffect(mode) { s.mode = mode }
     LaunchedEffect(nav) { EditorHooks.onOpenModels = { nav.navigate(Routes.Models) } }
     val notesUnread by remember(chapterId) { AppGraph.db.notes().unreadCount(chapterId) }.collectAsState(0)
+    var focus by rememberSaveable(chapterId) { mutableStateOf(false) }
+    var exitFocusConfirm by remember { mutableStateOf(false) }
+    var focusStartWords by rememberSaveable(chapterId) { mutableIntStateOf(0) }
+    var focusStartAt by rememberSaveable(chapterId) { mutableLongStateOf(0L) }
+    var focusTick by remember { mutableLongStateOf(0L) }
     // C5 节拍清单（链路第 ⑥ 步）：正文上方的可勾选清单
     var beats by remember(chapterId) { mutableStateOf(emptyList<com.lingwrite.app.data.Beat>()) }
     LaunchedEffect(chapterId) {
@@ -235,8 +253,24 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         }
     }
     val words = Words.count(st.value.text)
-
     val p = prefs
+    val focusTarget = p?.focusTarget?.coerceAtLeast(1) ?: 2000
+    val focusWords = (words - focusStartWords).coerceAtLeast(0)
+    val focusPercent = (focusWords.toFloat() / focusTarget).coerceIn(0f, 1f)
+    val focusElapsed = ((focusTick - focusStartAt).coerceAtLeast(0) / 1000).let { sec -> "%02d:%02d".format(sec / 60, sec % 60) }
+    LaunchedEffect(focus) {
+        if (focus) {
+            focusStartWords = Words.count(st.value.text)
+            focusStartAt = System.currentTimeMillis()
+            focusTick = focusStartAt
+            while (true) { delay(1000); focusTick = System.currentTimeMillis() }
+        }
+    }
+    val focusView = androidx.compose.ui.platform.LocalView.current
+    DisposableEffect(focus, focusView) {
+        focusView.keepScreenOn = focus
+        onDispose { focusView.keepScreenOn = false }
+    }
     val imeVisible = WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
     EditorScreen(
         noticeBar = {
@@ -332,10 +366,23 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             onCheck = { EditorHooks.onCheck(st, nav) }, onAi = { aiOpen.value = !aiOpen.value },
             onNotes = { notesOpen = true },
             onSave = { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) },
+            onFocus = { focus = true },
         ),
+        focusMode = focus,
+        onExitFocus = { if (focusWords >= focusTarget) focus = false else exitFocusConfirm = true },
+        focusWords = focusWords,
+        focusTarget = focusTarget,
+        focusElapsed = focusElapsed,
+        focusPercent = focusPercent,
+        typewriter = p?.focusTypewriter ?: true,
         directory = { EditorDirectory(st, nav) },
         tools = { tab -> EditorInspector(st, nav, tab) },
         bottomPanel = { EditorHooks.aiPanel(this, st, aiOpen) },
+    )
+    if (exitFocusConfirm) LingConfirm(
+        tr(R.string.focus_005), "", confirm = tr(R.string.focus_007), onDismiss = { exitFocusConfirm = false },
+        onConfirm = { exitFocusConfirm = false; focus = false },
+        extra = { Text(tr(R.string.focus_006), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant) },
     )
     EditorHooks.overlays(st, nav)
     NotesDrawer(chapterId, notesOpen, onClose = { notesOpen = false })
@@ -377,7 +424,23 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         }
     }
 
+    fun copyChapter(withTitle: Boolean, withBook: Boolean) {
+        scope.launch {
+            val book = if (withBook) AppGraph.db.books().get(ch.bookId)?.title.orEmpty() else ""
+            val text = buildString {
+                if (book.isNotBlank()) append(book).append("\n\n")
+                if (withTitle) append(ChapterLabel.full(ch.number, live?.title ?: ch.title)).append("\n\n")
+                append(st.value.text)
+            }
+            clipboard.setText(AnnotatedString(text))
+            android.widget.Toast.makeText(ctx, tr(R.string.editor_87), android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
     if (more) LingSheet({ more = false }) {
+        SheetAction(LingIcons.Copy, tr(R.string.editor_81), sub = tr(R.string.editor_82)) { copyChapter(false, false); more = false }
+        SheetAction(LingIcons.Copy, tr(R.string.editor_83), sub = tr(R.string.editor_84)) { copyChapter(true, false); more = false }
+        SheetAction(LingIcons.Copy, tr(R.string.editor_85), sub = tr(R.string.editor_86)) { copyChapter(true, true); more = false }
         SheetAction(LingIcons.Help, tr(R.string.editor_020), sub = tr(R.string.editor_021)) {
             scope.launch {
                 AppGraph.prefs.update { it.copy(authorGuide = true, authorGuideStep = 5, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION) }
@@ -401,6 +464,9 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         SheetAction(LingIcons.Add, tr(R.string.editor_030), sub = tr(R.string.editor_031)) { scope.launch { val n = repo.nextChapter(ch.bookId, afterChapterId = ch.id); nav.navigate(Routes.editor(n)) { popUpTo(Routes.Editor) { inclusive = true } } }; more = false }
         SheetAction(LingIcons.FactCheck, tr(R.string.editor_ai_046), sub = tr(R.string.editor_032)) {
             more = false; runProof()
+        }
+        SheetAction(LingIcons.FactCheck, tr(R.string.publish_001), sub = tr(R.string.publish_015)) {
+            more = false; nav.navigate(Routes.publishCheck(ch.bookId, chapterId))
         }
         SheetAction(LingIcons.Help, tr(R.string.editor_ai_045), sub = tr(R.string.editor_033)) { more = false; stuck = true }
         // A16 读者试读：模拟反馈，仅供参考（ai-features §16）

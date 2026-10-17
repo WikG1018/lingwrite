@@ -13,6 +13,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,14 +68,21 @@ fun ExportRoute(bookId: Long, nav: NavHostController) {
     var titles by remember { mutableStateOf(true) }
     var blurb by remember { mutableStateOf(true) }
     var numStyle by remember { mutableStateOf(ExportNumStyle.Arabic) }
+    var presetId by remember { mutableStateOf(AppGraph.prefs.snapshot?.exportPreset?.ifBlank { "web" } ?: "web") }
+    val preset = exportPresetById(presetId)
     var preview by remember { mutableStateOf("") }
     var msg by remember { mutableStateOf<String?>(null) }
-    val opts = Exporter.Options(md, from.toIntOrNull() ?: 1, to.toIntOrNull() ?: Int.MAX_VALUE, titles, blurb, numStyle = numStyle)
-    LaunchedEffect(opts) { preview = Exporter.render(bookId, opts) }
-    val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(if (md) "text/markdown" else "text/plain")) { uri: Uri? ->
+    val opts = Exporter.Options(md, from.toIntOrNull() ?: 1, to.toIntOrNull() ?: Int.MAX_VALUE, titles, blurb, numStyle = numStyle, preset = preset)
+    LaunchedEffect(opts) { preview = Exporter.renderPreview(bookId, opts) }
+    val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(if (md || presetId == "markdown") "text/markdown" else "text/plain")) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         scope.launch {
-            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { it.write(Exporter.render(bookId, opts).toByteArray()) } }; tr(R.string.data_004, Words.grouped(Words.count(preview))) }.getOrElse { tr(R.string.data_005, it.message) }
+            msg = runCatching {
+                withContext(Dispatchers.IO) {
+                    ctx.contentResolver.openOutputStream(uri)!!.use { out -> Exporter.writeToStream(bookId, opts, out) }
+                }
+                tr(R.string.data_004, Words.grouped(Words.count(preview)))
+            }.getOrElse { tr(R.string.data_005, it.message) }
         }
     }
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
@@ -83,6 +91,13 @@ fun ExportRoute(bookId: Long, nav: NavHostController) {
             Segmented(listOf("TXT", "Markdown"), if (md) 1 else 0) { md = it == 1 }
             LingCard {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(tr(R.string.data_54), style = Ling.type.label, color = c.primary)
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ExportPresets.forEach { p ->
+                            LingChip(presetId == p.id, { presetId = p.id; scope.launch { AppGraph.prefs.update { it.copy(exportPreset = p.id) } } }, p.name)
+                        }
+                    }
+                    Text(tr(R.string.data_55), style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant)
                     Text(tr(R.string.data_007), style = Ling.type.label, color = c.primary)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         LingTextField(from, { from = it.filter(Char::isDigit) }, Modifier.weight(1f), label = tr(R.string.data_008), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)

@@ -1489,4 +1489,41 @@
     <string name="import_022">空文件或无法识别正文</string>
     <string name="import_023">重新选择</string>
     <string name="import_024">序</string>
+    <string name="editor_81">复制正文</string>
+    <string name="editor_82">只复制正文</string>
+    <string name="editor_83">复制正文和标题</string>
+    <string name="editor_84">带章节标题</string>
+    <string name="editor_85">复制书名、标题和正文</string>
+    <string name="editor_86">带书名，方便存档</string>
+    <string name="editor_87">已复制到剪贴板</string>
+    <string name="data_54">导出模板</string>
+    <string name="data_55">平台格式会变，导出后请在平台后台预览；模板不宣称是官方格式。</string>
+    <string name="publish_001">发布前检查</string>
+    <string name="publish_002">重新检查</string>
+    <string name="publish_003">检查中…</string>
+    <string name="publish_004">没有发现问题</string>
+    <string name="publish_005">必须改</string>
+    <string name="publish_006">建议看</string>
+    <string name="publish_007">AI 标记占比</string>
+    <string name="publish_008" formatted="false">AI 生成 %1$d%% · 人工修改 %2$d%%（共 %3$d 字）</string>
+    <string name="publish_009">风险词表</string>
+    <string name="publish_010">未导入词表；只检查格式、字数和 AI 标记。</string>
+    <string name="publish_011">编辑风险词</string>
+    <string name="publish_012">保存</string>
+    <string name="publish_013">去原文</string>
+    <string name="publish_014">导出报告</string>
+    <string name="publish_015">本地检查不构成平台合规保证，也不用于规避检测。</string>
+    <string name="publish_016" formatted="false">检查范围：全书 %1$d 章</string>
+    <string name="publish_017">本章</string>
+    <string name="publish_018">词表已保存</string>
+    <string name="publish_019">报告已导出</string>
+    <string name="publish_020" formatted="false">检查失败：%1$s</string>
+    <string name="focus_001">进入专注</string>
+    <string name="focus_002">退出专注</string>
+    <string name="focus_003" formatted="false">目标 %1$d 字</string>
+    <string name="focus_004" formatted="false">本次 %1$d 字</string>
+    <string name="focus_005">还没到目标，仍要退出？</string>
+    <string name="focus_006">继续写</string>
+    <string name="focus_007">退出</string>
+    <string name="focus_008">打字机滚动</string>
 </resources>

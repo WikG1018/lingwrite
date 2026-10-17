@@ -70,6 +70,7 @@ data class EditorActions(
     val onQuote: () -> Unit = {}, val onForeshadow: () -> Unit = {}, val onCharacters: () -> Unit = {}, val onCheck: () -> Unit = {},
     val onAi: () -> Unit = {}, val onNotes: () -> Unit = {},
     val onRedo: () -> Unit = {}, val onSave: () -> Unit = {},
+    val onFocus: () -> Unit = {},
 )
 
 /** 截图 / 预览用的示例正文。 */
@@ -105,6 +106,13 @@ fun EditorScreen(
     directory: (@Composable () -> Unit)? = null,
     tools: (@Composable (Int) -> Unit)? = null,
     bottomPanel: @Composable ColumnScope.() -> Unit = { SuggestionCard(FakeData.suggestion, tr(R.string.editor_055)); ToolChips(0) {} },
+    focusMode: Boolean = false,
+    onExitFocus: () -> Unit = {},
+    focusWords: Int = 0,
+    focusTarget: Int = 2000,
+    focusElapsed: String = "",
+    focusPercent: Float = 0f,
+    typewriter: Boolean = false,
 ) {
     val editorHaze = remember { HazeState() }
     val c = Ling.colors
@@ -114,6 +122,25 @@ fun EditorScreen(
     val responsive = directory != null && tools != null
     val tablet = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 720 && responsive
     val a = actions.copy(onAi = { toolTab = 3; toolsOpen = true; actions.onAi() })
+    if (focusMode) {
+        Column(Modifier.fillMaxSize().background(c.paper).imePadding().statusBarsPadding()) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                LingIconButton(LingIcons.Close, tr(R.string.focus_002), onClick = onExitFocus)
+                Spacer(Modifier.width(4.dp))
+                Text(tr(R.string.focus_004, focusWords), style = Ling.type.label, color = c.onSurface)
+                Spacer(Modifier.weight(1f))
+                Text(tr(R.string.focus_003, focusTarget), style = Ling.type.caption, color = c.onSurfaceVariant)
+                Spacer(Modifier.width(8.dp))
+                Text(focusElapsed, style = Ling.type.caption, color = c.onSurfaceVariant)
+            }
+            Box(Modifier.weight(1f)) {
+                ManuscriptField(value, onValueChange, marks, names, readOnly, Modifier.fillMaxSize(), proofRanges, typewriter)
+            }
+            Box(Modifier.fillMaxWidth().height(3.dp).background(c.surfaceContainer)) {
+                Box(Modifier.fillMaxWidth(focusPercent.coerceIn(0f, 1f)).fillMaxHeight().background(c.primary))
+            }
+        }
+    } else {
     WritingWorkspace(toolsOpen && responsive, toolTab == 3, responsive,
         Modifier.fillMaxSize().background(c.paper).imePadding().onPreviewKeyEvent { e ->
             if (e.type != KeyEventType.KeyDown || value.composition != null) false
@@ -136,6 +163,7 @@ fun EditorScreen(
                 Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End) {
                 if (tablet) LingButton(if (toolsOpen) tr(R.string.editor_056) else tr(R.string.editor_057), BtnKind.Text, height = 36.dp, modifier = Modifier.testTag("toggle-writing-tools")) { toolsOpen = !toolsOpen }
                 badge?.invoke()
+                LingIconButton(LingIcons.EditNote, tr(R.string.focus_001), onClick = actions.onFocus)
                 LingIconButton(LingIcons.Undo, tr(R.string.check_042), tint = if (canUndo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onUndo)
                 LingIconButton(LingIcons.Redo, tr(R.string.editor_058), tint = if (canRedo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onRedo)
                 LingIconButton(LingIcons.More, tr(R.string.editor_059), onClick = actions.onMore)
@@ -144,6 +172,7 @@ fun EditorScreen(
             LingTopBar(title, subtitle, actions.onBack, titleStyle = Ling.type.subhead) {
                 if (tablet) LingButton(if (toolsOpen) tr(R.string.editor_056) else tr(R.string.editor_057), BtnKind.Text, height = 36.dp, modifier = Modifier.testTag("toggle-writing-tools")) { toolsOpen = !toolsOpen }
                 badge?.invoke()
+                LingIconButton(LingIcons.EditNote, tr(R.string.focus_001), onClick = actions.onFocus)
                 LingIconButton(LingIcons.Undo, tr(R.string.check_042), tint = if (canUndo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onUndo)
                 LingIconButton(LingIcons.Redo, tr(R.string.editor_058), tint = if (canRedo) c.onSurface else c.onSurface.copy(alpha = 0.35f), onClick = actions.onRedo)
                 LingIconButton(LingIcons.More, tr(R.string.editor_059), onClick = actions.onMore)
@@ -181,11 +210,12 @@ fun EditorScreen(
             Box(Modifier.weight(1f)) { tools?.invoke(toolTab) }
         }
     }, ai = { Column(Modifier.fillMaxWidth()) { if (tablet) Text(tr(R.string.editor_060), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(12.dp)); bottomPanel() } })
+    }
 }
 
 /** 正文输入区：首行缩进两字、AI 段落底色 + 虚线、人物名下划线。 */
 @Composable
-fun ManuscriptField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Unit, marks: List<AiMark>, names: List<String>, readOnly: Boolean, modifier: Modifier, proofRanges: List<IntRange> = emptyList()) {
+fun ManuscriptField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Unit, marks: List<AiMark>, names: List<String>, readOnly: Boolean, modifier: Modifier, proofRanges: List<IntRange> = emptyList(), typewriter: Boolean = false) {
     val c = Ling.colors
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     val transform = remember(marks, names, c) {
@@ -205,6 +235,16 @@ fun ManuscriptField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Un
         }
     }
     val scroll = rememberScrollState()
+    LaunchedEffect(value.selection.end, layout, typewriter) {
+        if (!typewriter) return@LaunchedEffect
+        val l = layout ?: return@LaunchedEffect
+        val n = value.text.length
+        if (n <= 0) return@LaunchedEffect
+        val line = l.getLineForOffset(value.selection.end.coerceIn(0, n))
+        val top = l.getLineTop(line)
+        val vp = scroll.viewportSize
+        if (vp > 0) scroll.scrollTo((top - vp * 0.4f).toInt().coerceIn(0, scroll.maxValue))
+    }
     BasicTextField(
         value, onValueChange, readOnly = readOnly,
         textStyle = Ling.type.manuscript.copy(color = c.paperInk, textIndent = TextIndent(firstLine = 2.em), lineBreak = LineBreak.Paragraph),

@@ -1414,4 +1414,41 @@
     <string name="import_022">空のファイル、または本文を認識できません</string>
     <string name="import_023">別のファイルを選択</string>
     <string name="import_024">序</string>
+    <string name="editor_81">本文をコピー</string>
+    <string name="editor_82">本文のみ</string>
+    <string name="editor_83">本文と章タイトルをコピー</string>
+    <string name="editor_84">章タイトル付き</string>
+    <string name="editor_85">書名・章タイトル・本文をコピー</string>
+    <string name="editor_86">書名付きで保存用</string>
+    <string name="editor_87">クリップボードにコピーしました</string>
+    <string name="data_54">エクスポートテンプレート</string>
+    <string name="data_55">プラットフォームの形式は変わります。書き出し後に管理画面で確認してください。テンプレートは公式形式ではありません。</string>
+    <string name="publish_001">公開前チェック</string>
+    <string name="publish_002">再チェック</string>
+    <string name="publish_003">チェック中…</string>
+    <string name="publish_004">問題は見つかりませんでした</string>
+    <string name="publish_005">要修正</string>
+    <string name="publish_006">確認</string>
+    <string name="publish_007">AI マーク率</string>
+    <string name="publish_008" formatted="false">AI 生成 %1$d%% · 人手修正 %2$d%%（全 %3$d 字）</string>
+    <string name="publish_009">リスク語リスト</string>
+    <string name="publish_010">語リスト未導入。形式・文字数・AI マークのみ確認します。</string>
+    <string name="publish_011">リスク語を編集</string>
+    <string name="publish_012">保存</string>
+    <string name="publish_013">本文へ</string>
+    <string name="publish_014">レポートを書き出す</string>
+    <string name="publish_015">このローカルチェックはプラットフォームの合规を保証するものではなく、検出回避のためでもありません。</string>
+    <string name="publish_016" formatted="false">範囲：全书 %1$d 章</string>
+    <string name="publish_017">この章</string>
+    <string name="publish_018">語リストを保存しました</string>
+    <string name="publish_019">レポートを書き出しました</string>
+    <string name="publish_020" formatted="false">チェック失敗：%1$s</string>
+    <string name="focus_001">集中モード</string>
+    <string name="focus_002">集中を終了</string>
+    <string name="focus_003" formatted="false">目標 %1$d 字</string>
+    <string name="focus_004" formatted="false">今回 %1$d 字</string>
+    <string name="focus_005">目標に届いていません。終了しますか？</string>
+    <string name="focus_006">書き続ける</string>
+    <string name="focus_007">終了</string>
+    <string name="focus_008">タイプライタースクロール</string>
 </resources>
