@@ -106,6 +106,18 @@ object OutlinePrompts {
     fun landed(plan: String, text: String) = "对照章纲检查正文是否写到。\n" + com.lingwrite.app.data.ai.PromptContract.JSON_ONLY +
         "\n格式：{\"event\":true/false,\"hook\":true/false,\"cliff\":true/false,\"note\":\"若有偏离，30 字内说明；没偏离给空串\"}" +
         "\n判断标准：只看“是否写到”，不评价写得好不好；正文明确写到了才给 true。\n\n【章纲】\n$plan\n\n【正文】\n${text.take(12000)}"
+    /** 正文写完、章纲偏离后，以正文为准回写章纲；只给草稿，不直接写库。 */
+    fun resync(plan: ChapterPlanEntity, text: String, gaps: List<String>) = buildString {
+        append("这一章的正文已经写完，但和原章纲有偏离。请以正文为准，更新章纲草稿。\n")
+        append("保留原章纲里仍然成立的内容；不要写正文，不要改人名地名，不要新增解释。\n")
+        append("只输出 JSON 对象，不要 Markdown、不要解释：\n")
+        append("{\"event\":\"核心事件\",\"hook\":\"开篇钩子\",\"cliff\":\"章尾悬念\",\"note\":\"偏离说明（30 字内，没有就空串）\",\"storyTime\":\"故事内时间（如「第三天清晨」，没有就空串）\"}\n")
+        append(com.lingwrite.app.data.ai.PromptContract.JSON_ONLY).append('\n')
+        if (gaps.isNotEmpty()) append("未落实项：").append(gaps.joinToString("、")).append('\n')
+        append("\n【原章纲】\n").append(plan.asPrompt()).append('\n')
+        append("\n【正文】\n").append(text.take(12000))
+    }
+
     fun golden(items: List<String>, chapters: List<ChapterEntity>) = buildString {
         append("你在审读一部网文的前三章。逐项判断下列检查项是否满足：满足时引用 20 字以内原文作依据，不满足时写清缺什么。\n")
         append(com.lingwrite.app.data.ai.PromptContract.JSON_ARRAY).append('\n')

@@ -4,6 +4,7 @@ package com.lingwrite.app.data.db
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 /** 作品级大纲配置：总纲、自定义章纲字段、线索、黄金三章检查表。 */
 @Entity(tableName = "book_plans", foreignKeys = [ForeignKey(entity = BookEntity::class, parentColumns = ["id"], childColumns = ["bookId"], onDelete = ForeignKey.CASCADE)])
@@ -50,6 +51,7 @@ data class VolumePlanEntity(
     val chapterCount: Int = 0,
 )
 
+@Serializable
 @Entity(tableName = "chapter_plans", foreignKeys = [ForeignKey(entity = ChapterEntity::class, parentColumns = ["id"], childColumns = ["chapterId"], onDelete = ForeignKey.CASCADE)], indices = [Index("bookId")])
 data class ChapterPlanEntity(
     @PrimaryKey val chapterId: Long,

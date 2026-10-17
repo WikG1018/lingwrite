@@ -171,6 +171,9 @@ fun OutlineTab(bookId: Long, nav: NavHostController, embedded: Boolean = false) 
                 Icon(LingIcons.ExpandMore, null, tint = c.primary, modifier = Modifier.size(20.dp).rotate(if (open) 0f else -90f))
                 Text(VolumeLabel.full(vi + 1, v.title), style = Ling.type.volumeHeader, color = c.primary, modifier = Modifier.padding(start = 4.dp).weight(1f))
                 Text(tr(R.string.outline_013, list.count { it.state == "done" }, list.size), style = Ling.type.caption, color = c.onSurfaceVariant)
+                vp?.chapterCount?.takeIf { it > 0 }?.let { planned ->
+                    Text(tr(R.string.outline_104, planned, list.size), style = Ling.type.caption, color = if (list.size > planned * 1.2) c.error else c.onSurfaceVariant, modifier = Modifier.padding(start = 6.dp))
+                }
                 if (vi > 0) Box(Modifier.rotate(180f)) { LingIconButton(LingIcons.ExpandMore, tr(R.string.outline_014), c.onSurfaceVariant) { scope.launch { repo.moveVolumeIn(bookId, v.id, -1) } } }
             }
             if (open) LingCard(Modifier.padding(horizontal = 16.dp).enterStagger(vi).animateContentSize()) {
@@ -346,15 +349,23 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
     var hook by rememberSaveable(chapterId) { mutableStateOf(p0.hook) }
     var cliff by rememberSaveable(chapterId) { mutableStateOf(p0.cliff) }
     var note by rememberSaveable(chapterId) { mutableStateOf(p0.note) }
+    var storyTime by rememberSaveable(chapterId) { mutableStateOf(p0.storyTime) }
     var customJson by rememberSaveable(chapterId) { mutableStateOf(p0.custom) }
     val custom = parseMap(customJson)
     var threadCsv by rememberSaveable(chapterId) { mutableStateOf(p0.threads) }
     val threads = threadCsv.split(',').map(String::trim).filter(String::isNotEmpty).toSet()
     var checking by remember { mutableStateOf(false) }
+    var syncing by remember { mutableStateOf(false) }
+    var proposal by remember { mutableStateOf<PlanProposal?>(null) }
+    var appliedVersion by remember { mutableStateOf<Long?>(null) }
     var msg by remember { mutableStateOf<String?>(null) }
     val fields = parseList(bp?.threads?.let { bp!!.fields } ?: "[]")
     val allThreads = parseList(bp?.threads ?: tr(R.string.outline_046))
-    fun current() = p0.copy(event = event.trim(), hook = hook.trim(), cliff = cliff.trim(), note = note.trim(), custom = encodeMap(custom.toMap()), threads = threads.joinToString(","))
+    fun current() = p0.copy(event = event.trim(), hook = hook.trim(), cliff = cliff.trim(), note = note.trim(), storyTime = storyTime.trim(), custom = encodeMap(custom.toMap()), threads = threads.joinToString(","))
+    fun usePlan(p: ChapterPlanEntity) {
+        event = p.event; hook = p.hook; cliff = p.cliff; note = p.note; storyTime = p.storyTime
+        customJson = p.custom; threadCsv = p.threads
+    }
     suspend fun persist() {
         val draft = current()
         AppGraph.db.withTransaction {
@@ -364,7 +375,7 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
                 check(theirs == before || theirs == ours) { tr(R.string.outline_047) }
                 return ours
             }
-            dao.upsertChapter(latest.copy(event = merge(p0.event, draft.event, latest.event), hook = merge(p0.hook, draft.hook, latest.hook), cliff = merge(p0.cliff, draft.cliff, latest.cliff), note = merge(p0.note, draft.note, latest.note), custom = merge(p0.custom, draft.custom, latest.custom), threads = merge(p0.threads, draft.threads, latest.threads)))
+            dao.upsertChapter(latest.copy(event = merge(p0.event, draft.event, latest.event), hook = merge(p0.hook, draft.hook, latest.hook), cliff = merge(p0.cliff, draft.cliff, latest.cliff), note = merge(p0.note, draft.note, latest.note), storyTime = merge(p0.storyTime, draft.storyTime, latest.storyTime), custom = merge(p0.custom, draft.custom, latest.custom), threads = merge(p0.threads, draft.threads, latest.threads)))
             loaded = dao.chapterOnce(chapterId)
         }
     }
@@ -375,6 +386,7 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
             LingTextField(event, { event = it }, label = tr(R.string.outline_051), singleLine = false, minLines = 2)
             LingTextField(hook, { hook = it }, label = tr(R.string.outline_052), singleLine = false)
             LingTextField(cliff, { cliff = it }, label = tr(R.string.outline_053), singleLine = false)
+            LingTextField(storyTime, { storyTime = it }, label = tr(R.string.outline_094), singleLine = false)
             fields.forEach { f -> LingTextField(custom[f].orEmpty(), { customJson = encodeMap(custom + (f to it)) }, label = f, singleLine = false) }
             LingTextField(note, { note = it }, label = tr(R.string.outline_054), singleLine = false)
             if (allThreads.isNotEmpty()) {
@@ -396,7 +408,52 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
                     }
                 }
             }
-            msg?.let { Text(it, style = Ling.type.caption, color = if (it == tr(R.string.outline_048)) c.good else c.error) }
+            if (ch?.content?.isNotBlank() == true) {
+                LingCard(color = c.surfaceContainer) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(tr(R.string.outline_095), style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface)
+                        Text(tr(R.string.outline_096), style = Ling.type.caption, color = c.onSurfaceVariant)
+                        Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            LingButton(if (syncing) tr(R.string.outline_102) else tr(R.string.outline_095), BtnKind.Text, height = 34.dp, enabled = !syncing) {
+                                syncing = true; msg = null
+                                scope.launch {
+                                    runCatching { persist(); PlanSync.propose(chapterId) }
+                                        .onSuccess { p -> proposal = p; if (p == null) msg = tr(R.string.outline_103) }
+                                        .onFailure { msg = it.message }
+                                    syncing = false
+                                }
+                            }
+                            if (appliedVersion != null) LingButton(tr(R.string.outline_100), BtnKind.Text, height = 34.dp) {
+                                scope.launch {
+                                    PlanSync.restore(chapterId, appliedVersion!!)?.let { p -> usePlan(p); loaded = p; msg = tr(R.string.outline_101) }
+                                    appliedVersion = null
+                                }
+                            }
+                        }
+                        proposal?.let { p ->
+                            Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(tr(R.string.outline_097), style = Ling.type.caption.copy(fontWeight = FontWeight.SemiBold), color = c.primary)
+                                p.diffs.forEach { d ->
+                                    Text(tr(R.string.outline_109, d.field), style = Ling.type.micro, color = c.onSurfaceVariant)
+                                    Text("- " + d.before, style = Ling.type.caption, color = c.onSurfaceVariant)
+                                    Text("+ " + d.after, style = Ling.type.caption, color = c.onSurface)
+                                }
+                                Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    LingButton(tr(R.string.sheets_002), BtnKind.Text, height = 32.dp) { proposal = null }
+                                    LingButton(tr(R.string.outline_098), BtnKind.Tonal, height = 32.dp) {
+                                        scope.launch {
+                                            runCatching { persist(); PlanSync.apply(p) }
+                                                .onSuccess { vid -> appliedVersion = vid; usePlan(p.after); loaded = dao.chapterOnce(chapterId); msg = tr(R.string.outline_099); proposal = null }
+                                                .onFailure { msg = it.message }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            msg?.let { Text(it, style = Ling.type.caption, color = if (it == tr(R.string.outline_048) || it == tr(R.string.outline_099) || it == tr(R.string.outline_101)) c.good else c.error) }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
                 LingButton(if (checking) tr(R.string.outline_058) else tr(R.string.outline_059), BtnKind.Tonal, icon = LingIcons.FactCheck, enabled = !checking, modifier = Modifier.weight(1f)) {
                     checking = true; msg = null

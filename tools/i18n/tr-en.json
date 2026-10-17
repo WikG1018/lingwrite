@@ -1480,5 +1480,21 @@
 "read_016": "Drop %1$d%%",
 "read_017": "Below median",
 "read_018": "No chapter-end hook in plan",
-"read_019": "Short chapter"
+"read_019": "Short chapter",
+"outline_094": "Story time",
+"outline_095": "Update outline from text",
+"outline_096": "When the draft diverges from the outline, let AI draft an updated outline from the text; the old outline is snapshotted first.",
+"outline_097": "AI draft (field diff)",
+"outline_098": "Apply",
+"outline_099": "Outline updated",
+"outline_100": "Undo update",
+"outline_101": "Undone",
+"outline_102": "Generating…",
+"outline_103": "No changes to write back",
+"outline_104": "Volume chapters: planned %1$d / actual %2$d",
+"outline_105": "Not enough outline ahead; plan the next 3–5 chapters",
+"outline_106": "Plan next 3–5 chapters",
+"outline_107": "Old outline",
+"outline_108": "New outline",
+"outline_109": "Fields: %1$s"
 }

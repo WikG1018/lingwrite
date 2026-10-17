@@ -1344,8 +1344,24 @@ private fun part5(m: HashMap<String, Int>) {
     m["低于中位数"] = R.string.read_017
     m["章纲无章尾钩子"] = R.string.read_018
     m["字数偏短"] = R.string.read_019
+    m["故事内时间"] = R.string.outline_094
+    m["以正文更新章纲"] = R.string.outline_095
+    m["正文写完、章纲偏离时，用 AI 依据正文生成章纲草稿；确认后先保存旧章纲。"] = R.string.outline_096
+    m["AI 草稿（字段对比）"] = R.string.outline_097
+    m["确认回写"] = R.string.outline_098
+    m["已回写章纲"] = R.string.outline_099
+    m["撤销回写"] = R.string.outline_100
+    m["已撤销"] = R.string.outline_101
+    m["生成中…"] = R.string.outline_102
+    m["没有可回写的变化"] = R.string.outline_103
+    m["卷章数：计划 %1\$d / 实际 %2\$d"] = R.string.outline_104
+    m["章纲余量不足，建议先补后 3–5 章"] = R.string.outline_105
+    m["规划后 3–5 章"] = R.string.outline_106
+    m["旧章纲"] = R.string.outline_107
+    m["新章纲"] = R.string.outline_108
+    m["字段：%1\$s"] = R.string.outline_109
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2656).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2688).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

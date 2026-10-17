@@ -1484,4 +1484,20 @@
     <string name="read_017">中央値より低い</string>
     <string name="read_018">章末フックが章綱にない</string>
     <string name="read_019">文字数が短い</string>
+    <string name="outline_094">作中時間</string>
+    <string name="outline_095">本文から章綱を更新</string>
+    <string name="outline_096">本文が章綱から外れたとき、AI が本文に合わせた章綱の下書きを作ります。確定前に旧章綱を保存します。</string>
+    <string name="outline_097">AI 下書き（項目差分）</string>
+    <string name="outline_098">反映する</string>
+    <string name="outline_099">章綱を更新しました</string>
+    <string name="outline_100">更新を取り消す</string>
+    <string name="outline_101">取り消しました</string>
+    <string name="outline_102">生成中…</string>
+    <string name="outline_103">反映する変更はありません</string>
+    <string name="outline_104" formatted="false">巻の章数：予定 %1$d / 実際 %2$d</string>
+    <string name="outline_105">章綱の余裕がありません。次の 3–5 章を計画してください</string>
+    <string name="outline_106">次の 3–5 章を計画</string>
+    <string name="outline_107">旧章綱</string>
+    <string name="outline_108">新章綱</string>
+    <string name="outline_109" formatted="false">項目：%1$s</string>
 </resources>
