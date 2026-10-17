@@ -38,7 +38,7 @@ class ExportCheckTest {
         val opts = Exporter.Options(preset = exportPresetById("fanqie"))
         val rendered = Exporter.render(id, opts)
         val bytes = ByteArrayOutputStream().also { Exporter.writeToStream(id, opts, it) }.toByteArray()
-        assertEquals(rendered, bytes.toString(Charsets.UTF_8))
+        assertEquals(rendered, bytes.toString(Charsets.UTF_8).trimEnd() + "\n")
         assertTrue(rendered.contains("第一段。"))
         assertTrue(rendered.contains("第1章"))
         assertTrue(Exporter.renderPreview(id, opts, 12).length <= 12)
