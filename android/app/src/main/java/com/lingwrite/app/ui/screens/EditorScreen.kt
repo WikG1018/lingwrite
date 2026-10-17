@@ -386,7 +386,7 @@ fun BeatsChecklist(beats: List<com.lingwrite.app.data.Beat>, onToggle: (Int) -> 
                             .size(20.dp)
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
                             .background(if (b.done) c.primary else c.surfaceContainer)
-                            .clickable { onToggle(i) },
+                            .clickable(role = Role.Checkbox) { onToggle(i) },
                         contentAlignment = Alignment.Center,
                     ) {
                         if (b.done) Icon(LingIcons.Check, tr(R.string.notes_drawer_009), tint = c.onPrimary, modifier = Modifier.size(14.dp))

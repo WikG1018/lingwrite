@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.hint
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,7 +59,12 @@ fun LingTextField(
     Column(modifier) {
         if (label != null) Text(label, style = Ling.type.caption.copy(fontWeight = FontWeight.Medium), color = c.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
         TextField(
-            value, onValueChange, Modifier.fillMaxWidth(), singleLine = singleLine, minLines = minLines, maxLines = maxLines,
+            value, onValueChange,
+            Modifier.fillMaxWidth().then(
+                // 视觉 label 没有进 M3 语义；这里补 hint，TalkBack 聚焦时能听到字段名。
+                label?.let { l -> if (l.isNotBlank()) Modifier.semantics { hint = l } else Modifier } ?: Modifier
+            ),
+            singleLine = singleLine, minLines = minLines, maxLines = maxLines,
             textStyle = textStyle.copy(color = c.onSurface), shape = Radius.card, isError = isError,
             placeholder = placeholder?.let { { Text(it, style = textStyle, color = c.onSurfaceVariant.copy(alpha = 0.7f)) } },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType), visualTransformation = visualTransformation, trailingIcon = trailing,

@@ -133,7 +133,7 @@ fun AskPanel(chapterId: Long, bookId: Long, chapterNo: Int, quote: String?, onDi
         }
     }
 
-    LingSheet(onDismiss, if (loreScope) trZh(R.string.ask_panel_017) else trZh(R.string.ask_panel_018), skipPartial = false, layout = SheetLayout.Viewport) {
+    LingSheet(onDismiss, if (loreScope) tr(R.string.ask_panel_017) else tr(R.string.ask_panel_018), skipPartial = false, layout = SheetLayout.Viewport) {
         Column(Modifier.fillMaxWidth().heightIn(max = 520.dp)) {
             Text(tr(R.string.ask_panel_019), style = Ling.type.micro, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 20.dp))
             Spacer(Modifier.height(4.dp))

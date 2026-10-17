@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.MainActivity
 import com.lingwrite.app.R
+import com.lingwrite.app.i18n.tr
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 
@@ -24,10 +25,10 @@ object TaskHooks {
     var done: suspend (Long, Int) -> Unit = { _, _ -> }
 }
 
-enum class NotifyType(val channel: String, val title: String, val desc: String) {
-    Tasks("tasks", "后台任务完成", "章节摘要、一致性检查等后台任务完成时提醒"),
-    Foreshadow("foreshadow", "伏笔临期/超期", "伏笔接近或超过计划回收章节时提醒"),
-    Update("update", "新版本", "发现灵写新版本时提醒"),
+enum class NotifyType(val channel: String, val titleRes: Int, val descRes: Int) {
+    Tasks("tasks", R.string.notify_001, R.string.notify_002),
+    Foreshadow("foreshadow", R.string.notify_003, R.string.notify_004),
+    Update("update", R.string.notify_005, R.string.notify_006),
 }
 
 /** 本地通知：渠道、权限判断、深链。 */
@@ -48,7 +49,7 @@ object Notifier {
     fun channels(ctx: Context) {
         val nm = ctx.getSystemService(NotificationManager::class.java) ?: return
         NotifyType.entries.forEach { t ->
-            nm.createNotificationChannel(NotificationChannel(t.channel, t.title, if (t == NotifyType.Update) NotificationManager.IMPORTANCE_LOW else NotificationManager.IMPORTANCE_DEFAULT).apply { description = t.desc })
+            nm.createNotificationChannel(NotificationChannel(t.channel, tr(t.titleRes), if (t == NotifyType.Update) NotificationManager.IMPORTANCE_LOW else NotificationManager.IMPORTANCE_DEFAULT).apply { description = tr(t.descRes) })
         }
     }
 
@@ -77,8 +78,11 @@ object Notifier {
             val cur = AppGraph.db.chapters().chaptersOnce(bookId).filter { it.wordCount > 0 }.maxOfOrNull { it.number } ?: 1
             val over = fs.count { fsState(it, cur) == FsState.Overdue }; val due = fs.count { fsState(it, cur) == FsState.Due }
             if (over + due == 0) return@forEach
-            val text = listOfNotNull(over.takeIf { it > 0 }?.let { "$it 条已超期" }, due.takeIf { it > 0 }?.let { "$it 条临近回收" }).joinToString("，")
-            if (post(ctx, NotifyType.Foreshadow, "《${book.title}》伏笔提醒", "$text，打开伏笔列表看看。", "work/$bookId")) sent++
+            val text = listOfNotNull(
+                over.takeIf { it > 0 }?.let { tr(R.string.notify_009, it) },
+                due.takeIf { it > 0 }?.let { tr(R.string.notify_010, it) },
+            ).joinToString(tr(R.string.data_043))
+            if (post(ctx, NotifyType.Foreshadow, tr(R.string.notify_007, book.title), tr(R.string.notify_008, text), "work/$bookId")) sent++
         }
         if (sent > 0) AppGraph.prefs.update { it.copy(lastFsNotify = now) }
         return sent

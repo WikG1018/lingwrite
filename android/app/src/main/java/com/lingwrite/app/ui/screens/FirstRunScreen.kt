@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -87,7 +88,7 @@ private fun ModeOption(
     val shape = RoundedCornerShape(20.dp)
     Column(
         modifier.fillMaxWidth().pressScale(i, 0.98f).clip(shape).background(bg).border(2.dp, border, shape)
-            .clickable(i, ripple(color = c.primary), role = Role.RadioButton) { onPick(value) }.padding(18.dp),
+            .selectable(on, i, ripple(color = c.primary), role = Role.RadioButton) { onPick(value) }.padding(18.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Tile(icon, tileBg, tileFg)

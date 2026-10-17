@@ -1069,7 +1069,7 @@
     <string name="reader_010">试读中…</string>
     <string name="reader_011">开始试读</string>
     <string name="reader_012">正在读这一章…</string>
-    <string name="reader_013" translatable="false">【读者 %1$s.name】%2$s</string>
+    <string name="reader_013">【读者 %1$s】%2$s</string>
     <string name="reader_014">模拟读者反馈，仅供参考 · 本次约 %1$s tokens</string>
     <string name="reader_015">再测一次</string>
     <string name="reader_016">未知错误</string>
@@ -1432,4 +1432,28 @@
     <string name="dl_096">模型没有返回内容，请重试；原稿未改动</string>
     <string name="editor_78">引文在正文中找不到或出现多次，请手动修改后再试。</string>
     <string name="data_46">导入的服务商会先保持停用；请重新填写 Key 并核对接口地址后再启用。</string>
+    <string name="lic_001">Apache License 2.0 全文</string>
+    <string name="lic_002">GNU AGPL-3.0 全文</string>
+    <string name="notify_001">后台任务完成</string>
+    <string name="notify_002">章节摘要、一致性检查等后台任务完成时提醒</string>
+    <string name="notify_003">伏笔临期/超期</string>
+    <string name="notify_004">伏笔接近或超过计划回收章节时提醒</string>
+    <string name="notify_005">新版本</string>
+    <string name="notify_006">发现灵写新版本时提醒</string>
+    <string name="notify_007">《%1$s》伏笔提醒</string>
+    <string name="notify_008">%1$s，打开伏笔列表看看。</string>
+    <string name="notify_009">%1$d 条已超期</string>
+    <string name="notify_010">%1$d 条临近回收</string>
+    <string name="update_034">发布说明里没有 SHA-256，无法确认安装包完整，已阻止安装</string>
+    <string name="update_035">安装包 SHA-256 校验失败，可能下载不完整或被篡改，已阻止安装</string>
+    <string name="update_036">安装包签名与当前版本不一致，已阻止安装</string>
+    <string name="llm_001">Key 无效或没有权限（%1$d）</string>
+    <string name="llm_002">接口地址或模型名不对（404）</string>
+    <string name="llm_003">请求太频繁或额度用完了（429）</string>
+    <string name="llm_004">服务商暂时出错（%1$d），稍后再试</string>
+    <string name="llm_005">连接失败：%1$s</string>
+    <string name="llm_006">请求失败（%1$d）：%2$s</string>
+    <string name="stats_029">日</string>
+    <string name="stats_030">周</string>
+    <string name="stats_031">月</string>
 </resources>

@@ -133,7 +133,7 @@ fun LingTopBar(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
-        Modifier.fillMaxWidth().height(64.dp).padding(start = 4.dp, end = 8.dp),
+        Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(start = 4.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (onBack != null) LingIconButton(com.lingwrite.app.ui.components.LingIcons.Back, tr(R.string.components_001), onClick = onBack)

@@ -396,7 +396,7 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
                     }
                 }
             }
-            msg?.let { Text(it, style = Ling.type.caption, color = if (it == "已保存") c.good else c.error) }
+            msg?.let { Text(it, style = Ling.type.caption, color = if (it == tr(R.string.outline_048)) c.good else c.error) }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
                 LingButton(if (checking) tr(R.string.outline_058) else tr(R.string.outline_059), BtnKind.Tonal, icon = LingIcons.FactCheck, enabled = !checking, modifier = Modifier.weight(1f)) {
                     checking = true; msg = null

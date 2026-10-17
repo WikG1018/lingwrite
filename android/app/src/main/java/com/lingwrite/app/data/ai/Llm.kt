@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.data.ai
 
+import com.lingwrite.app.R
+import com.lingwrite.app.i18n.tr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -48,13 +50,15 @@ object FakeLlmRegistry {
 }
 
 /** 把错误码翻译成作者看得懂的话（不包含 Key）。 */
-fun friendlyError(code: Int?, body: String): String = when (code) {
-    401, 403 -> "Key 无效或没有权限（$code）"
-    404 -> "接口地址或模型名不对（404）"
-    429 -> "请求太频繁或额度用完了（429）"
-    in 500..599 -> "服务商暂时出错（$code），稍后再试"
-    null -> "连接失败：$body"
-    else -> "请求失败（$code）：" + body.take(160)
+fun friendlyError(code: Int?, body: String): String {
+    if (code == null) return tr(R.string.llm_005, body)
+    return when {
+        code == 401 || code == 403 -> tr(R.string.llm_001, code)
+        code == 404 -> tr(R.string.llm_002)
+        code == 429 -> tr(R.string.llm_003)
+        code in 500..599 -> tr(R.string.llm_004, code)
+        else -> tr(R.string.llm_006, code, body.take(160))
+    }
 }
 
 private fun Request.Builder.auth(e: Endpoint): Request.Builder = when (e.auth) {

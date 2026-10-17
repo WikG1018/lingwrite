@@ -17,6 +17,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -123,7 +124,7 @@ private fun NoteRow(n: ChapterNoteEntity, modifier: Modifier = Modifier, onDone:
         Box(
             Modifier.size(20.dp).clip(RoundedCornerShape(6.dp))
                 .background(if (n.done) c.primary else c.surfaceContainer)
-                .clickable(onClick = onDone),
+                .clickable(role = Role.Checkbox, onClick = onDone),
             contentAlignment = Alignment.Center,
         ) { if (n.done) Icon(LingIcons.Check, tr(R.string.notes_drawer_009), tint = c.onPrimary, modifier = Modifier.size(14.dp)) }
         Spacer(Modifier.width(10.dp))

@@ -5336,7 +5336,7 @@
    "ReaderRoute.kt"
   ],
   "reader_013": [
-   "【读者 %1$s.name】%2$s",
+   "【读者 %1$s】%2$s",
    2,
    "ReaderRoute.kt"
   ],
@@ -7149,6 +7149,126 @@
    "导入的服务商会先保持停用；请重新填写 Key 并核对接口地址后再启用。",
    0,
    "DataRoute.kt"
+  ],
+  "lic_001": [
+   "Apache License 2.0 全文",
+   0,
+   "AboutRoute.kt"
+  ],
+  "lic_002": [
+   "GNU AGPL-3.0 全文",
+   0,
+   "AboutRoute.kt"
+  ],
+  "notify_001": [
+   "后台任务完成",
+   0,
+   "Notifier.kt"
+  ],
+  "notify_002": [
+   "章节摘要、一致性检查等后台任务完成时提醒",
+   0,
+   "Notifier.kt"
+  ],
+  "notify_003": [
+   "伏笔临期/超期",
+   0,
+   "Notifier.kt"
+  ],
+  "notify_004": [
+   "伏笔接近或超过计划回收章节时提醒",
+   0,
+   "Notifier.kt"
+  ],
+  "notify_005": [
+   "新版本",
+   0,
+   "Notifier.kt"
+  ],
+  "notify_006": [
+   "发现灵写新版本时提醒",
+   0,
+   "Notifier.kt"
+  ],
+  "notify_007": [
+   "《%1$s》伏笔提醒",
+   1,
+   "Notifier.kt"
+  ],
+  "notify_008": [
+   "%1$s，打开伏笔列表看看。",
+   1,
+   "Notifier.kt"
+  ],
+  "notify_009": [
+   "%1$d 条已超期",
+   1,
+   "Notifier.kt"
+  ],
+  "notify_010": [
+   "%1$d 条临近回收",
+   1,
+   "Notifier.kt"
+  ],
+  "update_034": [
+   "发布说明里没有 SHA-256，无法确认安装包完整，已阻止安装",
+   0,
+   "Updater.kt"
+  ],
+  "update_035": [
+   "安装包 SHA-256 校验失败，可能下载不完整或被篡改，已阻止安装",
+   0,
+   "Updater.kt"
+  ],
+  "update_036": [
+   "安装包签名与当前版本不一致，已阻止安装",
+   0,
+   "Updater.kt"
+  ],
+  "llm_001": [
+   "Key 无效或没有权限（%1$d）",
+   1,
+   "Llm.kt"
+  ],
+  "llm_002": [
+   "接口地址或模型名不对（404）",
+   0,
+   "Llm.kt"
+  ],
+  "llm_003": [
+   "请求太频繁或额度用完了（429）",
+   0,
+   "Llm.kt"
+  ],
+  "llm_004": [
+   "服务商暂时出错（%1$d），稍后再试",
+   1,
+   "Llm.kt"
+  ],
+  "llm_005": [
+   "连接失败：%1$s",
+   1,
+   "Llm.kt"
+  ],
+  "llm_006": [
+   "请求失败（%1$d）：%2$s",
+   2,
+   "Llm.kt"
+  ],
+  "stats_029": [
+   "日",
+   0,
+   "Stats.kt"
+  ],
+  "stats_030": [
+   "周",
+   0,
+   "Stats.kt"
+  ],
+  "stats_031": [
+   "月",
+   0,
+   "Stats.kt"
   ]
  },
  "skipped": [

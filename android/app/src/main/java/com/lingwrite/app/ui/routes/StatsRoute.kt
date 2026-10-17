@@ -87,7 +87,7 @@ fun StatsScreen(period: Period, label: String, d: StatsData, words: List<WordDay
         Text(tr(R.string.dock_002), style = Ling.type.headline, color = c.onSurface, modifier = Modifier.padding(start = 24.dp, top = 18.dp, bottom = 10.dp).enterStagger(0))
         WritingCard(words, Modifier.padding(horizontal = 16.dp).enterStagger(1))
         SectionLabel(tr(R.string.stats_002))
-        Segmented(Period.entries.map { trText(it.label) }, period.ordinal, Modifier.padding(horizontal = 16.dp)) { onPeriod(Period.entries[it]) }
+        Segmented(Period.entries.map { p -> when (p) { Period.Day -> tr(R.string.stats_029); Period.Week -> tr(R.string.stats_030); Period.Month -> tr(R.string.stats_031) } }, period.ordinal, Modifier.padding(horizontal = 16.dp)) { onPeriod(Period.entries[it]) }
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.rotateIcon(90f)) { LingIconButton(LingIcons.ExpandMore, tr(R.string.stats_003), c.onSurfaceVariant) { onShift(-1) } }
             Text(label, style = Ling.type.label.copy(fontWeight = FontWeight.SemiBold), color = c.onSurface, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)

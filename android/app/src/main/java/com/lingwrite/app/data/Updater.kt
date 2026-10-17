@@ -4,6 +4,8 @@ package com.lingwrite.app.data
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.lingwrite.app.R
+import com.lingwrite.app.i18n.tr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -125,11 +127,11 @@ object Updater {
     /** 校验 SHA-256 与签名证书；不通过时删除安装包。 */
     fun verify(ctx: Context, f: File, r: Release): Verdict {
         val v = when {
-            r.sha256 == null -> Verdict.Blocked("发布说明里没有 SHA-256，无法确认安装包完整，已阻止安装")
-            sha256(f) != r.sha256 -> Verdict.Blocked("安装包 SHA-256 校验失败，可能下载不完整或被篡改，已阻止安装")
+            r.sha256 == null -> Verdict.Blocked(tr(R.string.update_034))
+            sha256(f) != r.sha256 -> Verdict.Blocked(tr(R.string.update_035))
             else -> {
                 val a = signerOf(ctx, f); val b = selfSigners(ctx)
-                if (a.isNullOrEmpty() || b.isNullOrEmpty() || a != b) Verdict.Blocked("安装包签名与当前版本不一致，已阻止安装") else Verdict.Ok
+                if (a.isNullOrEmpty() || b.isNullOrEmpty() || a != b) Verdict.Blocked(tr(R.string.update_036)) else Verdict.Ok
             }
         }
         if (v is Verdict.Blocked) f.delete()

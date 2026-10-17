@@ -18,6 +18,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -50,7 +53,9 @@ import com.lingwrite.app.ui.screens.SettingsListScreen
 import com.lingwrite.app.ui.screens.Tone
 import com.lingwrite.app.ui.theme.Ling
 import com.lingwrite.app.ui.theme.Radius
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object AboutModule {
     const val Notifications = "notifications"
@@ -114,6 +119,8 @@ fun AboutRoute(nav: NavHostController) {
     val ctx = LocalContext.current
     val a by Updater.available.collectAsState()
     var sheet by remember { mutableStateOf<String?>(null) }
+    // 许可全文：标题 → assets 路径；非空时在同一 Sheet 内显示全文。
+    var licenseText by remember { mutableStateOf<Pair<String, String>?>(null) }
     var copied by remember { mutableStateOf(false) }
     SettingsListScreen(tr(R.string.about_024), listOf(
         SettingSection("", listOf(
@@ -146,13 +153,17 @@ fun AboutRoute(nav: NavHostController) {
         }
     }, footer = tr(R.string.about_040))
     when (sheet) {
-        "license" -> LingSheet({ sheet = null }, tr(R.string.about_029), layout = SheetLayout.Viewport) { LicenseList() }
+        "license" -> LingSheet({ sheet = null; licenseText = null }, tr(R.string.about_029), layout = SheetLayout.Viewport) {
+            val lt = licenseText
+            if (lt == null) LicenseList(onOpen = { n, a -> licenseText = n to a })
+            else LicenseFullText(lt.first, lt.second) { licenseText = null }
+        }
         "privacy" -> LingSheet({ sheet = null }, tr(R.string.about_031)) { PrivacyCards() }
     }
 }
 
 @Composable
-fun LicenseList() {
+fun LicenseList(onOpen: (String, String) -> Unit = { _, _ -> }) {
     val c = Ling.colors
     Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 20.dp)) {
         licenses.forEachIndexed { i, (n, l) ->
@@ -162,6 +173,44 @@ fun LicenseList() {
                 Text(l, style = Ling.type.caption, color = c.onSurfaceVariant)
             }
         }
+        InsetDivider(0.dp)
+        LicenseFileRow(tr(R.string.lic_001)) { onOpen(tr(R.string.lic_001), "licenses/Apache-2.0.txt") }
+        InsetDivider(0.dp)
+        LicenseFileRow(tr(R.string.lic_002)) { onOpen(tr(R.string.lic_002), "licenses/AGPL-3.0.txt") }
+    }
+}
+
+@Composable
+private fun LicenseFileRow(title: String, onClick: () -> Unit) {
+    val c = Ling.colors
+    Row(Modifier.fillMaxWidth().rowClick(onClick).padding(vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, style = Ling.type.bodyLarge, color = c.onSurface, modifier = Modifier.weight(1f))
+        Icon(LingIcons.ExpandMore, null, tint = c.onSurfaceVariant, modifier = Modifier.size(20.dp))
+    }
+}
+
+/** 许可全文（assets/licenses/ 内置 Apache-2.0 与 AGPL-3.0，满足分发时提供许可副本的要求）。 */
+@Composable
+private fun LicenseFullText(title: String, assetPath: String, onBack: () -> Unit) {
+    val c = Ling.colors
+    val ctx = LocalContext.current
+    val text by produceState(initialValue = "", key1 = assetPath) {
+        value = withContext(Dispatchers.IO) {
+            runCatching { ctx.assets.open(assetPath).bufferedReader().use { it.readText() } }.getOrDefault("")
+        }
+    }
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            LingIconButton(LingIcons.Back, tr(R.string.components_001), onClick = onBack)
+            Spacer(Modifier.width(4.dp))
+            Text(title, style = Ling.type.titleSmall, color = c.onSurface)
+        }
+        Text(
+            text,
+            style = Ling.type.micro.copy(fontFamily = FontFamily.Monospace, lineHeight = 16.sp),
+            color = c.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().heightIn(max = 520.dp).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp),
+        )
     }
 }
 
@@ -198,9 +247,9 @@ fun NotificationsRoute(nav: NavHostController) {
     SettingsListScreen(tr(R.string.about_002), listOf(
         SettingSection("", listOf(SettingRow(if (on) LingIcons.Notify else LingIcons.NotifyOff, tr(R.string.about_042), tr(R.string.about_043), switch = on, tone = Tone.Amber, onSwitch = { v -> upd { it.copy(notifyAll = v) } }))),
     ) + if (on) listOf(SettingSection(tr(R.string.about_044), listOf(
-        SettingRow(LingIcons.CheckCircle, NotifyType.Tasks.title, NotifyType.Tasks.desc, switch = prefs.notifyTasks, tone = Tone.Good, onSwitch = { v -> upd { it.copy(notifyTasks = v) } }),
-        SettingRow(LingIcons.Schedule, NotifyType.Foreshadow.title, tr(R.string.about_045), switch = prefs.notifyForeshadow, tone = Tone.Error, onSwitch = { v -> upd { it.copy(notifyForeshadow = v) } }),
-        SettingRow(LingIcons.Download, NotifyType.Update.title, NotifyType.Update.desc, switch = prefs.notifyUpdate, tone = Tone.Primary, onSwitch = { v -> upd { it.copy(notifyUpdate = v) } }),
+        SettingRow(LingIcons.CheckCircle, tr(NotifyType.Tasks.titleRes), tr(NotifyType.Tasks.descRes), switch = prefs.notifyTasks, tone = Tone.Good, onSwitch = { v -> upd { it.copy(notifyTasks = v) } }),
+        SettingRow(LingIcons.Schedule, tr(NotifyType.Foreshadow.titleRes), tr(R.string.about_045), switch = prefs.notifyForeshadow, tone = Tone.Error, onSwitch = { v -> upd { it.copy(notifyForeshadow = v) } }),
+        SettingRow(LingIcons.Download, tr(NotifyType.Update.titleRes), tr(NotifyType.Update.descRes), switch = prefs.notifyUpdate, tone = Tone.Primary, onSwitch = { v -> upd { it.copy(notifyUpdate = v) } }),
     ))) else emptyList(), onBack = { nav.popBackStack() }, header = {
         if (on && !granted) PermissionCard(denied = prefs.notifyAsked,
             onAllow = { if (Build.VERSION.SDK_INT >= 33) launcher.launch(Manifest.permission.POST_NOTIFICATIONS) },
