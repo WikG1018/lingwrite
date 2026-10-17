@@ -66,7 +66,7 @@ object Importer {
         val name = displayName(ctx, uri).ifBlank { "导入作品" }
         val lower = name.lowercase()
         val isDocx = lower.endsWith(".docx")
-        val decoded = if (isDocx) DocxText.extract(bytes) else decode(bytes, options.encoding)
+        val decoded = if (isDocx) Decoded(DocxText.extract(bytes), Charsets.UTF_8, false) else decode(bytes, options.encoding)
         val raw = decoded.text.trim()
         require(raw.isNotBlank()) { "文件里没有可导入的正文" }
         val baseTitle = name.substringBeforeLast('.').ifBlank { "导入作品" }
