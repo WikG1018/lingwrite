@@ -137,6 +137,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     var renaming by remember { mutableStateOf(false) }
     var modeSheet by remember { mutableStateOf(false) }
     var notesOpen by remember { mutableStateOf(false) }
+    var quickRef by remember { mutableStateOf(false) }
     val aiOpen = remember { mutableStateOf(false) }
     val prefs by remember { AppGraph.prefs.flow }.collectAsState(AppGraph.prefs.snapshot)
     val s = remember(chapterId) { sessionFor(chapterId) }
@@ -367,6 +368,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             onNotes = { notesOpen = true },
             onSave = { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) },
             onFocus = { focus = true },
+            onQuickRef = { quickRef = true },
         ),
         focusMode = focus,
         onExitFocus = { if (focusWords >= focusTarget) focus = false else exitFocusConfirm = true },
@@ -383,6 +385,22 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         tr(R.string.focus_005), "", confirm = tr(R.string.focus_007), onDismiss = { exitFocusConfirm = false },
         onConfirm = { exitFocusConfirm = false; focus = false },
         extra = { Text(tr(R.string.focus_006), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant) },
+    )
+    if (quickRef) EditorQuickRef(
+        bookId = ch.bookId, chapterId = chapterId, chapterNumber = ch.number, text = st.value.text,
+        onDismiss = { quickRef = false },
+        onOpenHit = { hit ->
+            quickRef = false
+            if (hit.chapterId == chapterId) {
+                st.value = st.value.copy(selection = TextRange(hit.start.coerceIn(0, st.value.text.length)))
+            } else {
+                scope.launch {
+                    repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
+                    EditorJump.put(hit.chapterId, hit.start)
+                    nav.navigate(Routes.editor(hit.chapterId))
+                }
+            }
+        },
     )
     EditorHooks.overlays(st, nav)
     NotesDrawer(chapterId, notesOpen, onClose = { notesOpen = false })

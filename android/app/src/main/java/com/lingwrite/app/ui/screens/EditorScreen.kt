@@ -71,6 +71,7 @@ data class EditorActions(
     val onAi: () -> Unit = {}, val onNotes: () -> Unit = {},
     val onRedo: () -> Unit = {}, val onSave: () -> Unit = {},
     val onFocus: () -> Unit = {},
+    val onQuickRef: () -> Unit = {},
 )
 
 /** 截图 / 预览用的示例正文。 */
@@ -378,7 +379,7 @@ private fun BottomToolbar(today: String, a: EditorActions, mode: WriteMode, note
         Box(Modifier.fillMaxWidth().height(1.dp).background(c.outlineVariant.copy(alpha = 0.7f)))
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f).horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically) {
-                listOf(Triple(LingIcons.Quote, tr(R.string.editor_062), a.onQuote), Triple(LingIcons.BookmarkAdd, tr(R.string.check_006), a.onForeshadow), Triple(LingIcons.Badge, tr(R.string.editor_063), a.onCharacters), Triple(LingIcons.FactCheck, tr(R.string.check_076), a.onCheck)).forEach { (ic, d, f) ->
+                listOf(Triple(LingIcons.Quote, tr(R.string.editor_062), a.onQuote), Triple(LingIcons.BookmarkAdd, tr(R.string.check_006), a.onForeshadow), Triple(LingIcons.Badge, tr(R.string.editor_063), a.onCharacters), Triple(LingIcons.FactCheck, tr(R.string.check_076), a.onCheck), Triple(LingIcons.Search, tr(R.string.quick_001), a.onQuickRef)).forEach { (ic, d, f) ->
                     Box(Modifier.size(44.dp, 48.dp).clip(Radius.pill).clickable(onClick = f), contentAlignment = Alignment.Center) { Icon(ic, d, Modifier.size(24.dp), tint = c.onSurface) }
                 }
                 // 本章便签（MD3）：替代原“设定”入口，带未读角标

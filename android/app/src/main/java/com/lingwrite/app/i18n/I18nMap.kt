@@ -1311,8 +1311,22 @@ private fun part5(m: HashMap<String, Int>) {
     m["继续写"] = R.string.focus_006
     m["退出"] = R.string.focus_007
     m["打字机滚动"] = R.string.focus_008
+    m["速查"] = R.string.quick_001
+    m["设定"] = R.string.quick_002
+    m["伏笔"] = R.string.quick_003
+    m["前情"] = R.string.quick_004
+    m["搜索"] = R.string.quick_005
+    m["搜索本书…"] = R.string.quick_006
+    m["暂无相关设定"] = R.string.quick_007
+    m["暂无摘要"] = R.string.quick_008
+    m["当前卷摘要"] = R.string.quick_009
+    m["搜索中…"] = R.string.quick_010
+    m["没有找到"] = R.string.quick_011
+    m["第 %1\$d 章"] = R.string.quick_012
+    m["埋设第 %1\$d 章 · 计划第 %2\$d 章回收"] = R.string.quick_013
+    m["未定回收章"] = R.string.quick_014
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2590).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2618).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

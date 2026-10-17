@@ -1451,4 +1451,18 @@
     <string name="focus_006">書き続ける</string>
     <string name="focus_007">終了</string>
     <string name="focus_008">タイプライタースクロール</string>
+    <string name="quick_001">クイック参照</string>
+    <string name="quick_002">設定</string>
+    <string name="quick_003">伏線</string>
+    <string name="quick_004">前情</string>
+    <string name="quick_005">検索</string>
+    <string name="quick_006">この作品を検索…</string>
+    <string name="quick_007">関連する設定はありません</string>
+    <string name="quick_008">要約はまだありません</string>
+    <string name="quick_009">現在の巻の要約</string>
+    <string name="quick_010">検索中…</string>
+    <string name="quick_011">見つかりません</string>
+    <string name="quick_012" formatted="false">第 %1$d 章</string>
+    <string name="quick_013" formatted="false">第 %1$d 章で伏線・第 %2$d 章で回収予定</string>
+    <string name="quick_014">回収章は未定</string>
 </resources>

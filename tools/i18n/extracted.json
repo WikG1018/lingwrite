@@ -7619,6 +7619,76 @@
    "打字机滚动",
    0,
    "EditorRoute.kt"
+  ],
+  "quick_001": [
+   "速查",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_002": [
+   "设定",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_003": [
+   "伏笔",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_004": [
+   "前情",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_005": [
+   "搜索",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_006": [
+   "搜索本书…",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_007": [
+   "暂无相关设定",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_008": [
+   "暂无摘要",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_009": [
+   "当前卷摘要",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_010": [
+   "搜索中…",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_011": [
+   "没有找到",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_012": [
+   "第 %1$d 章",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_013": [
+   "埋设第 %1$d 章 · 计划第 %2$d 章回收",
+   0,
+   "EditorQuickRef.kt"
+  ],
+  "quick_014": [
+   "未定回收章",
+   0,
+   "EditorQuickRef.kt"
   ]
  },
  "skipped": [

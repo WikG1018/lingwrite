@@ -1447,5 +1447,19 @@
 "focus_005": "Not at the goal yet. Exit anyway?",
 "focus_006": "Keep writing",
 "focus_007": "Exit",
-"focus_008": "Typewriter scrolling"
+"focus_008": "Typewriter scrolling",
+"quick_001": "Quick reference",
+"quick_002": "Lore",
+"quick_003": "Foreshadow",
+"quick_004": "Recap",
+"quick_005": "Search",
+"quick_006": "Search this book…",
+"quick_007": "No related lore",
+"quick_008": "No summary yet",
+"quick_009": "Current volume summary",
+"quick_010": "Searching…",
+"quick_011": "Nothing found",
+"quick_012": "Chapter %1$d",
+"quick_013": "Planted in chapter %1$d · planned payoff chapter %2$d",
+"quick_014": "No payoff chapter set"
 }
