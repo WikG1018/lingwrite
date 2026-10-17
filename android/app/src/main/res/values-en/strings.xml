@@ -1390,4 +1390,28 @@
     <string name="data_51">Export snapshot</string>
     <string name="data_52">Delete snapshot</string>
     <string name="data_53">Pre-upgrade snapshot exported</string>
+    <string name="import_001">Import work</string>
+    <string name="import_002">Supports TXT, Markdown and DOCX up to 20 MB; parsed locally.</string>
+    <string name="import_003">Choose file</string>
+    <string name="import_004">Parsing…</string>
+    <string name="import_005" formatted="false">Could not parse: %1$s</string>
+    <string name="import_006">Import preview</string>
+    <string name="import_007">Split by</string>
+    <string name="import_008">Chapter headings</string>
+    <string name="import_009">Chapter length</string>
+    <string name="import_010">Single chapter</string>
+    <string name="import_011" formatted="false">About %1$d characters per chapter</string>
+    <string name="import_012" formatted="false">Chapter preview (first %1$d)</string>
+    <string name="import_013" formatted="false">%1$d volumes · %2$d chapters · %3$s characters</string>
+    <string name="import_014">Title</string>
+    <string name="import_015">Import</string>
+    <string name="import_016">Writing…</string>
+    <string name="import_017" formatted="false">Import failed: %1$s</string>
+    <string name="import_018" formatted="false">Imported %1$d chapters</string>
+    <string name="import_019" formatted="false">Detected encoding: %1$s. If the text is garbled, try another encoding.</string>
+    <string name="import_020">Retry with another encoding</string>
+    <string name="import_021">Preview first; nothing is written until you confirm.</string>
+    <string name="import_022">Empty file or no readable text</string>
+    <string name="import_023">Choose another file</string>
+    <string name="import_024">Preface</string>
 </resources>

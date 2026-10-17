@@ -1248,8 +1248,34 @@ private fun part4(m: HashMap<String, Int>) {
     m["导出快照"] = R.string.data_51
     m["删除快照"] = R.string.data_52
     m["升级快照已导出"] = R.string.data_53
+    m["导入作品"] = R.string.import_001
+    m["支持 TXT、Markdown、DOCX，最大 20MB；文件只在本地解析。"] = R.string.import_002
+    m["选择文件"] = R.string.import_003
+    m["正在解析…"] = R.string.import_004
+    m["解析失败：%1\$s"] = R.string.import_005
+    m["导入预览"] = R.string.import_006
+    m["拆分方式"] = R.string.import_007
+    m["按章节标题"] = R.string.import_008
+    m["按每章长度"] = R.string.import_009
+    m["不分章"] = R.string.import_010
+    m["每章约 %1\$d 字"] = R.string.import_011
+    m["章节预览（前 %1\$d 章）"] = R.string.import_012
+    m["共 %1\$d 卷 · %2\$d 章 · %3\$s 字"] = R.string.import_013
+    m["书名"] = R.string.import_014
+    m["确认导入"] = R.string.import_015
+    m["正在写入…"] = R.string.import_016
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2468).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m) } }
+private fun part5(m: HashMap<String, Int>) {
+    m["导入失败：%1\$s"] = R.string.import_017
+    m["已导入 %1\$d 章"] = R.string.import_018
+    m["检测到编码：%1\$s；如乱码可换编码重试。"] = R.string.import_019
+    m["换编码重试"] = R.string.import_020
+    m["选择文件后先预览，确认才会写入作品。"] = R.string.import_021
+    m["空文件或无法识别正文"] = R.string.import_022
+    m["重新选择"] = R.string.import_023
+    m["序"] = R.string.import_024
+}
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2516).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh
