@@ -312,30 +312,63 @@ object Backup {
 
 /** 文本导出。 */
 object Exporter {
-        data class Options(val markdown: Boolean = false, val from: Int = 1, val to: Int = Int.MAX_VALUE, val titles: Boolean = true, val blurb: Boolean = true, val volumes: Boolean = true, val numStyle: ExportNumStyle = ExportNumStyle.Arabic)
+    data class Options(
+        val markdown: Boolean = false, val from: Int = 1, val to: Int = Int.MAX_VALUE,
+        val titles: Boolean = true, val blurb: Boolean = true, val volumes: Boolean = true,
+        val numStyle: ExportNumStyle = ExportNumStyle.Arabic,
+        /** 非空时按模板导出；为空保持旧行为（兼容现有测试和调用）。 */
+        val preset: ExportPreset? = null,
+    )
 
     suspend fun render(bookId: Long, o: Options): String {
+        val sb = StringBuilder()
+        write(bookId, o, sb)
+        return sb.toString().trimEnd() + "\n"
+    }
+
+    /** 预览：只为界面取前 [maxChars] 个字符，避免大书整本进 UI。 */
+    suspend fun renderPreview(bookId: Long, o: Options, maxChars: Int = 20_000): String =
+        render(bookId, o).take(maxChars)
+
+    /** 逐章写出，供 SAF 文件流使用；不在内存里拼整本。 */
+    suspend fun writeToStream(bookId: Long, o: Options, out: java.io.OutputStream) {
+        val w = java.io.OutputStreamWriter(out, Charsets.UTF_8)
+        write(bookId, o, w)
+        w.flush()
+    }
+
+    suspend fun write(bookId: Long, o: Options, out: Appendable) {
         val db = AppGraph.db
-        val b = db.books().get(bookId) ?: return ""
+        val b = db.books().get(bookId) ?: return
         val volList = db.chapters().volumesOnce(bookId)
         val volIdx = volList.withIndex().associate { (i, v) -> v.id to (i + 1) }
         val vols = volList.associateBy { it.id }
         val chs = db.chapters().chaptersOnce(bookId).filter { it.number in o.from..o.to }.sortedBy { it.number }
-        return buildString {
-            append(if (o.markdown) "# ${b.title}\n\n" else "${b.title}\n\n")
-            if (o.blurb && b.blurb.isNotBlank()) append(if (o.markdown) "> ${b.blurb.replace("\n", "\n> ")}\n\n" else "${b.blurb}\n\n")
-            var lastVol = -1L
-            chs.forEach { c ->
-                if (o.volumes && c.volumeId != lastVol && vols.size > 1) {
-                    lastVol = c.volumeId
-                    val vt = vols[c.volumeId]?.let { VolumeLabel.full(volIdx[it.id] ?: 0, it.title) }.orEmpty()
-                    append(if (o.markdown) "## $vt\n\n" else "$vt\n\n")
-                }
-                if (o.titles) append(if (o.markdown) "### ${ChapterLabel.export(c.number, c.title, o.numStyle)}\n\n" else "${ChapterLabel.export(c.number, c.title, o.numStyle)}\n\n")
-                val paras = c.content.split('\n').map { it.trim() }.filter { it.isNotEmpty() }
-                append(paras.joinToString(if (o.markdown) "\n\n" else "\n") { if (o.markdown) it else "　　$it" })
-                append("\n\n")
+        val p = o.preset
+        out.append(if (o.markdown) "# ${b.title}\n\n" else "${b.title}\n\n")
+        if (o.blurb && (p?.includeBlurb != false) && b.blurb.isNotBlank()) {
+            out.append(if (o.markdown) "> ${b.blurb.replace("\n", "\n> ")}\n\n" else "${b.blurb}\n\n")
+        }
+        var lastVol = -1L
+        chs.forEach { c ->
+            if (o.volumes && c.volumeId != lastVol && vols.size > 1) {
+                lastVol = c.volumeId
+                val idx = volIdx[c.volumeId] ?: 0
+                val vt = if (p != null) renderExportTemplate(p.volumeTitle, idx, CnNum.of(idx), vols[c.volumeId]?.title.orEmpty(), b.title)
+                else vols[c.volumeId]?.let { VolumeLabel.full(idx, it.title) }.orEmpty()
+                if (vt.isNotBlank()) out.append(if (o.markdown && p == null) "## $vt\n\n" else "$vt\n\n")
             }
-        }.trimEnd() + "\n"
+            if (o.titles) {
+                val title = if (p != null) renderExportTemplate(p.chapterTitle, c.number, CnNum.of(c.number), c.title, b.title)
+                else ChapterLabel.export(c.number, c.title, o.numStyle)
+                if (title.isNotBlank()) out.append(if (o.markdown && p == null) "### $title\n\n" else "$title\n\n")
+            }
+            val paras = c.content.split('\n').map { it.trim() }.filter { it.isNotEmpty() }
+            val indent = p?.indent ?: true
+            val blank = p?.blankLine ?: false
+            val sep = if (o.markdown || blank) "\n\n" else "\n"
+            out.append(paras.joinToString(sep) { if (o.markdown || !indent) it else "　　$it" })
+            out.append("\n\n")
+        }
     }
 }
