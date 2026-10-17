@@ -5,12 +5,14 @@ package com.lingwrite.app
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lingwrite.app.data.BookRepository
+import com.lingwrite.app.data.RestoreHints
 import com.lingwrite.app.data.Words
 import com.lingwrite.app.data.db.LingDatabase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -20,6 +22,9 @@ import org.robolectric.annotation.Config
 class RepositoryTest {
     private val db = LingDatabase.build(ApplicationProvider.getApplicationContext(), inMemory = true)
     private val repo = BookRepository(db)
+
+    /** 回收站恢复锚点是进程级状态；每个用例前清空，避免测试类之间章节 id 从 1 重开时串味。 */
+    @Before fun clearRestoreHints() { RestoreHints.clear() }
 
     @Test fun words() {
         assertEquals(6, Words.count("林砚说：好。"))
