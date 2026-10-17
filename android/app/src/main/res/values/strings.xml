@@ -1605,4 +1605,12 @@
     <string name="usage_012">报告已导出</string>
     <string name="usage_013" formatted="false">第 %1$d 章</string>
     <string name="usage_014">任务</string>
+    <string name="tts_001">朗读本章</string>
+    <string name="tts_002">播放</string>
+    <string name="tts_003">停止</string>
+    <string name="tts_004">语速</string>
+    <string name="tts_005">系统语音引擎不可用，或缺少中文语音包。</string>
+    <string name="tts_006">正在初始化语音…</string>
+    <string name="tts_007">从当前段开始</string>
+    <string name="tts_008">系统语音引擎可能联网，由系统设置决定；灵写不保存音频。</string>
 </resources>

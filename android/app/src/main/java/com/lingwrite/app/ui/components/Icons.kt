@@ -111,6 +111,8 @@ object LingIcons {
     val Feedback = Icons.Outlined.Feedback
     val Shield = Icons.Outlined.Shield
     val Article = Icons.AutoMirrored.Outlined.Article
+    val Play = Icons.Rounded.PlayArrow
+    val Stop = Icons.Rounded.Stop
     val Copy = Icons.Outlined.ContentCopy
     val StickyNote = Icons.Outlined.StickyNote2
     val ErrorOutline = Icons.Outlined.ErrorOutline
