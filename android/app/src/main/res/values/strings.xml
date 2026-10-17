@@ -1465,4 +1465,28 @@
     <string name="data_51">导出快照</string>
     <string name="data_52">删除快照</string>
     <string name="data_53">升级快照已导出</string>
+    <string name="import_001">导入作品</string>
+    <string name="import_002">支持 TXT、Markdown、DOCX，最大 20MB；文件只在本地解析。</string>
+    <string name="import_003">选择文件</string>
+    <string name="import_004">正在解析…</string>
+    <string name="import_005" formatted="false">解析失败：%1$s</string>
+    <string name="import_006">导入预览</string>
+    <string name="import_007">拆分方式</string>
+    <string name="import_008">按章节标题</string>
+    <string name="import_009">按每章长度</string>
+    <string name="import_010">不分章</string>
+    <string name="import_011" formatted="false">每章约 %1$d 字</string>
+    <string name="import_012" formatted="false">章节预览（前 %1$d 章）</string>
+    <string name="import_013" formatted="false">共 %1$d 卷 · %2$d 章 · %3$s 字</string>
+    <string name="import_014">书名</string>
+    <string name="import_015">确认导入</string>
+    <string name="import_016">正在写入…</string>
+    <string name="import_017" formatted="false">导入失败：%1$s</string>
+    <string name="import_018" formatted="false">已导入 %1$d 章</string>
+    <string name="import_019" formatted="false">检测到编码：%1$s；如乱码可换编码重试。</string>
+    <string name="import_020">换编码重试</string>
+    <string name="import_021">选择文件后先预览，确认才会写入作品。</string>
+    <string name="import_022">空文件或无法识别正文</string>
+    <string name="import_023">重新选择</string>
+    <string name="import_024">序</string>
 </resources>

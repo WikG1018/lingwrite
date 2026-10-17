@@ -1390,4 +1390,28 @@
     <string name="data_51">スナップショットをエクスポート</string>
     <string name="data_52">スナップショットを削除</string>
     <string name="data_53">アップグレード前スナップショットをエクスポートしました</string>
+    <string name="import_001">作品をインポート</string>
+    <string name="import_002">TXT、Markdown、DOCX（最大 20MB）に対応。ファイルは端末内でのみ解析します。</string>
+    <string name="import_003">ファイルを選択</string>
+    <string name="import_004">解析中…</string>
+    <string name="import_005" formatted="false">解析できませんでした：%1$s</string>
+    <string name="import_006">インポートプレビュー</string>
+    <string name="import_007">分割方法</string>
+    <string name="import_008">章見出しで分割</string>
+    <string name="import_009">章の長さで分割</string>
+    <string name="import_010">分割しない</string>
+    <string name="import_011" formatted="false">1章あたり約 %1$d 字</string>
+    <string name="import_012" formatted="false">章プレビュー（先頭 %1$d 章）</string>
+    <string name="import_013" formatted="false">%1$d 巻 · %2$d 章 · %3$s 字</string>
+    <string name="import_014">書名</string>
+    <string name="import_015">インポート</string>
+    <string name="import_016">書き込み中…</string>
+    <string name="import_017" formatted="false">インポート失敗：%1$s</string>
+    <string name="import_018" formatted="false">%1$d 章をインポートしました</string>
+    <string name="import_019" formatted="false">検出した文字コード：%1$s。文字化けする場合は別の文字コードで再試行してください。</string>
+    <string name="import_020">別の文字コードで再試行</string>
+    <string name="import_021">先にプレビューし、確認するまで作品には書き込みません。</string>
+    <string name="import_022">空のファイル、または本文を認識できません</string>
+    <string name="import_023">別のファイルを選択</string>
+    <string name="import_024">序</string>
 </resources>
