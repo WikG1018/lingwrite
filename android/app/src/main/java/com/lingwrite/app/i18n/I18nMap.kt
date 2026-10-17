@@ -1325,8 +1325,27 @@ private fun part5(m: HashMap<String, Int>) {
     m["第 %1\$d 章"] = R.string.quick_012
     m["埋设第 %1\$d 章 · 计划第 %2\$d 章回收"] = R.string.quick_013
     m["未定回收章"] = R.string.quick_014
+    m["追读数据"] = R.string.read_001
+    m["粘贴导入"] = R.string.read_002
+    m["手动录入"] = R.string.read_003
+    m["章号"] = R.string.read_004
+    m["追读"] = R.string.read_005
+    m["完读率 %"] = R.string.read_006
+    m["收藏"] = R.string.read_007
+    m["评论"] = R.string.read_008
+    m["导入"] = R.string.read_009
+    m["保存"] = R.string.read_010
+    m["暂无追读数据。平台数据需要手动粘贴；灵写不抓取后台。"] = R.string.read_011
+    m["把平台后台的表格复制到下面，表头含章/追读/完读率即可。"] = R.string.read_012
+    m["解析失败：%1\$s"] = R.string.read_013
+    m["已导入 %1\$d 行"] = R.string.read_014
+    m["完读率曲线"] = R.string.read_015
+    m["掉点 %1\$d%%"] = R.string.read_016
+    m["低于中位数"] = R.string.read_017
+    m["章纲无章尾钩子"] = R.string.read_018
+    m["字数偏短"] = R.string.read_019
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2618).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2656).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

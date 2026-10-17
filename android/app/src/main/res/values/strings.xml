@@ -1540,4 +1540,23 @@
     <string name="quick_012" formatted="false">第 %1$d 章</string>
     <string name="quick_013" formatted="false">埋设第 %1$d 章 · 计划第 %2$d 章回收</string>
     <string name="quick_014">未定回收章</string>
+    <string name="read_001">追读数据</string>
+    <string name="read_002">粘贴导入</string>
+    <string name="read_003">手动录入</string>
+    <string name="read_004">章号</string>
+    <string name="read_005">追读</string>
+    <string name="read_006" formatted="false">完读率 %</string>
+    <string name="read_007">收藏</string>
+    <string name="read_008">评论</string>
+    <string name="read_009">导入</string>
+    <string name="read_010">保存</string>
+    <string name="read_011">暂无追读数据。平台数据需要手动粘贴；灵写不抓取后台。</string>
+    <string name="read_012">把平台后台的表格复制到下面，表头含章/追读/完读率即可。</string>
+    <string name="read_013" formatted="false">解析失败：%1$s</string>
+    <string name="read_014" formatted="false">已导入 %1$d 行</string>
+    <string name="read_015">完读率曲线</string>
+    <string name="read_016" formatted="false">掉点 %1$d%%</string>
+    <string name="read_017">低于中位数</string>
+    <string name="read_018">章纲无章尾钩子</string>
+    <string name="read_019">字数偏短</string>
 </resources>

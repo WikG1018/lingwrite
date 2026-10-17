@@ -7689,6 +7689,101 @@
    "未定回收章",
    0,
    "EditorQuickRef.kt"
+  ],
+  "read_001": [
+   "追读数据",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_002": [
+   "粘贴导入",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_003": [
+   "手动录入",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_004": [
+   "章号",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_005": [
+   "追读",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_006": [
+   "完读率 %",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_007": [
+   "收藏",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_008": [
+   "评论",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_009": [
+   "导入",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_010": [
+   "保存",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_011": [
+   "暂无追读数据。平台数据需要手动粘贴；灵写不抓取后台。",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_012": [
+   "把平台后台的表格复制到下面，表头含章/追读/完读率即可。",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_013": [
+   "解析失败：%1$s",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_014": [
+   "已导入 %1$d 行",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_015": [
+   "完读率曲线",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_016": [
+   "掉点 %1$d%%",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_017": [
+   "低于中位数",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_018": [
+   "章纲无章尾钩子",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "read_019": [
+   "字数偏短",
+   0,
+   "ReadStatsRoute.kt"
   ]
  },
  "skipped": [

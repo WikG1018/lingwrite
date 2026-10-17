@@ -1465,4 +1465,23 @@
     <string name="quick_012" formatted="false">Chapter %1$d</string>
     <string name="quick_013" formatted="false">Planted in chapter %1$d · planned payoff chapter %2$d</string>
     <string name="quick_014">No payoff chapter set</string>
+    <string name="read_001">Readership data</string>
+    <string name="read_002">Paste import</string>
+    <string name="read_003">Add manually</string>
+    <string name="read_004">Chapter</string>
+    <string name="read_005">Reads</string>
+    <string name="read_006" formatted="false">Completion %</string>
+    <string name="read_007">Favorites</string>
+    <string name="read_008">Comments</string>
+    <string name="read_009">Import</string>
+    <string name="read_010">Save</string>
+    <string name="read_011">No readership data yet. Platform data must be pasted manually; LingWrite does not scrape backends.</string>
+    <string name="read_012">Paste the table from your platform backend; the header needs chapter/reads/completion.</string>
+    <string name="read_013" formatted="false">Could not parse: %1$s</string>
+    <string name="read_014" formatted="false">Imported %1$d rows</string>
+    <string name="read_015">Completion curve</string>
+    <string name="read_016" formatted="false">Drop %1$d%%</string>
+    <string name="read_017">Below median</string>
+    <string name="read_018">No chapter-end hook in plan</string>
+    <string name="read_019">Short chapter</string>
 </resources>
