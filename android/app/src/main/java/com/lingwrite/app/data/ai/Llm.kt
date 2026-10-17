@@ -4,6 +4,7 @@ package com.lingwrite.app.data.ai
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
@@ -92,19 +93,30 @@ class OpenAiCompatProvider(private val e: Endpoint) : LlmProvider {
         coroutineContext[kotlinx.coroutines.Job]?.invokeOnCompletion { call.cancel() }
         try {
             call.execute().use { r ->
-                if (!r.isSuccessful) { trySend(LlmEvent.Failed(friendlyError(r.code, r.body?.string().orEmpty()), r.code)); return@use }
+                if (!r.isSuccessful) { trySendBlocking(LlmEvent.Failed(friendlyError(r.code, r.body?.string().orEmpty()), r.code)); return@use }
                 var inT: Int? = null; var outT: Int? = null
                 sseLines(r.body!!) { _, d ->
                     if (d == "[DONE]") return@sseLines false
                     val o = runCatching { Json.parseToJsonElement(d).jsonObject }.getOrNull() ?: return@sseLines true
-                    o["choices"]?.jsonArray?.firstOrNull()?.jsonObject?.get("delta")?.jsonObject?.get("content")?.jsonPrimitive?.contentOrNull?.let { if (it.isNotEmpty()) trySend(LlmEvent.Delta(it)) }
-                    (o["usage"] as? JsonObject)?.let { u -> inT = u["prompt_tokens"]?.jsonPrimitive?.intOrNull; outT = u["completion_tokens"]?.jsonPrimitive?.intOrNull }
+                    // 部分兼容网关会以 200 + error 帧返回失败；明确转成 Failed，而不是丢光已生成内容后只报「没有返回内容」。
+                    val errorObj = o["error"] as? JsonObject
+                    if (errorObj != null) {
+                        val msg = (errorObj["message"] as? JsonPrimitive)?.contentOrNull ?: errorObj.toString()
+                        trySendBlocking(LlmEvent.Failed(friendlyError(null, msg)))
+                        return@sseLines false
+                    }
+                    // choices 缺失 / 为 null / 非数组时跳过这一帧，不能抛异常把整段生成判失败。
+                    val delta = (o["choices"] as? JsonArray)?.firstOrNull()?.let { it as? JsonObject }?.get("delta") as? JsonObject
+                    ((delta?.get("content") as? JsonPrimitive)?.contentOrNull)?.let { if (it.isNotEmpty()) trySendBlocking(LlmEvent.Delta(it)) }
+                    (o["usage"] as? JsonObject)?.let { u -> inT = (u["prompt_tokens"] as? JsonPrimitive)?.intOrNull; outT = (u["completion_tokens"] as? JsonPrimitive)?.intOrNull }
                     true
                 }
-                trySend(LlmEvent.Done(inT, outT))
+                trySendBlocking(LlmEvent.Done(inT, outT))
             }
-        } catch (ex: IOException) {
-            if (!call.isCanceled()) trySend(LlmEvent.Failed(friendlyError(null, ex.message ?: ex.javaClass.simpleName)))
+        } catch (ex: kotlinx.coroutines.CancellationException) {
+            throw ex
+        } catch (ex: Exception) {
+            if (!call.isCanceled()) trySendBlocking(LlmEvent.Failed(friendlyError(null, ex.message ?: ex.javaClass.simpleName)))
         }
         close()
         awaitClose { call.cancel() }
@@ -145,23 +157,29 @@ class AnthropicProvider(private val e: Endpoint) : LlmProvider {
         coroutineContext[kotlinx.coroutines.Job]?.invokeOnCompletion { call.cancel() }
         try {
             call.execute().use { r ->
-                if (!r.isSuccessful) { trySend(LlmEvent.Failed(friendlyError(r.code, r.body?.string().orEmpty()), r.code)); return@use }
+                if (!r.isSuccessful) { trySendBlocking(LlmEvent.Failed(friendlyError(r.code, r.body?.string().orEmpty()), r.code)); return@use }
                 var inT: Int? = null; var outT: Int? = null
                 sseLines(r.body!!) { _, d ->
                     val o = runCatching { Json.parseToJsonElement(d).jsonObject }.getOrNull() ?: return@sseLines true
-                    when (o["type"]?.jsonPrimitive?.contentOrNull) {
-                        "message_start" -> inT = o["message"]?.jsonObject?.get("usage")?.jsonObject?.get("input_tokens")?.jsonPrimitive?.intOrNull
-                        "content_block_delta" -> o["delta"]?.jsonObject?.get("text")?.jsonPrimitive?.contentOrNull?.let { trySend(LlmEvent.Delta(it)) }
-                        "message_delta" -> outT = o["usage"]?.jsonObject?.get("output_tokens")?.jsonPrimitive?.intOrNull ?: outT
-                        "error" -> { trySend(LlmEvent.Failed(o["error"]?.jsonObject?.get("message")?.jsonPrimitive?.contentOrNull ?: "服务商返回错误")); return@sseLines false }
+                    val type = (o["type"] as? JsonPrimitive)?.contentOrNull
+                    when (type) {
+                        "message_start" -> inT = ((o["message"] as? JsonObject)?.get("usage") as? JsonObject)?.get("input_tokens")?.let { (it as? JsonPrimitive)?.intOrNull }
+                        "content_block_delta" -> (((o["delta"] as? JsonObject)?.get("text")) as? JsonPrimitive)?.contentOrNull?.let { trySendBlocking(LlmEvent.Delta(it)) }
+                        "message_delta" -> outT = (((o["usage"] as? JsonObject)?.get("output_tokens")) as? JsonPrimitive)?.intOrNull ?: outT
+                        "error" -> {
+                            val msg = (((o["error"] as? JsonObject)?.get("message")) as? JsonPrimitive)?.contentOrNull ?: "服务商返回错误"
+                            trySendBlocking(LlmEvent.Failed(msg)); return@sseLines false
+                        }
                         "message_stop" -> return@sseLines false
                     }
                     true
                 }
-                trySend(LlmEvent.Done(inT, outT))
+                trySendBlocking(LlmEvent.Done(inT, outT))
             }
-        } catch (ex: IOException) {
-            if (!call.isCanceled()) trySend(LlmEvent.Failed(friendlyError(null, ex.message ?: ex.javaClass.simpleName)))
+        } catch (ex: kotlinx.coroutines.CancellationException) {
+            throw ex
+        } catch (ex: Exception) {
+            if (!call.isCanceled()) trySendBlocking(LlmEvent.Failed(friendlyError(null, ex.message ?: ex.javaClass.simpleName)))
         }
         close()
         awaitClose { call.cancel() }

@@ -21,6 +21,7 @@ object AppGraph {
         db = LingDatabase.build(context.applicationContext, inMemory)
         books = BookRepository(db)
         prefs = com.lingwrite.app.data.Prefs(context.applicationContext)
+        com.lingwrite.app.data.RestoreHints.init(context.applicationContext)
         ai = com.lingwrite.app.data.ai.AiService(db.ai(), prefs)
         com.lingwrite.app.ui.routes.AboutModule.bind(context)
         ready = true

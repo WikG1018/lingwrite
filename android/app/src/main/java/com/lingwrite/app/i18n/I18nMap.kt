@@ -1221,8 +1221,10 @@ private fun part4(m: HashMap<String, Int>) {
     m["你定章纲，AI 起草段落或整章，你来挑、改、定稿"] = R.string.dl_094
     m["还没有可用的模型。去 设置 › 模型设置 添加服务商和 Key。"] = R.string.dl_095
     m["模型没有返回内容，请重试；原稿未改动"] = R.string.dl_096
+    m["引文在正文中找不到或出现多次，请手动修改后再试。"] = R.string.editor_78
+    m["导入的服务商会先保持停用；请重新填写 Key 并核对接口地址后再启用。"] = R.string.data_46
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2414).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2418).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

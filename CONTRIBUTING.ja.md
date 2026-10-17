@@ -14,16 +14,16 @@
 
 ```bash
 cd android
-./gradlew assembleDebug testDebugUnitTest
+./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots
 ```
 
-JDK 17 と Android SDK（compileSdk 37）が必要です。初回ビルドで MiSans フォントをダウンロードします（README を参照）。スクリーンショットテストの出力先はデフォルトで `/workspace/lingwrite-shots` です。`-PshotDir=<ディレクトリ>` で変更できます。
+JDK 17 と Android SDK（compileSdk 37）が必要です。初回ビルドで MiSans フォントをダウンロードします（README を参照）。スクリーンショットの出力先は `-PshotDir` で指定します。Gradle の既定値 `/workspace/lingwrite-shots` は通常の環境では書き込めないことが多いため、ローカルでは `./gradlew testDebugUnitTest -PshotDir=build/shots` をおすすめします。
 
 ## Pull Request の送り方
 
 1. `main` からブランチを切り、`fix/outline-scroll` のように内容が分かる名前を付けてください。
 2. 1 つの PR では 1 つの変更だけを扱ってください。コミットメッセージは実際の変更内容と一致させ、空コミットは作らないでください。
-3. ローカルで `./gradlew assembleDebug testDebugUnitTest` を通してください。CI でも同じものが走ります。
+3. ローカルで `./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots` を通してください。CI でも同じものが走ります。
 4. UI を変更した場合は、ライト／ダーク両方のスクリーンショットを添付してください。アニメーションは [docs/motion-design.md](docs/motion-design.md) に従い、カードには**左端のアクセントバーを使わないでください**。
 5. 新しいソースファイルの先頭には SPDX ヘッダーを付けてください。
    ```kotlin

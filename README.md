@@ -48,11 +48,12 @@ App 内「关于 → 检查更新」会访问本仓库的 Releases；GitHub 连�
 git clone https://github.com/WikG1018/lingwrite.git
 cd lingwrite/android
 ./gradlew assembleDebug          # 调试包
-./gradlew testDebugUnitTest      # 单元测试和截图测试
+./gradlew testDebugUnitTest -PshotDir=build/shots   # 单元测试和截图测试
 ./gradlew assembleRelease        # 没有签名配置时用 debug 签名
 ```
 
 - **字体**：MiSans 不随仓库分发（原因见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md)）。首次构建会从小米官方地址下载字体包（约 220 MB，缓存在 `~/.gradle/caches/lingwrite-misans/`），并逐个核对 SHA-256。离线或加 `-Plingwrite.misans=off` 时改用系统字体，构建照常通过。
+- **截图测试**：截图输出目录由 `-PshotDir` 控制；Gradle 默认的 `/workspace/lingwrite-shots` 在普通本机通常不可写，推荐用 `./gradlew testDebugUnitTest -PshotDir=build/shots`。
 - **签名**：仓库里没有任何签名密钥。自己打的 release 包用 debug 签名，不能覆盖安装官方版本。如需自签，按 `android/app/build.gradle.kts` 顶部的说明配置 `~/.lingwrite/signing.properties` 或环境变量。
 
 ## 隐私

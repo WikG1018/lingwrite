@@ -146,6 +146,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     val proof = remember { mutableStateListOf<com.lingwrite.app.data.ProofIssue>() }
     var proofBusy by remember { mutableStateOf(false) }
     var proofErr by remember { mutableStateOf<String?>(null) }
+    var fixErr by remember { mutableStateOf<String?>(null) }
     var proofPick by remember { mutableStateOf(-1) }
     var stuck by remember { mutableStateOf(false) }
     val proofRanges = proof.mapNotNull { issue ->
@@ -154,11 +155,11 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     }
     fun acceptProof(i: Int) {
         val issue = proof.getOrNull(i) ?: return
-        val at = com.lingwrite.app.data.Proof.locate(st.value.text, issue.quote)
-        if (at >= 0) {
-            val kind = if (com.lingwrite.app.data.Proof.needsAiMark(issue)) "edited" else null
-            st.replace(at, at + issue.quote.length, issue.fix, kind)
-        }
+        // 引文必须唯一命中，否则宁可让作者手动改，也不能改错同名句。
+        val at = com.lingwrite.app.data.Proof.locateUnique(st.value.text, issue.quote)
+        if (at < 0) { proofErr = tr(R.string.editor_78); return }
+        val kind = if (com.lingwrite.app.data.Proof.needsAiMark(issue)) "edited" else null
+        st.replace(at, at + issue.quote.length, issue.fix, kind)
         proof.removeAt(i)
         proofPick = -1
     }
@@ -227,7 +228,11 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         onDispose { lifecycle.removeObserver(observer) }
     }
     DisposableEffect(chapterId) {
-        onDispose { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) }
+        onDispose {
+            repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks))
+            // 离开编辑器时清空本章 AI 会话，避免流式任务残留、重进卡「生成中」和内存累积。
+            com.lingwrite.app.ui.routes.clearAiSession(chapterId)
+        }
     }
     val words = Words.count(st.value.text)
 
@@ -266,16 +271,20 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
                 Text(tr(R.string.editor_006), style = Ling.type.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold), color = Ling.colors.onSurface)
                 Text(tr(R.string.editor_007, pf.before.take(50)), style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(tr(R.string.editor_008, pf.after.take(50)), style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.primary, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                fixErr?.let { Text(it, style = Ling.type.micro.copy(lineHeight = 16.sp), color = Ling.colors.error, maxLines = 2, overflow = TextOverflow.Ellipsis) }
             }
             LingButton(tr(R.string.about_001), BtnKind.Tonal, height = 32.dp) {
                 scope.launch {
-                    val at = st.value.text.indexOf(pf.before)
-                    if (at >= 0) {
+                    // 原文必须唯一命中；找不到或出现多次时保留确认条并提示，绝不猜位置。
+                    val at = com.lingwrite.app.data.Proof.locateUnique(st.value.text, pf.before)
+                    if (at < 0) {
+                        fixErr = tr(R.string.editor_78)
+                    } else {
                         repo.saveContent(chapterId, st.value.text, encodeMarks(st.marks))
                         repo.snapshot(chapterId, "ai", tr(R.string.editor_009))
                         st.replace(at, at + pf.before.length, pf.after, "edited")
+                        pf.clear(); fixErr = null
                     }
-                    pf.clear()
                 }
             }
             LingButton(tr(R.string.check_066), BtnKind.Text, height = 32.dp) { pf.clear() }

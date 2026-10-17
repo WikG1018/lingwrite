@@ -182,7 +182,7 @@
     | AI 流式输出 2000 字（模拟 provider） | 帧 P90 | ≤ 14ms |
     | 候选卡 Pager 连续滑动 | 帧 P95 | ≤ 16ms |
   - 流式输出：token 先按 16ms 窗口合并，每帧最多更新一次文本，避免每个 token 都触发重组。
-  - Box 上没有可用的模拟器（KVM 不可用），所以基准只要求**能编译**（`./gradlew :benchmark:assemble`）；数据在真机上跑，结果写进 `docs/perf/v0.2.md`。CI 不门禁。
+  - Box 上没有可用的模拟器（KVM 不可用），所以基准只要求**能编译**（`./gradlew :benchmark:assemble`）；数据在真机上跑，结果记录在 [`docs/perf/v0.2.md`](perf/v0.2.md)（占位，待真机补充）。CI 不门禁。
 
 ## 18. 新增动效的写法规范和检查清单
 **写法**

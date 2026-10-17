@@ -108,14 +108,16 @@ object ChainPrompts {
         append("给出 3 种开篇写法示意，每种 ≤80 字，并说明这种写法的效果。严格只输出 JSON 数组：[{\"text\":\"≤80字\",\"effect\":\"≤15字效果\"}]。")
     }
 
-    // ⑥ 起草（生成模式）：按节拍写正文
-    fun draft(u: String, beats: List<String>, style: String, part: Int, total: Int, drafted: String): String = buildString {
+    // ⑥ 起草（生成模式）：按节拍写正文。beats 是本段要写的 1–2 条节拍，part/total 是全局段号。
+    fun draft(u: String, beats: List<String>, style: String, part: Int, total: Int, drafted: String, first: Boolean = false): String = buildString {
         append("你是资深中文网络小说编辑兼写手。只输出正文内容本身，不要解释、不要标题。\n")
         if (style.isNotBlank()) append(style).append('\n')
         append(u)
-        append("【本章节拍（本次写第 ").append(part).append("–").append(part).append(" 条，共 ").append(total).append(" 条）】\n")
-        append(beats.getOrNull(part - 1)?.let { "第 $part 条：$it" } ?: "").append('\n')
+        append("【本章节拍（第 ").append(part).append("/").append(total).append(" 段）】\n")
+        beats.forEach { append("· ").append(it).append('\n') }
         if (drafted.isNotBlank()) append("\n【已起草部分（结尾 800 字）】\n").append(drafted.takeLast(800)).append('\n')
-        append("\n写 1200–1500 字正文，紧接已起草部分（如有）。这是第一章，前 500 字必须出现钩子；不要大段交代背景，设定在冲突中带出。")
+        append("\n写 1200–1500 字正文，紧接已起草部分（如有）。")
+        if (first) append("这是第一章，前 500 字必须出现钩子；")
+        append("不要大段交代背景，设定在冲突中带出。")
     }
 }

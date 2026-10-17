@@ -1354,4 +1354,6 @@
     <string name="dl_094">You set the outline; AI drafts paragraphs or whole chapters, and you pick, edit and finalize</string>
     <string name="dl_095">No model available yet. Add a provider and key in Settings › Model settings.</string>
     <string name="dl_096">The model returned nothing. Please retry; your draft is untouched</string>
+    <string name="editor_78">The quoted text is missing or appears more than once in this chapter. Please edit it manually and try again.</string>
+    <string name="data_46">Imported providers stay disabled. Re-enter the key and verify the API address before enabling them.</string>
 </resources>

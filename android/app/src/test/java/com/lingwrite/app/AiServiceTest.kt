@@ -14,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -37,6 +38,36 @@ class AiServiceTest {
         assertEquals("continue", log.task); assertEquals(true, log.estimated)
         ai.setOutcome(fin.logId, "accepted")
         assertEquals(1, db.ai().usageSince(0).first().single().calls)
+        s.shutdown(); KeyVault.override = null
+    }
+
+    /** 兼容网关 200 + error 帧：必须转成 Error，且不能丢掉服务商错误信息。 */
+    @Test fun streamSurfacesErrorFrame() = runBlocking {
+        KeyVault.override = ({ s: String -> "enc:$s" } to { s: String -> s.removePrefix("enc:") })
+        val ctx = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val db = LingDatabase.build(ctx, inMemory = true)
+        val ai = AiService(db.ai(), Prefs(ctx))
+        val s = MockWebServer()
+        s.enqueue(MockResponse().setBody("data: {\"error\":{\"message\":\"quota exceeded\"}}\n\n")); s.start()
+        db.ai().insertProvider(ProviderEntity(presetId = "custom", name = "测", protocol = "openai", baseUrl = s.url("/v1").toString(), auth = "bearer", models = "m1", keyCipher = KeyVault.encrypt("secret")))
+        val out = ai.stream("continue", Slot.Writing, "sys", listOf(ChatMessage("user", "u")), bookId = 1).toList()
+        val err = out.last() as AiStream.Error
+        assertTrue("错误里应保留服务商信息，实际：${err.message}", err.message.contains("quota exceeded"))
+        assertTrue("不应误报「模型没有返回内容」", !err.message.contains("没有返回内容"))
+        s.shutdown(); KeyVault.override = null
+    }
+
+    /** choices 为 null 的兼容帧不能被当成异常丢掉整段生成。 */
+    @Test fun streamToleratesNullChoices() = runBlocking {
+        KeyVault.override = ({ s: String -> "enc:$s" } to { s: String -> s.removePrefix("enc:") })
+        val ctx = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val db = LingDatabase.build(ctx, inMemory = true)
+        val ai = AiService(db.ai(), Prefs(ctx))
+        val s = MockWebServer()
+        s.enqueue(MockResponse().setBody("data: {\"choices\":null}\n\ndata: {\"choices\":[{\"delta\":{\"content\":\"正常\"}}]}\n\ndata: [DONE]\n\n")); s.start()
+        db.ai().insertProvider(ProviderEntity(presetId = "custom", name = "测", protocol = "openai", baseUrl = s.url("/v1").toString(), auth = "bearer", models = "m1", keyCipher = KeyVault.encrypt("secret")))
+        val out = ai.stream("continue", Slot.Writing, "sys", listOf(ChatMessage("user", "u")), bookId = 1).toList()
+        assertEquals("正常", (out.last() as AiStream.Finished).text)
         s.shutdown(); KeyVault.override = null
     }
 }

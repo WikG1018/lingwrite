@@ -82,6 +82,8 @@ class AiSession {
     var anchor by mutableStateOf<com.lingwrite.app.data.TextAnchor?>(null)
     var noteAnchor: com.lingwrite.app.data.TextAnchor? = null
     var job: Job? = null
+    /** 采纳进行中，防连点造成重复插入。 */
+    var accepting by mutableStateOf(false)
     // A3 多候选
     var multi by mutableStateOf(false)
     val cands = mutableStateListOf<Candidate>()
@@ -105,7 +107,7 @@ class AiSession {
     var wantProof by mutableStateOf(false)
     /** [keepRun] = true 时保留 AiRun 的 Adopted 态，让采纳高亮能播完（由 UI 调 settle 回到 Idle）。 */
     fun clear(keepRun: Boolean = false) {
-        job?.cancel(); tool = null; text = ""; streaming = false; error = null; logId = null; target = null; anchor = null
+        job?.cancel(); accepting = false; tool = null; text = ""; streaming = false; error = null; logId = null; target = null; anchor = null
         multi = false; cands.clear(); selected = 0; candCount = 0
         if (!keepRun) run.reset()
     }
@@ -114,6 +116,11 @@ class AiSession {
 
 private val sessions = mutableMapOf<Long, AiSession>()
 fun sessionFor(chapterId: Long) = sessions.getOrPut(chapterId) { AiSession() }
+
+/** 离开编辑器时清空该章 AI 会话：取消流式任务、释放候选/批注文本，避免内存累积与重进后卡「生成中」。 */
+fun clearAiSession(chapterId: Long) {
+    sessions.remove(chapterId)?.let { s -> s.job?.cancel(); s.clear() }
+}
 
 object EditorAi {
     fun install() {
@@ -153,9 +160,11 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         val text = st.value.text
         val range = if (hasSel) sel.min until sel.max else null
         s.target = range
-        s.anchor = range?.let { com.lingwrite.app.data.TextAnchor(text, it.first, it.last + 1) }
-        val quote = range?.let { text.substring(it.first, it.last + 1) } ?: ""
         val cursor = if (hasSel) sel.min else sel.end
+        // 生成时就把插入位置钉住：无选区时也锚定光标，采纳时正文变了就拒绝。
+        s.anchor = range?.let { com.lingwrite.app.data.TextAnchor(text, it.first, it.last + 1) }
+            ?: com.lingwrite.app.data.TextAnchor(text, cursor, cursor)
+        val quote = range?.let { text.substring(it.first, it.last + 1) } ?: ""
         s.job = scope.launch {
             val ctx = PromptHooks.context(st.chapter.bookId, st.chapter.id, cursor, text)
             val system = Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p)
@@ -183,33 +192,41 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         }
     }
 
-    /** C5 起草本章：按节拍分段起草，流式进草稿区，不直接写正文。 */
-    fun runDraftLocal(st: EditorState, s: AiSession, p: com.lingwrite.app.data.AppPrefs) {
-        s.clearDraft(); s.tool = null; s.draftOpen = true; s.error = null
+    /** C5 起草本章：按节拍分段起草，流式进草稿区，不直接写正文。[only] 非空时只重写这一段。 */
+    fun runDraftLocal(st: EditorState, s: AiSession, p: com.lingwrite.app.data.AppPrefs, only: Int? = null) {
+        if (only == null) {
+            s.clearDraft(); s.tool = null; s.draftOpen = true; s.error = null
+        } else {
+            s.job?.cancel(); s.error = null
+        }
         s.job = scope.launch {
             val plan = AppGraph.db.plan().chapterOnce(st.chapter.id)
             val beats = com.lingwrite.app.data.parseBeats(plan?.beats ?: "[]")
             if (beats.isEmpty()) {
                 s.error = tr(R.string.editor_ai_030)
+                s.draftStreaming = -1
                 return@launch
             }
-            s.draftTotal = beats.size.coerceIn(2, 3).let { beats.size }
-            val n = (beats.size + 1) / 2 // 每段约 2 条节拍
+            val n = (beats.size + 1) / 2
             s.draftTotal = n
+            if (only == null) s.draftSegs.clear()
             val style = com.lingwrite.app.data.ai.PromptHooks.style(st.chapter.bookId, p)
-            for (i in 0 until n) {
+            val upstream = AppGraph.db.plan().bookOnce(st.chapter.bookId) ?: com.lingwrite.app.data.db.BookPlanEntity(st.chapter.bookId)
+            val indices = if (only == null) (0 until n).toList() else listOf(only.coerceIn(0, n - 1))
+            for (i in indices) {
                 s.draftStreaming = i
-                val done = s.draftSegs.joinToString(System.lineSeparator())
+                while (s.draftSegs.size <= i) s.draftSegs += ""
+                val done = s.draftSegs.take(i).joinToString(System.lineSeparator())
+                // 这一段对应的节拍（每段 2 条）；段号用 1 起的全局段号。
                 val partBeats = beats.drop(i * 2).take(2).map { it.text }
                 val user = com.lingwrite.app.data.ChainPrompts.draft(
-                    com.lingwrite.app.data.ChainPrompts.upstream(AppGraph.db.plan().bookOnce(st.chapter.bookId) ?: com.lingwrite.app.data.db.BookPlanEntity(st.chapter.bookId)),
-                    partBeats, style, i + 1, n, done,
+                    upstream, partBeats, style, i + 1, n, done, first = st.chapter.number <= 1,
                 )
                 var seg = ""
                 AppGraph.ai.stream("draft", Slot.Writing, com.lingwrite.app.data.ai.Prompts.BASE, listOf(ChatMessage("user", user)), 1600, st.chapter.bookId, st.chapter.id, scope = trZh(R.string.editor_ai_031)).collect { e ->
                     when (e) {
-                        is AiStream.Partial -> { seg = e.text; if (s.draftSegs.size <= i) s.draftSegs += e.text else s.draftSegs[i] = e.text }
-                        is AiStream.Finished -> { seg = e.text; if (s.draftSegs.size <= i) s.draftSegs += e.text else s.draftSegs[i] = e.text }
+                        is AiStream.Partial -> { seg = e.text; s.draftSegs[i] = e.text }
+                        is AiStream.Finished -> { seg = e.text; s.draftSegs[i] = e.text }
                         is AiStream.Error -> { s.error = e.message; return@collect }
                     }
                 }
@@ -231,9 +248,11 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         val text = st.value.text
         val range = if (hasSel) sel.min until sel.max else null
         s.target = range
-        s.anchor = range?.let { com.lingwrite.app.data.TextAnchor(text, it.first, it.last + 1) }
-        val quote = range?.let { text.substring(it.first, it.last + 1) } ?: ""
         val cursor = if (hasSel) sel.min else sel.end
+        // 生成时就把插入位置钉住：无选区时也锚定光标，采纳时正文变了就拒绝。
+        s.anchor = range?.let { com.lingwrite.app.data.TextAnchor(text, it.first, it.last + 1) }
+            ?: com.lingwrite.app.data.TextAnchor(text, cursor, cursor)
+        val quote = range?.let { text.substring(it.first, it.last + 1) } ?: ""
         s.job = scope.launch {
             val ctx = PromptHooks.context(st.chapter.bookId, st.chapter.id, cursor, text)
             val system = Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p)
@@ -259,49 +278,60 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
     }
 
     fun accept(text: String, edited: Boolean) {
+        if (s.accepting) return
         scope.launch {
-            // 辅助类输出（给方向）绝不写进正文：存便签（MD1 红线，adoptTo 与测试共用同一套判断）
-            val to = AiAdopt.adoptTo(s.tool?.id ?: "", s.target != null)
-            if (to == AdoptTo.Note) { saveNote("direction", text); return@launch }
-            AppGraph.books.saveContent(st.chapter.id, st.value.text)
-            AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
-            val r = s.target
-            val cur = st.value.text
-            if (r != null && s.anchor?.valid(cur) != true) { s.error = tr(R.string.editor_ai_033); return@launch }
-            // 辅助模式改选中的句子：改的是作者自己写的字，按“AI 建议 + 人工修改”计
-            val kind = if (s.mode == WriteMode.Assist && r != null) "edited" else if (edited) "edited" else "gen"
-            if (r != null && r.last < cur.length) st.replace(r.first, r.last + 1, text, kind)
-            else {
-                val at = st.value.selection.end.coerceIn(0, cur.length)
-                val needBreak = s.tool?.id in setOf("continue", "dialog") && at > 0 && cur[at - 1] != '\n' && text.length > 60
-                st.replace(at, at, (if (needBreak) "\n" else "") + text, kind)
-            }
-            s.logId?.let { AppGraph.ai.setOutcome(it, if (edited) "edited" else "accepted") }
-            s.run.adopted(AdoptTarget.Body)
-            s.clear(keepRun = true)
+            s.accepting = true
+            try {
+                // 辅助类输出（给方向）绝不写进正文：存便签（MD1 红线，adoptTo 与测试共用同一套判断）
+                val to = AiAdopt.adoptTo(s.tool?.id ?: "", s.target != null)
+                if (to == AdoptTo.Note) { saveNote("direction", text); return@launch }
+                AppGraph.books.saveContent(st.chapter.id, st.value.text)
+                AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
+                val cur = st.value.text
+                // 生成时的光标/选区锚点：正文变了就拒绝，绝不猜测位置。
+                val anchor = s.anchor ?: run { s.error = tr(R.string.editor_ai_033); return@launch }
+                if (!anchor.valid(cur)) { s.error = tr(R.string.editor_ai_033); return@launch }
+                val r = s.target
+                // 辅助模式改选中的句子：改的是作者自己写的字，按“AI 建议 + 人工修改”计
+                val kind = if (s.mode == WriteMode.Assist && r != null) "edited" else if (edited) "edited" else "gen"
+                if (r != null) st.replace(r.first, r.last + 1, text, kind)
+                else {
+                    val at = anchor.start.coerceIn(0, cur.length)
+                    val needBreak = s.tool?.id in setOf("continue", "dialog") && at > 0 && cur[at - 1] != '\n' && text.length > 60
+                    st.replace(at, at, (if (needBreak) "\n" else "") + text, kind)
+                }
+                s.logId?.let { AppGraph.ai.setOutcome(it, if (edited) "edited" else "accepted") }
+                s.run.adopted(AdoptTarget.Body)
+                s.clear(keepRun = true)
+            } finally { s.accepting = false }
         }
     }
 
     fun acceptCandidate() {
         val cand = s.cands.getOrNull(s.selected) ?: return
+        if (s.accepting) return
         scope.launch {
-            AppGraph.books.saveContent(st.chapter.id, st.value.text)
-            AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
-            val r = s.target
-            val cur = st.value.text
-            if (r != null && s.anchor?.valid(cur) != true) { s.error = tr(R.string.editor_ai_033); return@launch }
-            val kind = if (cand.edited != null) "edited" else "gen"
-            if (r != null && r.last < cur.length) st.replace(r.first, r.last + 1, cand.display, kind)
-            else {
-                val at = st.value.selection.end.coerceIn(0, cur.length)
-                val needBreak = s.tool?.id in setOf("continue", "dialog") && at > 0 && cur[at - 1] != '\n' && cand.display.length > 60
-                st.replace(at, at, (if (needBreak) "\n" else "") + cand.display, kind)
-            }
-            // F4：记录候选数与采纳下标
-            cand.logId?.let { AppGraph.db.ai().setChoice(it, s.candCount, cand.sourceIndex.takeIf { i -> i >= 0 } ?: s.selected) }
-            cand.logId?.let { AppGraph.ai.setOutcome(it, if (cand.edited != null) "edited" else "accepted") }
-            s.run.adopted(AdoptTarget.Body)
-            s.clear(keepRun = true)
+            s.accepting = true
+            try {
+                AppGraph.books.saveContent(st.chapter.id, st.value.text)
+                AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))
+                val cur = st.value.text
+                val anchor = s.anchor ?: run { s.error = tr(R.string.editor_ai_033); return@launch }
+                if (!anchor.valid(cur)) { s.error = tr(R.string.editor_ai_033); return@launch }
+                val r = s.target
+                val kind = if (cand.edited != null) "edited" else "gen"
+                if (r != null) st.replace(r.first, r.last + 1, cand.display, kind)
+                else {
+                    val at = anchor.start.coerceIn(0, cur.length)
+                    val needBreak = s.tool?.id in setOf("continue", "dialog") && at > 0 && cur[at - 1] != '\n' && cand.display.length > 60
+                    st.replace(at, at, (if (needBreak) "\n" else "") + cand.display, kind)
+                }
+                // F4：记录候选数与采纳下标
+                cand.logId?.let { AppGraph.db.ai().setChoice(it, s.candCount, cand.sourceIndex.takeIf { i -> i >= 0 } ?: s.selected) }
+                cand.logId?.let { AppGraph.ai.setOutcome(it, if (cand.edited != null) "edited" else "accepted") }
+                s.run.adopted(AdoptTarget.Body)
+                s.clear(keepRun = true)
+            } finally { s.accepting = false }
         }
     }
 
@@ -324,7 +354,7 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                     }
                 },
                 onTweak = { s.selected = it; s.tweak = true },
-                onReroll = { s.draftSegs.removeAt(it); s.draftStreaming = it; scope.launch { s.job = launch { runDraftLocal(st, s, p) } } },
+                onReroll = { i -> runDraftLocal(st, s, p, only = i) },
                 onAdoptAll = {
                     scope.launch {
                         AppGraph.books.saveContent(st.chapter.id, st.value.text); AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_034))
@@ -411,7 +441,8 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             }
             // 工具条胶囊（modes.md §5）：辅助模式常驻「卡文急救」；「校对本章」两种模式都有
             val chips = buildList {
-                addAll(tools.map { trText(it.label) })
+                // 传给 ToolChips 的必须是原始 label：显示由 ToolChips 内部 trText 完成，点击也按原始 label 匹配。
+                addAll(tools.map { it.label })
                 add("随手问")
                 if (s.mode == WriteMode.Assist) add("卡文急救")
                 add("校对本章")

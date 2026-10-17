@@ -250,22 +250,55 @@ class BookRepository(private val db: LingDatabase) {
     suspend fun setChapterState(id: Long, state: String) = ch.setState(id, state)
     suspend fun deleteChapter(id: Long) = lock(id).withLock {
         pending.remove(id)?.let { saveContentLocked(id, it.text, it.marks, 5 * 60_000) }
-        ch.get(id)?.let { c -> ch.setDeleted(id, System.currentTimeMillis()); renumber(c.bookId); books.touch(c.bookId) }
+        ch.get(id)?.let { c ->
+            // 删前记录左右邻居：恢复时按邻居插回原位（不依赖会被重排的旧章号，也不改 schema）。
+            val visible = ch.chaptersOnce(c.bookId)
+            val i = visible.indexOfFirst { it.id == id }
+            if (i >= 0) RestoreHints.put(c.id, visible.getOrNull(i - 1)?.id, visible.getOrNull(i + 1)?.id)
+            ch.setDeleted(id, System.currentTimeMillis()); renumber(c.bookId); books.touch(c.bookId)
+        }
     }
     suspend fun restoreChapter(id: Long) = lock(id).withLock {
         val c = ch.get(id) ?: return@withLock
         if (c.deletedAt == 0L) return@withLock
-        val slot = c.number
-        val vols = ch.volumesOnce(c.bookId)
-        val volIndex = vols.indexOfFirst { it.id == c.volumeId }.let { if (it < 0) 0 else it }
-        val order = vols.withIndex().associate { (i, v) -> v.id to i }
+        val visible = ch.chaptersOnce(c.bookId).filter { it.id != id }
+        val index = resolveRestoreIndex(c, visible) ?: visible.count { it.number < c.number }
+        // 先把插入点之后的章节整体后移一位，再把本章放回该位置，最后统一重排章号。
+        visible.filter { it.number >= index + 1 }.forEach { ch.position(it.id, it.number + 1, it.volumeId) }
         ch.setDeleted(id, 0)
-        ch.chaptersOnce(c.bookId).filter { it.id != id }.forEach { other ->
-            val ov = order[other.volumeId] ?: 0
-            if (ov > volIndex || (ov == volIndex && other.number >= slot)) ch.position(other.id, other.number + 1, other.volumeId)
-        }
+        ch.position(id, index + 1, c.volumeId)
+        RestoreHints.remove(id)
         renumber(c.bookId)
         books.touch(c.bookId)
+    }
+
+    /**
+     * 恢复位置（0 起的插入下标）：按删除时记录的左右邻居锚定，跳过仍被删的中间章继续找。
+     * - 左邻居为空：它原本就是第一章，放最前；
+     * - 右邻居为空：原本是最后一章，放最后；
+     * - 否则优先插到左邻居之后，其次插到右邻居之前；
+     * - 返回 null 时调用方回退到旧的章号推断（兼容升级前就已删除、没有锚点的章节）。
+     */
+    private suspend fun resolveRestoreIndex(c: ChapterEntity, visible: List<ChapterEntity>): Int? {
+        val idx = visible.withIndex().associate { (i, x) -> x.id to i }
+        val hint = RestoreHints.get(c.id) ?: return null
+        if (hint.first == null) return 0
+        if (hint.second == null) return visible.size
+        var p: Long? = hint.first
+        var guard = 0
+        while (p != null && guard++ < 1000) {
+            idx[p]?.let { return it + 1 }
+            val h = RestoreHints.get(p) ?: break
+            if (h.first == null) break
+            p = h.first
+        }
+        var n: Long? = hint.second
+        guard = 0
+        while (n != null && guard++ < 1000) {
+            idx[n]?.let { return it }
+            n = RestoreHints.get(n)?.second
+        }
+        return null
     }
 
     /**

@@ -1,6 +1,6 @@
 # 灵写 LingWrite 开发进度
 
-工程在 `android/`。构建：`cd android && ./gradlew assembleDebug testDebugUnitTest`（截图测试默认输出到 `/workspace/lingwrite-shots`，可用 `-PshotDir=...` 改）。
+工程在 `android/`。构建：`cd android && ./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots`（Gradle 的截图默认目录是 `/workspace/lingwrite-shots`，普通本机通常不可写；可用 `-PshotDir=...` 改，本项目统一用 `build/shots`）。
 
 ## 已完成
 | 模块 | 内容 | commit |
@@ -43,6 +43,7 @@
 - **校对改正文的口径**：校对结果只在作者逐条/全部确认后才落正文；改了超过 6 个字的病句标 `edited`，只改错字标点的不加 AI 段落标记。不存在自动写入正文的路径。
 
 ## 发布
+- **v0.3.0**（versionCode 15，数据库 8）：界面多语言（zh-CN 默认 / en / zh-TW / ja）、语言设置、按界面语言的卷章编号、AI 输出语言；无数据库迁移（仍为 8）；无签名密钥变化。校验和与签名见 GitHub Release `v0.3.0`。
 - **v0.2.12**（versionCode 14，数据库 8）：UI 与动效完善。卡片、弹层、建议卡、提示卡的左侧色条全部去掉，改成浅底色、1dp 描边和小圆标（ToneCard），并写进设计规范。候选卡左右露出相邻卡，滑动有吸附；「换一批」先让当前这批离场再重新生成；流式输出有闪烁光标；所有生成中状态统一成 AiThinking。编辑器底栏改成毛玻璃，ToolChips 加了图标。新页面列表逐个错开入场，并逐页修了视觉细节。MigrationTest 按 schema 建库时补上索引。校验和见 GitHub Release `v0.2.12`。
 - **v0.2.11**（versionCode 13，数据库 8）：大纲页和章节、设定库一样，书名和标签跟着内容一起滚。作品页菜单「AI 生成书面」按现有书名做封面，书架和作品页显示，备份带上封面图。校验和见 GitHub Release `v0.2.11`。
 - **v0.2.10**（versionCode 12，数据库 8）：大纲页改成标签下方单独滚动，底部留 116dp，不再套在作品列表里。三张入口卡去掉说明，标题一行，高度一致。从大纲回到章节时，书名和章节列表不再重新淡入。校验和见 GitHub Release `v0.2.10`。
@@ -61,7 +62,7 @@
   - `aapt2 dump badging`：`versionCode='3' versionName='0.2.1'`，minSdk 31。
   - 整改内容见上面的「计划与实现的偏差」与各任务卡：断链修复（给改法、拆文人名、卡文/校对入口、读者反馈重试）、F3 真重试、AiRun 与采纳高亮接线、链路候选/上游落库、向导第 8 步实做、A13 手动再生成、A8 diff+撤销，以及测试口径更正（42 类 / 172 用例 / 0 失败，含 Room 全链迁移与红线回归）。
   - 仍在边界上的已知问题：截图 56/57 是手搓布局不渲染真实 `ChainRoute`；向导与工作台只共用数据层；骨架只接了两处首屏；AI 相关测试都用假 provider。
-- 已知问题：**仓库是私有的 → App 内「检查更新」走匿名 GitHub API 会失败**，用户收不到应用内更新提示；需要仓库公开或改用公开发布渠道（沿用 v0.1 的说明）。
+- 已解决（v0.3.0）：**仓库已公开，应用内更新可正常检查**；历史说明保留在此以便追溯。此前仓库为私有，App 内「检查更新」走匿名 GitHub API 会失败，用户收不到应用内更新提示，需要仓库公开或改用公开发布渠道（沿用 v0.1 的说明）。
 - 签名：release keystore 只放在仓库外（维护者本机备份 + GitHub Actions Secrets），仓库里永远不放密钥。发版由 `.github/workflows/release.yml` 在打 tag 时完成。
   Gradle 读取顺序：环境变量 `LINGWRITE_STORE_FILE` / `_STORE_PASSWORD` / `_KEY_ALIAS` / `_KEY_PASSWORD`，其次 `LINGWRITE_SIGNING_PROPS` 或 `-Plingwrite.signing=<路径>`，最后 `~/.lingwrite/signing.properties`。都没有时 release 包退回 debug 签名，不影响构建。
 - 证书 SHA-256：`f31f5b4f455617f50337dc1bf1643023811d26464c3074e6cc706e4f1f3fce52`。之后每个版本都必须用同一把密钥签名，否则应用内更新会阻止安装，系统也无法覆盖升级。
@@ -69,11 +70,11 @@
 
 ### 真机冒烟
 - v0.1.0 → v0.2.0 覆盖升级 + 迁移 1→7：**待做**。这轮改动只在本机跑了 JVM/Robolectric 测试（含走 Room 的 1→7 全链迁移校验），没有真机或模拟器环境（构建机无 KVM），所以「真机覆盖升级、数据完整迁移」这条**没有实测记录，不能当已验证**。需要用户在真机上冒烟：装 v0.1.0 → 写数据 → 覆盖安装 v0.2.0 → 检查作品/章节/设定/伏笔是否完整。
+- v0.2.12 → v0.3.0 覆盖升级真机冒烟：**待做**（数据库仍为 8，不得跳过）。v0.3.0 自身没有数据库迁移，但仍需从 v0.2.12 正式 APK 写入数据后覆盖安装 v0.3.0，检查作品/章节/设定/伏笔以及备份读取是否完整。
 
 ## 下一步
-- 真机冒烟（见上）+ 决定 v0.2.0 APK 是否重打。
+- 真机冒烟（见上）：v0.2.12 → v0.3.0 覆盖升级真机冒烟待做（数据库仍为 8，不得跳过）；另决定 v0.2.0 APK 是否重打。
 - M4/M5 的功能验收按 `docs/v0.2-plan.md` 的验收条目在真机过一遍（截图只能证明终态）。
-- 仓库私有 → 应用内更新不可用，等用户决定公开渠道。
 
 ## 约定
 - Room 从 v0.1.0 起以 schema version 1 为基线（`app/schemas/.../1.json`），已去掉破坏性重建。每次改表：version + 1，写显式 `Migration`，并提交新的 schema JSON。只有 debug 包在数据库版本降级时允许重建（兼容旧开发库）。迁移的正确性由两条测试保证：逐版本 `migrateN_N+1()`（手工 DDL + 数据）和 `roomOpensAfterFullChainMigration()`（Room 打开后逐项校验 schema，不一致会抛异常）。

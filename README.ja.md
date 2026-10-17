@@ -28,6 +28,7 @@ Web 小説を書くための Android アプリです。章エディタ、設定�
 | 長編コンテキスト | 章・巻の要約、トークン予算に応じた取捨、全文検索、任意でセマンティック検索 |
 | チェック | 整合性チェック（人物像・実力・時系列・関係）、伏線の回収期限リマインダー、AI っぽさチェック |
 | その他 | 統計、TXT／Markdown 書き出し、全体バックアップ、アプリ内アップデート（SHA-256 と署名を検証） |
+| 言語 | UI は簡体字中国語・繁体字中国語・英語・日本語に対応。AI の出力言語は作品の言語に従う |
 
 ## ダウンロード
 
@@ -47,11 +48,12 @@ JDK 17 と Android SDK（compileSdk 37）が必要です。
 git clone https://github.com/WikG1018/lingwrite.git
 cd lingwrite/android
 ./gradlew assembleDebug
-./gradlew testDebugUnitTest
+./gradlew testDebugUnitTest -PshotDir=build/shots
 ./gradlew assembleRelease        # 署名設定がなければ debug キーで署名
 ```
 
 - **フォント**：MiSans はリポジトリに同梱していません（理由は [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) を参照）。初回ビルド時に Xiaomi 公式サイトからフォントパッケージ（約 220 MB）をダウンロードして `~/.gradle/caches/lingwrite-misans/` にキャッシュし、ファイルごとに SHA-256 を照合します。オフラインのときや `-Plingwrite.misans=off` を指定したときはシステムフォントを使い、ビルドはそのまま通ります。
+- **スクリーンショットテスト**：出力先は `-PshotDir` で指定します。Gradle の既定値 `/workspace/lingwrite-shots` は通常の環境では書き込めないことが多いため、`./gradlew testDebugUnitTest -PshotDir=build/shots` をおすすめします。
 - **署名**：リポジトリに署名鍵は含まれていません。自分でビルドした release 版は debug キーで署名されるため、公式版に上書きインストールはできません。
 
 ## プライバシー

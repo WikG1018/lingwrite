@@ -14,16 +14,16 @@ Thanks for wanting to help. These guidelines keep reviews quick and leave room f
 
 ```bash
 cd android
-./gradlew assembleDebug testDebugUnitTest
+./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots
 ```
 
-You need JDK 17 and the Android SDK (compileSdk 37). The first build downloads the MiSans font; see the README. Screenshot tests write to `/workspace/lingwrite-shots` by default. Override that with `-PshotDir=<dir>`.
+You need JDK 17 and the Android SDK (compileSdk 37). The first build downloads the MiSans font; see the README. Screenshot output is controlled by `-PshotDir`: the Gradle default, `/workspace/lingwrite-shots`, usually isn't writable on a normal machine, so run `./gradlew testDebugUnitTest -PshotDir=build/shots` locally.
 
 ## Pull requests
 
 1. Branch off `main` and use a descriptive name such as `fix/outline-scroll`.
 2. Keep each PR to one change. Commit messages should describe what the commit actually does. No empty commits.
-3. Run `./gradlew assembleDebug testDebugUnitTest` locally. CI runs it again.
+3. Run `./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots` locally. CI runs it again.
 4. For UI changes, attach light and dark screenshots. Follow [docs/motion-design.md](docs/motion-design.md) for motion, and **don't use left-edge accent bars** on cards.
 5. Start new source files with an SPDX header:
    ```kotlin

@@ -1430,4 +1430,6 @@
     <string name="dl_094">你定章綱，AI 起草段落或整章，你來挑、改、定稿</string>
     <string name="dl_095">還沒有可用的模型。去 設定 › 模型設定 新增服務商和 Key。</string>
     <string name="dl_096">模型沒有返回內容，請重試；原稿未改動</string>
+    <string name="editor_78">引文在正文中找不到或出現多次，請手動修改後再試。</string>
+    <string name="data_46">匯入的服務商會先保持停用；請重新填寫 Key 並核對介面位址後再啟用。</string>
 </resources>

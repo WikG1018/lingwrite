@@ -48,6 +48,14 @@ object Proof {
         return text.indexOf(quote).coerceAtLeast(-1)
     }
 
+    /** 只在正文里唯一出现时返回下标；找不到或出现多次返回 -1（采纳前防改错同名句）。 */
+    fun locateUnique(text: String, quote: String): Int {
+        if (quote.isBlank()) return -1
+        val first = text.indexOf(quote)
+        if (first < 0) return -1
+        return if (text.indexOf(quote, first + 1) < 0) first else -1
+    }
+
     /** 是否需要标「AI 建议 + 人工修改」：病句类改写超过 6 个字（补个标点之类的小改不标）。 */
     fun needsAiMark(issue: ProofIssue): Boolean =
         issue.type == "grammar" && issue.fix.length > 6
