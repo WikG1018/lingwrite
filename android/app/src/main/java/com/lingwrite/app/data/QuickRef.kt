@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.db.ForeshadowEntity
+import com.lingwrite.app.data.db.Hit
 import com.lingwrite.app.data.db.LoreCardEntity
 import com.lingwrite.app.data.db.VolumeSummaryEntity
 

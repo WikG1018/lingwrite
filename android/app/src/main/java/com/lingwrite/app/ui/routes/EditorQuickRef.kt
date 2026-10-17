@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lingwrite.app.R
 import com.lingwrite.app.data.*
+import com.lingwrite.app.data.db.Hit
 import com.lingwrite.app.i18n.tr
 import com.lingwrite.app.ui.components.*
 import com.lingwrite.app.ui.theme.Ling

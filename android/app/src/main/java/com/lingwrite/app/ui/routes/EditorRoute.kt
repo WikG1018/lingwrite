@@ -34,6 +34,7 @@ import com.lingwrite.app.data.ChapterLabel
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.*
 import com.lingwrite.app.data.db.ChapterEntity
+import com.lingwrite.app.data.db.Hit
 import com.lingwrite.app.data.db.ChapterNoteEntity
 import com.lingwrite.app.data.db.ChapterVersionEntity
 import com.lingwrite.app.ui.Routes
