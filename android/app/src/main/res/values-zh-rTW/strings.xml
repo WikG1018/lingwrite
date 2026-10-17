@@ -1591,4 +1591,18 @@
     <string name="timeline_014">設定變化</string>
     <string name="timeline_015">關係變化</string>
     <string name="timeline_016">章綱</string>
+    <string name="usage_001">AI 使用健檢</string>
+    <string name="usage_002">AI 標記字元佔比</string>
+    <string name="usage_003">採納率</string>
+    <string name="usage_004">按章</string>
+    <string name="usage_005">按任務</string>
+    <string name="usage_006">匯出報告</string>
+    <string name="usage_007">僅統計 App 內標記的 AI 段落；手動修改/外部貼上不計入。不能作為平台判定依據，也不用於規避偵測。</string>
+    <string name="usage_008" formatted="false">AI 生成 %1$d%% · 人工修改 %2$d%%</string>
+    <string name="usage_009" formatted="false">共 %1$d 字</string>
+    <string name="usage_010" formatted="false">呼叫 %1$d 次 · 採納 %2$d</string>
+    <string name="usage_011">暫無 AI 使用紀錄</string>
+    <string name="usage_012">報告已匯出</string>
+    <string name="usage_013" formatted="false">第 %1$d 章</string>
+    <string name="usage_014">任務</string>
 </resources>

@@ -1376,8 +1376,22 @@ private fun part5(m: HashMap<String, Int>) {
     m["设定变化"] = R.string.timeline_014
     m["关系变化"] = R.string.timeline_015
     m["章纲"] = R.string.timeline_016
+    m["AI 使用体检"] = R.string.usage_001
+    m["AI 标记字符占比"] = R.string.usage_002
+    m["采纳率"] = R.string.usage_003
+    m["按章"] = R.string.usage_004
+    m["按任务"] = R.string.usage_005
+    m["导出报告"] = R.string.usage_006
+    m["仅统计 App 内标记的 AI 段落；手工修改/外部粘贴不计入。不能作为平台判定依据，也不用于规避检测。"] = R.string.usage_007
+    m["AI 生成 %1\$d%% · 人工修改 %2\$d%%"] = R.string.usage_008
+    m["共 %1\$d 字"] = R.string.usage_009
+    m["调用 %1\$d 次 · 采纳 %2\$d"] = R.string.usage_010
+    m["暂无 AI 使用记录"] = R.string.usage_011
+    m["报告已导出"] = R.string.usage_012
+    m["第 %1\$d 章"] = R.string.usage_013
+    m["任务"] = R.string.usage_014
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2720).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2748).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

@@ -1516,4 +1516,18 @@
     <string name="timeline_014">Lore change</string>
     <string name="timeline_015">Relationship change</string>
     <string name="timeline_016">Outline</string>
+    <string name="usage_001">AI usage check</string>
+    <string name="usage_002">AI-marked character share</string>
+    <string name="usage_003">Adoption rate</string>
+    <string name="usage_004">By chapter</string>
+    <string name="usage_005">By task</string>
+    <string name="usage_006">Export report</string>
+    <string name="usage_007">Only AI-marked passages inside this app are counted; manual edits and external pastes are excluded. This is not a platform judgment and is not for evading detection.</string>
+    <string name="usage_008" formatted="false">AI generated %1$d%% · human edited %2$d%%</string>
+    <string name="usage_009" formatted="false">%1$d characters total</string>
+    <string name="usage_010" formatted="false">%1$d calls · %2$d adopted</string>
+    <string name="usage_011">No AI usage yet</string>
+    <string name="usage_012">Report exported</string>
+    <string name="usage_013" formatted="false">Chapter %1$d</string>
+    <string name="usage_014">Task</string>
 </resources>

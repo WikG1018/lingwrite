@@ -34,12 +34,14 @@ object Routes {
     const val PublishCheck = "publish/{bookId}/{chapterId}"
     const val ReadStats = "readstats/{bookId}"
     const val Timeline = "timeline/{bookId}"
+    const val AiUsage = "aiusage/{bookId}"
     fun work(id: Long) = "work/$id"; fun editor(id: Long) = "editor/$id"; fun lore(book: Long, card: Long) = "lore/$book/$card"
     fun search(book: Long) = "search/$book"; fun wizard(id: Long) = "wizard/$id"; fun export(id: Long) = "export/$id"
     fun reader(book: Long, chapter: Int) = "reader/$book/$chapter"
     fun publishCheck(book: Long, chapter: Long = 0) = "publish/$book/$chapter"
     fun readStats(book: Long) = "readstats/$book"
     fun timeline(book: Long) = "timeline/$book"
+    fun aiUsage(book: Long) = "aiusage/$book"
     /** A12 拆文：bookId=0 表示还没选书（只能分析）；viewId>0 直接打开已存的分析。 */
     fun breakdown(book: Long = 0, view: Long = 0) = "breakdown/$book/$view"
 }
@@ -134,7 +136,7 @@ fun LingWriteApp(nav: NavHostController = rememberNavController()) {
                 val id = e.arguments!!.getLong("bookId")
                 WorkRoute(id, onBack = { nav.popBackStack() }, onOpenChapter = { nav.navigate(Routes.editor(it)) },
                     onSearch = { nav.navigate(Routes.search(id)) }, onExport = { nav.navigate(Routes.export(it)) },
-                    onPublishCheck = { nav.navigate(Routes.publishCheck(id, 0)) }, onReadStats = { nav.navigate(Routes.readStats(id)) }, onTimeline = { nav.navigate(Routes.timeline(id)) }, initialTab = e.arguments!!.getInt("tab"))
+                    onPublishCheck = { nav.navigate(Routes.publishCheck(id, 0)) }, onReadStats = { nav.navigate(Routes.readStats(id)) }, onTimeline = { nav.navigate(Routes.timeline(id)) }, onAiUsage = { nav.navigate(Routes.aiUsage(id)) }, initialTab = e.arguments!!.getInt("tab"))
             }
             composable(Routes.Editor, listOf(navArgument("chapterId") { type = NavType.LongType })) { e ->
                 EditorRoute(e.arguments!!.getLong("chapterId"), nav)
@@ -163,6 +165,9 @@ fun LingWriteApp(nav: NavHostController = rememberNavController()) {
             }
             composable(Routes.Timeline, listOf(navArgument("bookId") { type = NavType.LongType })) { e ->
                 TimelineRoute(e.arguments!!.getLong("bookId"), nav)
+            }
+            composable(Routes.AiUsage, listOf(navArgument("bookId") { type = NavType.LongType })) { e ->
+                AiUsageRoute(e.arguments!!.getLong("bookId"), nav)
             }
             ExtraDestinations.list.forEach { it(nav) }
         }

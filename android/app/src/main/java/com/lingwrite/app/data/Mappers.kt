@@ -33,8 +33,9 @@ fun BookSummary.toUi() = Book(
 )
 
 fun ChapterEntity.toUi(): Chapter {
-    val ai = parseMarks(aiMarks).sumOf { it.e - it.s }
-    val share = if (wordCount > 50 && ai > 0) (ai * 100 / wordCount.coerceAtLeast(1)).coerceIn(1, 100) else null
+    val ai = PublishCheck.share(content, aiMarks)
+    val pct = (ai.genPercent + ai.editedPercent).coerceIn(0, 100)
+    val share = if (wordCount > 50 && pct > 0) pct.coerceIn(1, 100) else null
     return Chapter(
         id = id, no = number, title = title,
         state = (if (state == "done") "已完成" else "草稿") + " · " + TimeFmt.relative(updatedAt),
