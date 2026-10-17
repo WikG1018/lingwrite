@@ -68,7 +68,8 @@ class JsonExtractTest {
     @Test fun typeMismatchIsRejected() {
         assertNotNull(JsonExtract.extract("""{"a":1}""", array = false))
         assertNull(JsonExtract.extract("""{"a":1}""", array = true))
-        assertNull(JsonExtract.extract("""[{"a":1}]""", array = false))
+        // 对象被数组包裹时，对象模式能取出对象（兼容模型把 JSON 包一层的常见情况）
+        assertNotNull(JsonExtract.extract("""[{"a":1}]""", array = false))
     }
 
     @Test fun noJsonReturnsNull() {
