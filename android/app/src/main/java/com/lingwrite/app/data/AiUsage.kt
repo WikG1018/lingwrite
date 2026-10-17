@@ -11,7 +11,7 @@ data class ChapterUsage(
     val number: Int,
     val title: String,
     val words: Int,
-    val share: PublishCheck.AiShare,
+    val share: AiShare,
     val calls: Int,
     val accepted: Int,
     val edited: Int,
@@ -22,7 +22,7 @@ data class TaskUsage(val task: String, val calls: Int, val accepted: Int)
 
 data class AiUsageReport(
     val chapters: List<ChapterUsage>,
-    val totalShare: PublishCheck.AiShare,
+    val totalShare: AiShare,
     val totalCalls: Int,
     val totalAccepted: Int,
     val totalEdited: Int,
@@ -59,7 +59,7 @@ object AiUsage {
             .sortedByDescending { it.calls }
         return AiUsageReport(
             chapters = chapters,
-            totalShare = PublishCheck.AiShare(gen, edited, total, gParas, eParas),
+            totalShare = AiShare(gen, edited, total, gParas, eParas),
             totalCalls = calls, totalAccepted = accepted, totalEdited = editedN, totalRejected = rejected,
             tasks = tasks,
         )
