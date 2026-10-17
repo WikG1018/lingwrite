@@ -1390,4 +1390,33 @@
     <string name="data_51">Export snapshot</string>
     <string name="data_52">Delete snapshot</string>
     <string name="data_53">Pre-upgrade snapshot exported</string>
+    <string name="editor_81">Copy text</string>
+    <string name="editor_82">Text only</string>
+    <string name="editor_83">Copy text and title</string>
+    <string name="editor_84">With chapter title</string>
+    <string name="editor_85">Copy book, title and text</string>
+    <string name="editor_86">With book title</string>
+    <string name="editor_87">Copied to clipboard</string>
+    <string name="data_54">Export template</string>
+    <string name="data_55">Platform formats change. Preview in the platform backend after exporting; templates are not official formats.</string>
+    <string name="publish_001">Pre-publish check</string>
+    <string name="publish_002">Check again</string>
+    <string name="publish_003">Checking…</string>
+    <string name="publish_004">No issues found</string>
+    <string name="publish_005">Fix required</string>
+    <string name="publish_006">Review</string>
+    <string name="publish_007">AI-marked share</string>
+    <string name="publish_008" formatted="false">AI generated %1$d%% · human edited %2$d%% (%3$d characters)</string>
+    <string name="publish_009">Risk word list</string>
+    <string name="publish_010">No word list imported; only format, length and AI marks are checked.</string>
+    <string name="publish_011">Edit risk words</string>
+    <string name="publish_012">Save</string>
+    <string name="publish_013">Go to text</string>
+    <string name="publish_014">Export report</string>
+    <string name="publish_015">This local check is not a platform compliance guarantee and is not for evading detection.</string>
+    <string name="publish_016" formatted="false">Scope: whole book, %1$d chapters</string>
+    <string name="publish_017">This chapter</string>
+    <string name="publish_018">Word list saved</string>
+    <string name="publish_019">Report exported</string>
+    <string name="publish_020" formatted="false">Check failed: %1$s</string>
 </resources>

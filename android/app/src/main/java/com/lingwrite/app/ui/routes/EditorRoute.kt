@@ -19,6 +19,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
@@ -102,12 +105,21 @@ object EditorHooks {
 fun EditorRoute(chapterId: Long, nav: NavHostController) {
     val repo = AppGraph.books
     val scope = rememberCoroutineScope()
+    val clipboard = LocalClipboardManager.current
+    val ctx = LocalContext.current
     var state by remember { mutableStateOf<EditorState?>(null) }
     LaunchedEffect(chapterId) {
         val loaded = repo.editorChapter(chapterId)
         if (loaded == null) nav.popBackStack() else state = EditorState(loaded)
     }
     val st = state ?: return
+    // 检查结果「去原文」的一次性定位；不改变正文，只移动光标。
+    LaunchedEffect(chapterId, st) {
+        EditorJump.consume(chapterId)?.let { at ->
+            val len = st.value.text.length
+            st.value = st.value.copy(selection = TextRange(at.coerceIn(0, len)))
+        }
+    }
     val ch = st.chapter
     val live by remember(chapterId) { repo.chapter(chapterId) }.collectAsState(ch)
     // Metadata may change while this editor remains open; keep anchors on the current chapter number.
@@ -377,7 +389,23 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         }
     }
 
+    fun copyChapter(withTitle: Boolean, withBook: Boolean) {
+        scope.launch {
+            val book = if (withBook) AppGraph.db.books().get(ch.bookId)?.title.orEmpty() else ""
+            val text = buildString {
+                if (book.isNotBlank()) append(book).append("\n\n")
+                if (withTitle) append(ChapterLabel.full(ch.number, live?.title ?: ch.title)).append("\n\n")
+                append(st.value.text)
+            }
+            clipboard.setText(AnnotatedString(text))
+            android.widget.Toast.makeText(ctx, tr(R.string.editor_87), android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
     if (more) LingSheet({ more = false }) {
+        SheetAction(LingIcons.Copy, tr(R.string.editor_81), sub = tr(R.string.editor_82)) { copyChapter(false, false); more = false }
+        SheetAction(LingIcons.Copy, tr(R.string.editor_83), sub = tr(R.string.editor_84)) { copyChapter(true, false); more = false }
+        SheetAction(LingIcons.Copy, tr(R.string.editor_85), sub = tr(R.string.editor_86)) { copyChapter(true, true); more = false }
         SheetAction(LingIcons.Help, tr(R.string.editor_020), sub = tr(R.string.editor_021)) {
             scope.launch {
                 AppGraph.prefs.update { it.copy(authorGuide = true, authorGuideStep = 5, authorGuideInviteRevision = AUTHOR_GUIDE_REVISION) }
@@ -401,6 +429,9 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         SheetAction(LingIcons.Add, tr(R.string.editor_030), sub = tr(R.string.editor_031)) { scope.launch { val n = repo.nextChapter(ch.bookId, afterChapterId = ch.id); nav.navigate(Routes.editor(n)) { popUpTo(Routes.Editor) { inclusive = true } } }; more = false }
         SheetAction(LingIcons.FactCheck, tr(R.string.editor_ai_046), sub = tr(R.string.editor_032)) {
             more = false; runProof()
+        }
+        SheetAction(LingIcons.FactCheck, tr(R.string.publish_001), sub = tr(R.string.publish_015)) {
+            more = false; nav.navigate(Routes.publishCheck(ch.bookId, chapterId))
         }
         SheetAction(LingIcons.Help, tr(R.string.editor_ai_045), sub = tr(R.string.editor_033)) { more = false; stuck = true }
         // A16 读者试读：模拟反馈，仅供参考（ai-features §16）

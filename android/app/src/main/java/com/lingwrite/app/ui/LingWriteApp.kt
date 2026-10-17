@@ -31,9 +31,11 @@ object Routes {
     const val Settings = "settings"; const val Search = "search/{bookId}"; const val Wizard = "wizard/{bookId}"
     const val About = "about"; const val Backup = "backup"; const val Export = "export/{bookId}"
     const val Breakdown = "breakdown/{bookId}/{viewId}"; const val Reader = "reader/{bookId}/{chapter}"
+    const val PublishCheck = "publish/{bookId}/{chapterId}"
     fun work(id: Long) = "work/$id"; fun editor(id: Long) = "editor/$id"; fun lore(book: Long, card: Long) = "lore/$book/$card"
     fun search(book: Long) = "search/$book"; fun wizard(id: Long) = "wizard/$id"; fun export(id: Long) = "export/$id"
     fun reader(book: Long, chapter: Int) = "reader/$book/$chapter"
+    fun publishCheck(book: Long, chapter: Long = 0) = "publish/$book/$chapter"
     /** A12 拆文：bookId=0 表示还没选书（只能分析）；viewId>0 直接打开已存的分析。 */
     fun breakdown(book: Long = 0, view: Long = 0) = "breakdown/$book/$view"
 }
@@ -125,7 +127,8 @@ fun LingWriteApp(nav: NavHostController = rememberNavController()) {
             composable(Routes.Work, listOf(navArgument("bookId") { type = NavType.LongType }, navArgument("tab") { type = NavType.IntType; defaultValue = 0 })) { e ->
                 val id = e.arguments!!.getLong("bookId")
                 WorkRoute(id, onBack = { nav.popBackStack() }, onOpenChapter = { nav.navigate(Routes.editor(it)) },
-                    onSearch = { nav.navigate(Routes.search(id)) }, onExport = { nav.navigate(Routes.export(it)) }, initialTab = e.arguments!!.getInt("tab"))
+                    onSearch = { nav.navigate(Routes.search(id)) }, onExport = { nav.navigate(Routes.export(it)) },
+                    onPublishCheck = { nav.navigate(Routes.publishCheck(id, 0)) }, initialTab = e.arguments!!.getInt("tab"))
             }
             composable(Routes.Editor, listOf(navArgument("chapterId") { type = NavType.LongType })) { e ->
                 EditorRoute(e.arguments!!.getLong("chapterId"), nav)
@@ -145,6 +148,9 @@ fun LingWriteApp(nav: NavHostController = rememberNavController()) {
             }
             composable(Routes.Reader, listOf(navArgument("bookId") { type = NavType.LongType }, navArgument("chapter") { type = NavType.IntType })) { e ->
                 com.lingwrite.app.ui.routes.ReaderRoute(e.arguments!!.getLong("bookId"), e.arguments!!.getInt("chapter"), nav)
+            }
+            composable(Routes.PublishCheck, listOf(navArgument("bookId") { type = NavType.LongType }, navArgument("chapterId") { type = NavType.LongType })) { e ->
+                com.lingwrite.app.ui.routes.PublishCheckRoute(e.arguments!!.getLong("bookId"), e.arguments!!.getLong("chapterId"), nav)
             }
             ExtraDestinations.list.forEach { it(nav) }
         }

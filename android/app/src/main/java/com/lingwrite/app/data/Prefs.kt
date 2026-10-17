@@ -64,6 +64,8 @@ data class AppPrefs(
     val candidates: Int = 3,
     /** 语义检索向量模型 "providerId|model" */
     val embedModel: String = "",
+    /** 导出模板 id；空=默认通用网文 */
+    val exportPreset: String = "",
 ) {
     companion object {
         const val DEFAULT_BANNED = "不禁,宛如,仿佛,一抹,嘴角勾起一抹,眼中闪过一丝,心中一凛,倒吸一口凉气,不由得,深邃,璀璨,与此同时,值得一提的是,总而言之,命运的齿轮,空气仿佛凝固了"

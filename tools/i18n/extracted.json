@@ -7314,6 +7314,151 @@
    "升级快照已导出",
    0,
    "DataRoute.kt"
+  ],
+  "editor_81": [
+   "复制正文",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_82": [
+   "只复制正文",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_83": [
+   "复制正文和标题",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_84": [
+   "带章节标题",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_85": [
+   "复制书名、标题和正文",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_86": [
+   "带书名，方便存档",
+   0,
+   "EditorRoute.kt"
+  ],
+  "editor_87": [
+   "已复制到剪贴板",
+   0,
+   "EditorRoute.kt"
+  ],
+  "data_54": [
+   "导出模板",
+   0,
+   "DataRoute.kt"
+  ],
+  "data_55": [
+   "平台格式会变，导出后请在平台后台预览；模板不宣称是官方格式。",
+   0,
+   "DataRoute.kt"
+  ],
+  "publish_001": [
+   "发布前检查",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_002": [
+   "重新检查",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_003": [
+   "检查中…",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_004": [
+   "没有发现问题",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_005": [
+   "必须改",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_006": [
+   "建议看",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_007": [
+   "AI 标记占比",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_008": [
+   "AI 生成 %1$d%% · 人工修改 %2$d%%（共 %3$d 字）",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_009": [
+   "风险词表",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_010": [
+   "未导入词表；只检查格式、字数和 AI 标记。",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_011": [
+   "编辑风险词",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_012": [
+   "保存",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_013": [
+   "去原文",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_014": [
+   "导出报告",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_015": [
+   "本地检查不构成平台合规保证，也不用于规避检测。",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_016": [
+   "检查范围：全书 %1$d 章",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_017": [
+   "本章",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_018": [
+   "词表已保存",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_019": [
+   "报告已导出",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "publish_020": [
+   "检查失败：%1$s",
+   0,
+   "PublishCheckRoute.kt"
   ]
  },
  "skipped": [

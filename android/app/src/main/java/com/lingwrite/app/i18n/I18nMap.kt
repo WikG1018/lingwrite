@@ -1248,8 +1248,39 @@ private fun part4(m: HashMap<String, Int>) {
     m["导出快照"] = R.string.data_51
     m["删除快照"] = R.string.data_52
     m["升级快照已导出"] = R.string.data_53
+    m["复制正文"] = R.string.editor_81
+    m["只复制正文"] = R.string.editor_82
+    m["复制正文和标题"] = R.string.editor_83
+    m["带章节标题"] = R.string.editor_84
+    m["复制书名、标题和正文"] = R.string.editor_85
+    m["带书名，方便存档"] = R.string.editor_86
+    m["已复制到剪贴板"] = R.string.editor_87
+    m["导出模板"] = R.string.data_54
+    m["平台格式会变，导出后请在平台后台预览；模板不宣称是官方格式。"] = R.string.data_55
+    m["发布前检查"] = R.string.publish_001
+    m["重新检查"] = R.string.publish_002
+    m["检查中…"] = R.string.publish_003
+    m["没有发现问题"] = R.string.publish_004
+    m["必须改"] = R.string.publish_005
+    m["建议看"] = R.string.publish_006
+    m["AI 标记占比"] = R.string.publish_007
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2468).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m) } }
+private fun part5(m: HashMap<String, Int>) {
+    m["AI 生成 %1\$d%% · 人工修改 %2\$d%%（共 %3\$d 字）"] = R.string.publish_008
+    m["风险词表"] = R.string.publish_009
+    m["未导入词表；只检查格式、字数和 AI 标记。"] = R.string.publish_010
+    m["编辑风险词"] = R.string.publish_011
+    m["保存"] = R.string.publish_012
+    m["去原文"] = R.string.publish_013
+    m["导出报告"] = R.string.publish_014
+    m["本地检查不构成平台合规保证，也不用于规避检测。"] = R.string.publish_015
+    m["检查范围：全书 %1\$d 章"] = R.string.publish_016
+    m["本章"] = R.string.publish_017
+    m["词表已保存"] = R.string.publish_018
+    m["报告已导出"] = R.string.publish_019
+    m["检查失败：%1\$s"] = R.string.publish_020
+}
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2526).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh
