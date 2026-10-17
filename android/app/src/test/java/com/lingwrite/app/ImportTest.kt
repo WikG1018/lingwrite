@@ -83,7 +83,7 @@ class ImportTest {
     }
 
     @Test fun noHeadingFallsBackToLength() = runBlocking {
-        val text = (1..20).joinToString("\n") { "这是第${it}段没有章节标题的正文。" }
+        val text = (1..60).joinToString("\n") { "这是第${it}段没有章节标题的正文。" }
         val p = Importer.parse(ctx, file("plain.txt", text), ImportOptions(fallbackLength = 100))
         assertTrue(p.chapters.size > 1)
         assertTrue(p.warnings.any { it.contains("章节标题") })

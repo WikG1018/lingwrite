@@ -197,11 +197,14 @@ object Importer {
         else -> t
     }
 
-    private fun displayName(ctx: Context, uri: Uri): String = runCatching {
-        ctx.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
-            if (c.moveToFirst()) c.getString(0).orEmpty() else ""
-        }.orEmpty()
-    }.getOrDefault(uri.lastPathSegment.orEmpty())
+    private fun displayName(ctx: Context, uri: Uri): String {
+        val queried = runCatching {
+            ctx.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                if (c.moveToFirst()) c.getString(0).orEmpty() else ""
+            }
+        }.getOrNull().orEmpty()
+        return queried.ifBlank { uri.lastPathSegment.orEmpty().substringAfterLast('/') }
+    }
 
     private fun readLimited(ctx: Context, uri: Uri): ByteArray {
         val input = ctx.contentResolver.openInputStream(uri) ?: error("无法读取文件")
