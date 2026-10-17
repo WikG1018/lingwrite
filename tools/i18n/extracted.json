@@ -7314,6 +7314,126 @@
    "升级快照已导出",
    0,
    "DataRoute.kt"
+  ],
+  "import_001": [
+   "导入作品",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_002": [
+   "支持 TXT、Markdown、DOCX，最大 20MB；文件只在本地解析。",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_003": [
+   "选择文件",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_004": [
+   "正在解析…",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_005": [
+   "解析失败：%1$s",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_006": [
+   "导入预览",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_007": [
+   "拆分方式",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_008": [
+   "按章节标题",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_009": [
+   "按每章长度",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_010": [
+   "不分章",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_011": [
+   "每章约 %1$d 字",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_012": [
+   "章节预览（前 %1$d 章）",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_013": [
+   "共 %1$d 卷 · %2$d 章 · %3$s 字",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_014": [
+   "书名",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_015": [
+   "确认导入",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_016": [
+   "正在写入…",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_017": [
+   "导入失败：%1$s",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_018": [
+   "已导入 %1$d 章",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_019": [
+   "检测到编码：%1$s；如乱码可换编码重试。",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_020": [
+   "换编码重试",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_021": [
+   "选择文件后先预览，确认才会写入作品。",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_022": [
+   "空文件或无法识别正文",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_023": [
+   "重新选择",
+   0,
+   "ImportRoute.kt"
+  ],
+  "import_024": [
+   "序",
+   0,
+   "Import.kt"
   ]
  },
  "skipped": [

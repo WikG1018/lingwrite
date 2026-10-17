@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 val Genres get() = listOf(tr(R.string.shelf_001), tr(R.string.shelf_002), tr(R.string.shelf_003), tr(R.string.shelf_004), tr(R.string.shelf_005), tr(R.string.shelf_006), tr(R.string.shelf_007), tr(R.string.shelf_008), tr(R.string.lore_055))
 
 @Composable
-fun ShelfRoute(onOpenBook: (Long) -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onWizard: (Long) -> Unit) {
+fun ShelfRoute(onOpenBook: (Long) -> Unit, onOpenChapter: (Long) -> Unit, onSearch: () -> Unit, onWizard: (Long) -> Unit, onImport: () -> Unit = {}) {
     val repo = AppGraph.books
     val scope = rememberCoroutineScope()
     val summaries by remember { repo.summaries() }.collectAsState(initial = null)
@@ -45,7 +45,7 @@ fun ShelfRoute(onOpenBook: (Long) -> Unit, onOpenChapter: (Long) -> Unit, onSear
         onSample = { scope.launch { repo.seedSample() } }, onBookMenu = { menuFor = it },
     )
 
-    if (newSheet) NewBookSheet(onDismiss = { newSheet = false }, onWizard = { scope.launch { newSheet = false; onWizard(repo.createBook("", status = "wizard")) } }) { t, g ->
+    if (newSheet) NewBookSheet(onDismiss = { newSheet = false }, onWizard = { scope.launch { newSheet = false; onWizard(repo.createBook("", status = "wizard")) } }, onImport = { newSheet = false; onImport() }) { t, g ->
         scope.launch { newSheet = false; onOpenBook(repo.createBook(t, g)) }
     }
     menuFor?.let { b ->
@@ -68,7 +68,7 @@ fun ShelfRoute(onOpenBook: (Long) -> Unit, onOpenChapter: (Long) -> Unit, onSear
 }
 
 @Composable
-fun NewBookSheet(onDismiss: () -> Unit, onWizard: () -> Unit, onCreate: (String, String) -> Unit) {
+fun NewBookSheet(onDismiss: () -> Unit, onWizard: () -> Unit, onImport: () -> Unit = {}, onCreate: (String, String) -> Unit) {
     val c = Ling.colors
     var title by remember { mutableStateOf("") }
     var genre by remember { mutableStateOf("") }
@@ -80,6 +80,16 @@ fun NewBookSheet(onDismiss: () -> Unit, onWizard: () -> Unit, onCreate: (String,
                 Column {
                     Text(tr(R.string.shelf_016), style = Ling.type.subhead, color = c.onPrimaryContainer)
                     Text(tr(R.string.shelf_017), style = Ling.type.caption, color = c.onPrimaryContainer.copy(alpha = 0.8f))
+                }
+            }
+        }
+        LingCard(Modifier.padding(horizontal = 20.dp, vertical = 10.dp).fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth().rowClick(onImport).padding(16.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Tile(LingIcons.Add, c.surfaceContainer, c.onSurfaceVariant)
+                Spacer(Modifier.width(14.dp))
+                Column {
+                    Text(tr(R.string.import_001), style = Ling.type.subhead, color = c.onSurface)
+                    Text(tr(R.string.import_002), style = Ling.type.caption, color = c.onSurfaceVariant)
                 }
             }
         }

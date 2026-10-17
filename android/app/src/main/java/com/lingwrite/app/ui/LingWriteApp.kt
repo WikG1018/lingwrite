@@ -26,7 +26,7 @@ import com.lingwrite.app.ui.theme.Motion
 import kotlinx.coroutines.launch
 
 object Routes {
-    const val FirstRun = "firstrun"; const val Shelf = "shelf"; const val Work = "work/{bookId}?tab={tab}"; const val Editor = "editor/{chapterId}"
+    const val FirstRun = "firstrun"; const val Shelf = "shelf"; const val Import = "import"; const val Work = "work/{bookId}?tab={tab}"; const val Editor = "editor/{chapterId}"
     const val Lore = "lore/{bookId}/{cardId}"; const val Models = "models"; const val Ideas = "ideas"; const val Stats = "stats"
     const val Settings = "settings"; const val Search = "search/{bookId}"; const val Wizard = "wizard/{bookId}"
     const val About = "about"; const val Backup = "backup"; const val Export = "export/{bookId}"
@@ -120,8 +120,10 @@ fun LingWriteApp(nav: NavHostController = rememberNavController()) {
                 ShelfRoute(
                     onOpenBook = { nav.navigate(Routes.work(it)) }, onOpenChapter = { nav.navigate(Routes.editor(it)) },
                     onSearch = { nav.navigate(Routes.search(0)) }, onWizard = { nav.navigate(Routes.wizard(it)) },
+                    onImport = { nav.navigate(Routes.Import) },
                 )
             }
+            composable(Routes.Import) { ImportRoute(nav) }
             composable(Routes.Work, listOf(navArgument("bookId") { type = NavType.LongType }, navArgument("tab") { type = NavType.IntType; defaultValue = 0 })) { e ->
                 val id = e.arguments!!.getLong("bookId")
                 WorkRoute(id, onBack = { nav.popBackStack() }, onOpenChapter = { nav.navigate(Routes.editor(it)) },
