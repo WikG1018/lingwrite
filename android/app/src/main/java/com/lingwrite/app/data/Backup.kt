@@ -22,6 +22,7 @@ object Backup {
     /** 按依赖顺序；索引（passages / fts / chapter_index）不备份，导入后自动重建。 */
     val tables = listOf(
         TableSpec("books", "id"),
+        TableSpec("read_metrics", "id", mapOf("bookId" to "books")),
         TableSpec("volumes", "id", mapOf("bookId" to "books")),
         TableSpec("chapters", "id", mapOf("bookId" to "books", "volumeId" to "volumes")),
         TableSpec("chapter_versions", "id", mapOf("chapterId" to "chapters")),
@@ -33,6 +34,7 @@ object Backup {
         TableSpec("book_plans", "bookId", mapOf("bookId" to "books"), pkIsFk = true),
         TableSpec("volume_plans", "volumeId", mapOf("volumeId" to "volumes", "bookId" to "books"), pkIsFk = true),
         TableSpec("chapter_plans", "chapterId", mapOf("chapterId" to "chapters", "bookId" to "books"), pkIsFk = true),
+        TableSpec("chapter_plan_versions", "id", mapOf("chapterId" to "chapters", "bookId" to "books")),
         TableSpec("chapter_summaries", "chapterId", mapOf("chapterId" to "chapters", "bookId" to "books"), pkIsFk = true),
         TableSpec("volume_summaries", "volumeId", mapOf("volumeId" to "volumes", "bookId" to "books"), pkIsFk = true),
         TableSpec("issues", "id", mapOf("bookId" to "books", "chapterId" to "chapters")),
