@@ -1557,5 +1557,12 @@
 "wf_020": "%1$d open foreshadows",
 "wf_021": "%1$d AI-tone hints",
 "wf_022": "Check the outline and recap before writing; run the self-check after. Candidates only, never body text.",
-"wf_023": "No candidates generated. Try again."
+"wf_023": "No candidates generated. Try again.",
+"fc_001": "Foreshadow payoff calendar",
+"fc_002": "%1$d overdue",
+"fc_003": "%1$d due soon",
+"fc_004": "Chapter %1$d · %2$d",
+"fc_005": "About %1$d days at the last 7-day pace",
+"fc_006": "%1$d without a payoff chapter",
+"fc_007": "No new foreshadowing in the last 3 chapters; consider adding one"
 }

@@ -1561,4 +1561,11 @@
     <string name="wf_021" formatted="false">%1$d AI-tone hints</string>
     <string name="wf_022">Check the outline and recap before writing; run the self-check after. Candidates only, never body text.</string>
     <string name="wf_023">No candidates generated. Try again.</string>
+    <string name="fc_001">Foreshadow payoff calendar</string>
+    <string name="fc_002" formatted="false">%1$d overdue</string>
+    <string name="fc_003" formatted="false">%1$d due soon</string>
+    <string name="fc_004" formatted="false">Chapter %1$d · %2$d</string>
+    <string name="fc_005" formatted="false">About %1$d days at the last 7-day pace</string>
+    <string name="fc_006" formatted="false">%1$d without a payoff chapter</string>
+    <string name="fc_007">No new foreshadowing in the last 3 chapters; consider adding one</string>
 </resources>

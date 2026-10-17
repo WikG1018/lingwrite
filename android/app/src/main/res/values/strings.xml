@@ -1636,4 +1636,11 @@
     <string name="wf_021" formatted="false">AI 腔提示 %1$d 处</string>
     <string name="wf_022">写前先看章纲和前情；写后过一遍自查。只给候选，不写正文。</string>
     <string name="wf_023">没有生成候选，请重试</string>
+    <string name="fc_001">伏笔回收日历</string>
+    <string name="fc_002" formatted="false">逾期 %1$d 条</string>
+    <string name="fc_003" formatted="false">临期 %1$d 条</string>
+    <string name="fc_004" formatted="false">第 %1$d 章 · %2$d 条</string>
+    <string name="fc_005" formatted="false">按最近 7 天速度约 %1$d 天后</string>
+    <string name="fc_006" formatted="false">未定回收章 %1$d 条</string>
+    <string name="fc_007">最近 3 章没有新伏笔，建议补一条</string>
 </resources>

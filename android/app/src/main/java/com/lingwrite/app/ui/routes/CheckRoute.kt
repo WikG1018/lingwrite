@@ -128,6 +128,22 @@ fun ForeshadowTab(bookId: Long, nav: NavHostController) {
                 androidx.compose.material3.Icon(LingIcons.Chevron, null, tint = c.onSurfaceVariant)
             }
         }
+        val calendar = remember(fs, cur) { ForeshadowCalendar.build(fs, cur) }
+        val done7 = remember(chs) { val since = System.currentTimeMillis() - 7L * 86_400_000; chs.count { it.state == "done" && it.updatedAt >= since } }
+        val pace = done7 / 7.0
+        LingCard(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(tr(R.string.fc_001), style = Ling.type.titleSmall, color = c.onSurface)
+                if (calendar.overdue.isNotEmpty()) Text(tr(R.string.fc_002, calendar.overdue.size), style = Ling.type.caption, color = c.error)
+                if (calendar.due.isNotEmpty()) Text(tr(R.string.fc_003, calendar.due.size), style = Ling.type.caption, color = c.tertiary)
+                calendar.upcoming.take(3).forEach { g ->
+                    val eta = ForeshadowCalendar.etaDays(g.chapter, cur, pace)
+                    Text(tr(R.string.fc_004, g.chapter, g.items.size) + (eta?.let { " · " + tr(R.string.fc_005, it) } ?: ""), style = Ling.type.caption, color = c.onSurfaceVariant)
+                }
+                if (calendar.unscheduled.isNotEmpty()) Text(tr(R.string.fc_006, calendar.unscheduled.size), style = Ling.type.caption, color = c.onSurfaceVariant)
+                if (ForeshadowCalendar.pacingWarning(fs, cur)) Text(tr(R.string.fc_007), style = Ling.type.caption, color = c.tertiary)
+            }
+        }
         ForeshadowList(fs, cur, cards.associate { it.id to it.name }, filter, { filter = it },
             onOpen = { f -> scope.launch { CheckModule.fsDraft = FsDraft(bookId, f.chapterId, f.plantNumber, f.quote, f.quoteStart, f) } },
             onAdopt = { f -> scope.launch { dao.updateForeshadow(f.copy(pending = false)) } },
