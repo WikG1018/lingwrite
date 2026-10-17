@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.semantics.hint
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,8 +61,8 @@ fun LingTextField(
         TextField(
             value, onValueChange,
             Modifier.fillMaxWidth().then(
-                // 视觉 label 没有进 M3 语义；这里补 hint，TalkBack 聚焦时能听到字段名。
-                label?.let { l -> if (l.isNotBlank()) Modifier.semantics { hint = l } else Modifier } ?: Modifier
+                // 视觉 label 没有进 M3 语义；这里补 contentDescription，TalkBack 聚焦时能听到字段名。
+                label?.let { l -> if (l.isNotBlank()) Modifier.semantics { contentDescription = l } else Modifier } ?: Modifier
             ),
             singleLine = singleLine, minLines = minLines, maxLines = maxLines,
             textStyle = textStyle.copy(color = c.onSurface), shape = Radius.card, isError = isError,
