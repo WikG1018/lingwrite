@@ -66,6 +66,10 @@ fun tr(@StringRes id: Int, vararg args: Any?): String {
     return if (args.isEmpty()) r.getString(id) else r.getString(id, *args)
 }
 
+/** 数据层兜底：纯 JVM（无 Android Context）取不到资源时返回给定文案，保证单测与降级路径可用。 */
+fun trOr(@StringRes id: Int, fallback: String, vararg args: Any?): String =
+    runCatching { tr(id, *args) }.getOrElse { fallback }
+
 /** AI 提示词片段：始终用简体中文（默认资源），不随界面语言变化。 */
 fun trZh(@StringRes id: Int, vararg args: Any?): String {
     val r = zhResources()
