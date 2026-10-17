@@ -1360,8 +1360,24 @@ private fun part5(m: HashMap<String, Int>) {
     m["旧章纲"] = R.string.outline_107
     m["新章纲"] = R.string.outline_108
     m["字段：%1\$s"] = R.string.outline_109
+    m["章节事件轴"] = R.string.timeline_001
+    m["全部"] = R.string.timeline_002
+    m["人物"] = R.string.timeline_003
+    m["地点"] = R.string.timeline_004
+    m["物品"] = R.string.timeline_005
+    m["能力"] = R.string.timeline_006
+    m["伏笔"] = R.string.timeline_007
+    m["章纲"] = R.string.timeline_008
+    m["按章节顺序；故事内时间以章纲标注为准。"] = R.string.timeline_009
+    m["暂无事件"] = R.string.timeline_010
+    m["第 %1\$d 章"] = R.string.timeline_011
+    m["埋设"] = R.string.timeline_012
+    m["计划回收"] = R.string.timeline_013
+    m["设定变化"] = R.string.timeline_014
+    m["关系变化"] = R.string.timeline_015
+    m["章纲"] = R.string.timeline_016
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2688).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2720).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

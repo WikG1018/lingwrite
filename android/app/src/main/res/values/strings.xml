@@ -1575,4 +1575,20 @@
     <string name="outline_107">旧章纲</string>
     <string name="outline_108">新章纲</string>
     <string name="outline_109" formatted="false">字段：%1$s</string>
+    <string name="timeline_001">章节事件轴</string>
+    <string name="timeline_002">全部</string>
+    <string name="timeline_003">人物</string>
+    <string name="timeline_004">地点</string>
+    <string name="timeline_005">物品</string>
+    <string name="timeline_006">能力</string>
+    <string name="timeline_007">伏笔</string>
+    <string name="timeline_008">章纲</string>
+    <string name="timeline_009">按章节顺序；故事内时间以章纲标注为准。</string>
+    <string name="timeline_010">暂无事件</string>
+    <string name="timeline_011" formatted="false">第 %1$d 章</string>
+    <string name="timeline_012">埋设</string>
+    <string name="timeline_013">计划回收</string>
+    <string name="timeline_014">设定变化</string>
+    <string name="timeline_015">关系变化</string>
+    <string name="timeline_016">章纲</string>
 </resources>

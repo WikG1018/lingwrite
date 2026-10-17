@@ -1571,5 +1571,21 @@
 "outline_106": "規劃後 3–5 章",
 "outline_107": "舊章綱",
 "outline_108": "新章綱",
-"outline_109": "欄位：%1$s"
+"outline_109": "欄位：%1$s",
+"timeline_001": "章節事件軸",
+"timeline_002": "全部",
+"timeline_003": "人物",
+"timeline_004": "地點",
+"timeline_005": "物品",
+"timeline_006": "能力",
+"timeline_007": "伏筆",
+"timeline_008": "章綱",
+"timeline_009": "按章節順序；故事內時間以章綱標註為準。",
+"timeline_010": "暫無事件",
+"timeline_011": "第 %1$d 章",
+"timeline_012": "埋設",
+"timeline_013": "計畫回收",
+"timeline_014": "設定變化",
+"timeline_015": "關係變化",
+"timeline_016": "章綱"
 }

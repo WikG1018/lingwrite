@@ -31,7 +31,7 @@ fun locate(text: String, quote: String): Int {
 /** 故意为之的问题：同类且引文相近即视为同一条。 */
 fun suppressed(kind: String, quote: String, intended: List<IssueEntity>) = intended.any { it.kind == kind && (it.quote == quote || (quote.length >= 6 && it.quote.contains(quote.take(6)))) }
 
-fun kindLabel(k: String) = when (k) { "persona" -> "人设"; "power" -> "等级实力"; "time" -> "时间线"; "relation" -> "关系/生死"; else -> "其他" }
+fun kindLabel(k: String) = when (k) { "persona" -> "人设"; "power" -> "等级实力"; "time" -> "时间线"; "relation" -> "关系/生死"; "geography" -> "地点/距离"; "item" -> "物品"; "title" -> "称谓/身份"; "knowledge" -> "信息差"; else -> "其他" }
 
 object Consistency {
     val SYS = "你是严谨的长篇小说审校编辑，专门找前后矛盾。\n" + PromptContract.JSON_ARRAY
@@ -49,10 +49,10 @@ object Consistency {
     /** 第二步：与设定、当章状态、前情比对。 */
     fun comparePrompt(facts: String, basis: String) = buildString {
         append("对照【设定与前情】，判断下面每条事实是否与之矛盾。只报告确实矛盾的：不确定、可能是人物说谎、视角受限或故意隐瞒的，不要报。\n")
-        append("kind 只能是：persona（人设崩）/ power（等级实力前后不一）/ time（时间错乱、年龄、人物此时不该知道某事）/ relation（关系或生死矛盾）。\n")
+        append("kind 只能是：persona（人设崩）/ power（等级实力前后不一）/ time（时间错乱、年龄、人物此时不该知道某事）/ relation（关系或生死矛盾）/ geography（地点、距离、方位、气候矛盾）/ item（物品归属、能力、损毁矛盾）/ title（称谓、身份称呼前后不一）/ knowledge（信息差：该知道却不知道，或不该知道却知道）。\n")
         append(PromptContract.JSON_ARRAY).append('\n')
         append(PromptContract.VERBATIM_QUOTE).append('\n')
-        append("没有矛盾就输出 []。格式示例：[{\"kind\":\"power\",\"quote\":\"林砚不过炼气三层\",\"basis\":\"第三章已写他筑基成功\",\"explain\":\"实力描述前后矛盾\"}]\n\n")
+        append("没有矛盾就输出 []。格式示例：[{\"kind\":\"power\",\"quote\":\"林砚不过炼气三层\",\"basis\":\"第三章已写他筑基成功\",\"explain\":\"实力描述前后矛盾\"},{\"kind\":\"knowledge\",\"quote\":\"林砚道：师父还活着\",\"basis\":\"第 5 章已写他亲眼看到师父下葬\",\"explain\":\"角色不该知道/相信相反信息\"}]\n\n")
         append("【设定与前情】\n").append(basis).append("\n\n【本章事实】\n").append(facts)
     }
 
@@ -71,6 +71,7 @@ object Consistency {
             if (rels.isNotEmpty()) append("【关系】").append(rels.joinToString("；") { "${names[it.fromId]}—${names[it.toId]}：${it.label}" }).append('\n')
             val s = prev.mapNotNull { p -> sums[p.id]?.let { "第 ${p.number} 章：${it.text}" } }
             if (s.isNotEmpty()) append("【前情摘要】\n").append(s.joinToString("\n")).append('\n')
+            db.plan().chapterOnce(c.id)?.storyTime?.takeIf { it.isNotBlank() }?.let { append("【本章故事内时间】").append(it).append('\n') }
             val hits = runCatching { ContextEngine.retrieve(c.bookId, c, mentioned.filter { it.type == "character" }.map { it.name }, c.content.take(600), 4) }.getOrDefault(emptyList())
             if (hits.isNotEmpty()) append("【相关前文】\n").append(hits.joinToString("\n") { "（第 ${it.number} 章）${it.text.take(200)}" })
         }
