@@ -11,6 +11,7 @@ import com.lingwrite.app.data.LingJson
 import com.lingwrite.app.data.db.LingDatabase
 import com.lingwrite.app.data.db.MIGRATION_1_2
 import com.lingwrite.app.data.db.MIGRATION_8_9
+import com.lingwrite.app.data.db.MIGRATION_9_10
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -214,6 +215,25 @@ class MigrationTest {
         db.close()
     }
 
+    @Test fun migrate9To10() {
+        val db = openAt(9)
+        db.execSQL("INSERT INTO books (id, title, genre, status, coverIndex, dailyTarget, blurb, wizardStep, createdAt, updatedAt, bufferTarget, publishedUpTo) VALUES (1, '系列测试', '仙侠', 'serial', 0, 0, '', 0, 0, 0, 5, 0)")
+        db.execSQL("INSERT INTO volumes (id, bookId, title, sort) VALUES (1, 1, '山门', 0)")
+        db.execSQL("INSERT INTO chapters (id, bookId, volumeId, number, title, content, wordCount, state, aiMarks, updatedAt, deletedAt) VALUES (1, 1, 1, 1, '夜雨', '正文', 2, 'done', '[]', 0, 0)")
+
+        MIGRATION_9_10.migrate(db)
+
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM series"))
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM series_lore"))
+        assertEquals("", scalar(db, "SELECT COALESCE(seriesId, '') FROM books WHERE id = 1"))
+        db.execSQL("INSERT INTO series (id, name, note, createdAt) VALUES (1, '雾港宇宙', '', 0)")
+        db.execSQL("INSERT INTO series_lore (seriesId, type, name, aliases, role, fields, states, relations, updatedAt) VALUES (1, 'character', '沈砚', '', '', '[]', '[]', '[]', 0)")
+        db.execSQL("UPDATE books SET seriesId = 1 WHERE id = 1")
+        assertEquals("1", scalar(db, "SELECT seriesId FROM books WHERE id = 1"))
+        assertEquals("沈砚", scalar(db, "SELECT name FROM series_lore WHERE seriesId = 1"))
+        db.close()
+    }
+
     /**
      * 全链迁移走 Room（v0.2-plan §6 风险项）：按 v1 schema 建库并写数据，
      * 再用 Room（version 7 + MIGRATIONS）打开。Room 会把迁移结果与编译期 schema 逐项校验
@@ -251,7 +271,7 @@ class MigrationTest {
                 db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = 1, kind = "direction", text = "迁移后可用"))
             }
             assertEquals("1", db.query("SELECT COUNT(*) FROM chapter_notes", null).use { c -> c.moveToFirst(); c.getString(0) })
-            assertEquals("9", db.query("PRAGMA user_version", null).use { c -> c.moveToFirst(); c.getString(0) })
+            assertEquals("10", db.query("PRAGMA user_version", null).use { c -> c.moveToFirst(); c.getString(0) })
         } finally {
             db.close()
             ctx.deleteDatabase(name)

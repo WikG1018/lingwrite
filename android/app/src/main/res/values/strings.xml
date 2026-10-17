@@ -1643,4 +1643,27 @@
     <string name="fc_005" formatted="false">按最近 7 天速度约 %1$d 天后</string>
     <string name="fc_006" formatted="false">未定回收章 %1$d 条</string>
     <string name="fc_007">最近 3 章没有新伏笔，建议补一条</string>
+    <string name="series_001">系列</string>
+    <string name="series_002">系列圣经</string>
+    <string name="series_003">新建系列</string>
+    <string name="series_004">系列名称</string>
+    <string name="series_005">创建</string>
+    <string name="series_006">还没有系列。把同一世界观的多本书放进系列，共享设定只作为参考库。</string>
+    <string name="series_007">本书</string>
+    <string name="series_008">加入系列</string>
+    <string name="series_009">未加入系列的作品</string>
+    <string name="series_010">共享设定</string>
+    <string name="series_011">添加共享卡</string>
+    <string name="series_012">名称</string>
+    <string name="series_013">类型</string>
+    <string name="series_014">定位</string>
+    <string name="series_015">字段（每行 k=v）</string>
+    <string name="series_016">保存</string>
+    <string name="series_017">复制到本书</string>
+    <string name="series_018">选择作品</string>
+    <string name="series_019">已复制</string>
+    <string name="series_020">系列卡只是参考库，复制到本书后才参与一致性检查。</string>
+    <string name="series_021">删除系列</string>
+    <string name="series_022">已删除</string>
+    <string name="series_023">暂无共享卡</string>
 </resources>

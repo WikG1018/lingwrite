@@ -21,7 +21,8 @@ object Backup {
     const val FORMAT = 2
     /** 按依赖顺序；索引（passages / fts / chapter_index）不备份，导入后自动重建。 */
     val tables = listOf(
-        TableSpec("books", "id"),
+        TableSpec("series", "id"),
+        TableSpec("books", "id", mapOf("seriesId" to "series")),
         TableSpec("read_metrics", "id", mapOf("bookId" to "books")),
         TableSpec("volumes", "id", mapOf("bookId" to "books")),
         TableSpec("chapters", "id", mapOf("bookId" to "books", "volumeId" to "volumes")),
@@ -46,6 +47,7 @@ object Backup {
         TableSpec("call_logs", "id", mapOf("bookId" to "books", "chapterId" to "chapters")),
         TableSpec("breakdowns", "id", mapOf("bookId" to "books")),
         TableSpec("reader_reports", "id", mapOf("bookId" to "books")),
+        TableSpec("series_lore", "id", mapOf("seriesId" to "series")),
     )
 
     private val nullableFks = setOf("map_marks.cardId", "foreshadows.chapterId", "foreshadows.cardId", "lore_suggestions.cardId", "ideas.bookId", "ideas.chapterId", "call_logs.bookId", "call_logs.chapterId", "breakdowns.bookId")

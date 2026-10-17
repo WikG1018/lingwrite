@@ -8204,6 +8204,121 @@
    "最近 3 章没有新伏笔，建议补一条",
    0,
    "CheckRoute.kt"
+  ],
+  "series_001": [
+   "系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_002": [
+   "系列圣经",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_003": [
+   "新建系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_004": [
+   "系列名称",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_005": [
+   "创建",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_006": [
+   "还没有系列。把同一世界观的多本书放进系列，共享设定只作为参考库。",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_007": [
+   "本书",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_008": [
+   "加入系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_009": [
+   "未加入系列的作品",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_010": [
+   "共享设定",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_011": [
+   "添加共享卡",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_012": [
+   "名称",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_013": [
+   "类型",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_014": [
+   "定位",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_015": [
+   "字段（每行 k=v）",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_016": [
+   "保存",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_017": [
+   "复制到本书",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_018": [
+   "选择作品",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_019": [
+   "已复制",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_020": [
+   "系列卡只是参考库，复制到本书后才参与一致性检查。",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_021": [
+   "删除系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_022": [
+   "已删除",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_023": [
+   "暂无共享卡",
+   0,
+   "SeriesRoute.kt"
   ]
  },
  "skipped": [

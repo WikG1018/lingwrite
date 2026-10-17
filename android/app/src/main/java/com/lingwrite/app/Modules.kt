@@ -21,5 +21,6 @@ object Modules {
         com.lingwrite.app.ui.routes.UpdateModule.install()
         com.lingwrite.app.ui.routes.AboutModule.install()
         com.lingwrite.app.ui.routes.AuthorGuideModule.install()
+        com.lingwrite.app.ui.routes.SeriesModule.install()
     }
 }

@@ -1428,8 +1428,31 @@ private fun part5(m: HashMap<String, Int>) {
     m["按最近 7 天速度约 %1\$d 天后"] = R.string.fc_005
     m["未定回收章 %1\$d 条"] = R.string.fc_006
     m["最近 3 章没有新伏笔，建议补一条"] = R.string.fc_007
+    m["系列"] = R.string.series_001
+    m["系列圣经"] = R.string.series_002
+    m["新建系列"] = R.string.series_003
+    m["系列名称"] = R.string.series_004
+    m["创建"] = R.string.series_005
+    m["还没有系列。把同一世界观的多本书放进系列，共享设定只作为参考库。"] = R.string.series_006
+    m["本书"] = R.string.series_007
+    m["加入系列"] = R.string.series_008
+    m["未加入系列的作品"] = R.string.series_009
+    m["共享设定"] = R.string.series_010
+    m["添加共享卡"] = R.string.series_011
+    m["名称"] = R.string.series_012
+    m["类型"] = R.string.series_013
+    m["定位"] = R.string.series_014
+    m["字段（每行 k=v）"] = R.string.series_015
+    m["保存"] = R.string.series_016
+    m["复制到本书"] = R.string.series_017
+    m["选择作品"] = R.string.series_018
+    m["已复制"] = R.string.series_019
+    m["系列卡只是参考库，复制到本书后才参与一致性检查。"] = R.string.series_020
+    m["删除系列"] = R.string.series_021
+    m["已删除"] = R.string.series_022
+    m["暂无共享卡"] = R.string.series_023
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2824).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2870).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

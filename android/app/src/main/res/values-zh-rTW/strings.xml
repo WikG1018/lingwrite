@@ -1643,4 +1643,27 @@
     <string name="fc_005" formatted="false">按最近 7 天速度約 %1$d 天後</string>
     <string name="fc_006" formatted="false">未定回收章 %1$d 條</string>
     <string name="fc_007">最近 3 章沒有新伏筆，建議補一條</string>
+    <string name="series_001">系列</string>
+    <string name="series_002">系列聖經</string>
+    <string name="series_003">新建系列</string>
+    <string name="series_004">系列名稱</string>
+    <string name="series_005">建立</string>
+    <string name="series_006">還沒有系列。把同一世界觀的多本書放進系列，共享設定只作為參考庫。</string>
+    <string name="series_007">本書</string>
+    <string name="series_008">加入系列</string>
+    <string name="series_009">未加入系列的作品</string>
+    <string name="series_010">共享設定</string>
+    <string name="series_011">新增共享卡</string>
+    <string name="series_012">名稱</string>
+    <string name="series_013">類型</string>
+    <string name="series_014">定位</string>
+    <string name="series_015">欄位（每行 k=v）</string>
+    <string name="series_016">儲存</string>
+    <string name="series_017">複製到本書</string>
+    <string name="series_018">選擇作品</string>
+    <string name="series_019">已複製</string>
+    <string name="series_020">系列卡只是參考庫，複製到本書後才參與一致性檢查。</string>
+    <string name="series_021">刪除系列</string>
+    <string name="series_022">已刪除</string>
+    <string name="series_023">暫無共享卡</string>
 </resources>
