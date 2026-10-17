@@ -1419,4 +1419,12 @@
     <string name="publish_018">Word list saved</string>
     <string name="publish_019">Report exported</string>
     <string name="publish_020" formatted="false">Check failed: %1$s</string>
+    <string name="focus_001">Focus mode</string>
+    <string name="focus_002">Exit focus</string>
+    <string name="focus_003" formatted="false">Goal %1$d characters</string>
+    <string name="focus_004" formatted="false">%1$d characters this session</string>
+    <string name="focus_005">Not at the goal yet. Exit anyway?</string>
+    <string name="focus_006">Keep writing</string>
+    <string name="focus_007">Exit</string>
+    <string name="focus_008">Typewriter scrolling</string>
 </resources>

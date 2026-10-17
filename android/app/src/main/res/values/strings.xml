@@ -1494,4 +1494,12 @@
     <string name="publish_018">词表已保存</string>
     <string name="publish_019">报告已导出</string>
     <string name="publish_020" formatted="false">检查失败：%1$s</string>
+    <string name="focus_001">进入专注</string>
+    <string name="focus_002">退出专注</string>
+    <string name="focus_003" formatted="false">目标 %1$d 字</string>
+    <string name="focus_004" formatted="false">本次 %1$d 字</string>
+    <string name="focus_005">还没到目标，仍要退出？</string>
+    <string name="focus_006">继续写</string>
+    <string name="focus_007">退出</string>
+    <string name="focus_008">打字机滚动</string>
 </resources>

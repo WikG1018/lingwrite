@@ -7459,6 +7459,46 @@
    "检查失败：%1$s",
    0,
    "PublishCheckRoute.kt"
+  ],
+  "focus_001": [
+   "进入专注",
+   0,
+   "EditorScreen.kt"
+  ],
+  "focus_002": [
+   "退出专注",
+   0,
+   "EditorScreen.kt"
+  ],
+  "focus_003": [
+   "目标 %1$d 字",
+   0,
+   "EditorScreen.kt"
+  ],
+  "focus_004": [
+   "本次 %1$d 字",
+   0,
+   "EditorScreen.kt"
+  ],
+  "focus_005": [
+   "还没到目标，仍要退出？",
+   0,
+   "EditorRoute.kt"
+  ],
+  "focus_006": [
+   "继续写",
+   0,
+   "EditorRoute.kt"
+  ],
+  "focus_007": [
+   "退出",
+   0,
+   "EditorRoute.kt"
+  ],
+  "focus_008": [
+   "打字机滚动",
+   0,
+   "EditorRoute.kt"
   ]
  },
  "skipped": [

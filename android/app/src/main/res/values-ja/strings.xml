@@ -1419,4 +1419,12 @@
     <string name="publish_018">語リストを保存しました</string>
     <string name="publish_019">レポートを書き出しました</string>
     <string name="publish_020" formatted="false">チェック失敗：%1$s</string>
+    <string name="focus_001">集中モード</string>
+    <string name="focus_002">集中を終了</string>
+    <string name="focus_003" formatted="false">目標 %1$d 字</string>
+    <string name="focus_004" formatted="false">今回 %1$d 字</string>
+    <string name="focus_005">目標に届いていません。終了しますか？</string>
+    <string name="focus_006">書き続ける</string>
+    <string name="focus_007">終了</string>
+    <string name="focus_008">タイプライタースクロール</string>
 </resources>

@@ -66,6 +66,10 @@ data class AppPrefs(
     val embedModel: String = "",
     /** 导出模板 id；空=默认通用网文 */
     val exportPreset: String = "",
+    /** 专注模式默认目标字数 */
+    val focusTarget: Int = 2000,
+    val focusTypewriter: Boolean = true,
+    val focusHideMarks: Boolean = false,
 ) {
     companion object {
         const val DEFAULT_BANNED = "不禁,宛如,仿佛,一抹,嘴角勾起一抹,眼中闪过一丝,心中一凛,倒吸一口凉气,不由得,深邃,璀璨,与此同时,值得一提的是,总而言之,命运的齿轮,空气仿佛凝固了"

@@ -148,6 +148,11 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     LaunchedEffect(mode) { s.mode = mode }
     LaunchedEffect(nav) { EditorHooks.onOpenModels = { nav.navigate(Routes.Models) } }
     val notesUnread by remember(chapterId) { AppGraph.db.notes().unreadCount(chapterId) }.collectAsState(0)
+    var focus by rememberSaveable(chapterId) { mutableStateOf(false) }
+    var exitFocusConfirm by remember { mutableStateOf(false) }
+    var focusStartWords by rememberSaveable(chapterId) { mutableIntStateOf(0) }
+    var focusStartAt by rememberSaveable(chapterId) { mutableLongStateOf(0L) }
+    var focusTick by remember { mutableLongStateOf(0L) }
     // C5 节拍清单（链路第 ⑥ 步）：正文上方的可勾选清单
     var beats by remember(chapterId) { mutableStateOf(emptyList<com.lingwrite.app.data.Beat>()) }
     LaunchedEffect(chapterId) {
@@ -247,8 +252,24 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         }
     }
     val words = Words.count(st.value.text)
-
     val p = prefs
+    val focusTarget = p?.focusTarget?.coerceAtLeast(1) ?: 2000
+    val focusWords = (words - focusStartWords).coerceAtLeast(0)
+    val focusPercent = (focusWords.toFloat() / focusTarget).coerceIn(0f, 1f)
+    val focusElapsed = ((focusTick - focusStartAt).coerceAtLeast(0) / 1000).let { sec -> "%02d:%02d".format(sec / 60, sec % 60) }
+    LaunchedEffect(focus) {
+        if (focus) {
+            focusStartWords = Words.count(st.value.text)
+            focusStartAt = System.currentTimeMillis()
+            focusTick = focusStartAt
+            while (true) { delay(1000); focusTick = System.currentTimeMillis() }
+        }
+    }
+    val focusView = androidx.compose.ui.platform.LocalView.current
+    DisposableEffect(focus, focusView) {
+        focusView.keepScreenOn = focus
+        onDispose { focusView.keepScreenOn = false }
+    }
     val imeVisible = WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
     EditorScreen(
         noticeBar = {
@@ -344,10 +365,23 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             onCheck = { EditorHooks.onCheck(st, nav) }, onAi = { aiOpen.value = !aiOpen.value },
             onNotes = { notesOpen = true },
             onSave = { repo.queueSave(chapterId, st.value.text, encodeMarks(st.marks)) },
+            onFocus = { focus = true },
         ),
+        focus = focus,
+        onExitFocus = { if (focusWords >= focusTarget) focus = false else exitFocusConfirm = true },
+        focusWords = focusWords,
+        focusTarget = focusTarget,
+        focusElapsed = focusElapsed,
+        focusPercent = focusPercent,
+        typewriter = p?.focusTypewriter ?: true,,
         directory = { EditorDirectory(st, nav) },
         tools = { tab -> EditorInspector(st, nav, tab) },
         bottomPanel = { EditorHooks.aiPanel(this, st, aiOpen) },
+    )
+    if (exitFocusConfirm) LingConfirm(
+        tr(R.string.focus_005), "", confirm = tr(R.string.focus_007), onDismiss = { exitFocusConfirm = false },
+        onConfirm = { exitFocusConfirm = false; focus = false },
+        extra = { Text(tr(R.string.focus_006), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant) },
     )
     EditorHooks.overlays(st, nav)
     NotesDrawer(chapterId, notesOpen, onClose = { notesOpen = false })

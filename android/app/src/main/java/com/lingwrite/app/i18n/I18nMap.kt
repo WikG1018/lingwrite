@@ -1279,8 +1279,16 @@ private fun part5(m: HashMap<String, Int>) {
     m["词表已保存"] = R.string.publish_018
     m["报告已导出"] = R.string.publish_019
     m["检查失败：%1\$s"] = R.string.publish_020
+    m["进入专注"] = R.string.focus_001
+    m["退出专注"] = R.string.focus_002
+    m["目标 %1\$d 字"] = R.string.focus_003
+    m["本次 %1\$d 字"] = R.string.focus_004
+    m["还没到目标，仍要退出？"] = R.string.focus_005
+    m["继续写"] = R.string.focus_006
+    m["退出"] = R.string.focus_007
+    m["打字机滚动"] = R.string.focus_008
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2526).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2542).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

@@ -1415,5 +1415,13 @@
 "publish_017": "This chapter",
 "publish_018": "Word list saved",
 "publish_019": "Report exported",
-"publish_020": "Check failed: %1$s"
+"publish_020": "Check failed: %1$s",
+"focus_001": "Focus mode",
+"focus_002": "Exit focus",
+"focus_003": "Goal %1$d characters",
+"focus_004": "%1$d characters this session",
+"focus_005": "Not at the goal yet. Exit anyway?",
+"focus_006": "Keep writing",
+"focus_007": "Exit",
+"focus_008": "Typewriter scrolling"
 }
