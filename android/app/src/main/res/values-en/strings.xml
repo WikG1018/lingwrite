@@ -1530,4 +1530,12 @@
     <string name="usage_012">Report exported</string>
     <string name="usage_013" formatted="false">Chapter %1$d</string>
     <string name="usage_014">Task</string>
+    <string name="tts_001">Read this chapter</string>
+    <string name="tts_002">Play</string>
+    <string name="tts_003">Stop</string>
+    <string name="tts_004">Speed</string>
+    <string name="tts_005">The system speech engine is unavailable or Chinese voice data is missing.</string>
+    <string name="tts_006">Initializing speech…</string>
+    <string name="tts_007">Start from current paragraph</string>
+    <string name="tts_008">The system speech engine may use the network depending on system settings; LingWrite stores no audio.</string>
 </resources>

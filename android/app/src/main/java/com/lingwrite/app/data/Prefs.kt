@@ -70,6 +70,8 @@ data class AppPrefs(
     val focusTarget: Int = 2000,
     val focusTypewriter: Boolean = true,
     val focusHideMarks: Boolean = false,
+    /** 听稿语速 */
+    val ttsSpeed: Float = 1.0f,
 ) {
     companion object {
         const val DEFAULT_BANNED = "不禁,宛如,仿佛,一抹,嘴角勾起一抹,眼中闪过一丝,心中一凛,倒吸一口凉气,不由得,深邃,璀璨,与此同时,值得一提的是,总而言之,命运的齿轮,空气仿佛凝固了"

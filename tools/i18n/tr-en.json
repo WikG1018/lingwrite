@@ -1526,5 +1526,13 @@
 "usage_011": "No AI usage yet",
 "usage_012": "Report exported",
 "usage_013": "Chapter %1$d",
-"usage_014": "Task"
+"usage_014": "Task",
+"tts_001": "Read this chapter",
+"tts_002": "Play",
+"tts_003": "Stop",
+"tts_004": "Speed",
+"tts_005": "The system speech engine is unavailable or Chinese voice data is missing.",
+"tts_006": "Initializing speech…",
+"tts_007": "Start from current paragraph",
+"tts_008": "The system speech engine may use the network depending on system settings; LingWrite stores no audio."
 }

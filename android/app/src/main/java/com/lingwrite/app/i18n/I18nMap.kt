@@ -1390,8 +1390,16 @@ private fun part5(m: HashMap<String, Int>) {
     m["报告已导出"] = R.string.usage_012
     m["第 %1\$d 章"] = R.string.usage_013
     m["任务"] = R.string.usage_014
+    m["朗读本章"] = R.string.tts_001
+    m["播放"] = R.string.tts_002
+    m["停止"] = R.string.tts_003
+    m["语速"] = R.string.tts_004
+    m["系统语音引擎不可用，或缺少中文语音包。"] = R.string.tts_005
+    m["正在初始化语音…"] = R.string.tts_006
+    m["从当前段开始"] = R.string.tts_007
+    m["系统语音引擎可能联网，由系统设置决定；灵写不保存音频。"] = R.string.tts_008
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2748).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2764).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh
