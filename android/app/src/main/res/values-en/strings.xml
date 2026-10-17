@@ -1383,4 +1383,11 @@
     <string name="stats_031">Month</string>
     <string name="editor_79">The selection is too long (over 4,000 characters). Please rewrite it in smaller parts so the AI output is not truncated.</string>
     <string name="editor_80">The AI output looks truncated (much shorter than the original). Your draft was left unchanged; please retry or shorten the selection.</string>
+    <string name="data_47">Include all history versions (larger file)</string>
+    <string name="data_48">By default only the latest 3 automatic versions per chapter are backed up; manual, rollback and AI snapshots are kept.</string>
+    <string name="data_49">Pre-upgrade database snapshots</string>
+    <string name="data_50">Original database saved before an upgrade; backup only, no automatic restore.</string>
+    <string name="data_51">Export snapshot</string>
+    <string name="data_52">Delete snapshot</string>
+    <string name="data_53">Pre-upgrade snapshot exported</string>
 </resources>

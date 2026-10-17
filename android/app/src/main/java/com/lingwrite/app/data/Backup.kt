@@ -55,16 +55,22 @@ object Backup {
         else -> JsonPrimitive(c.getString(i))
     }
 
-    /** 导出整库为 JSON（Key 永不导出：服务商只导出配置，keyCipher 置空）。 */
-    fun dump(): JsonObject {
+    /** 导出整库为 JSON（Key 永不导出：服务商只导出配置，keyCipher 置空）。[includeAllVersions] 为 false 时只留每章最近 3 个自动版本，控制长篇备份体积。 */
+    fun dump(includeAllVersions: Boolean = false): JsonObject {
         val db = AppGraph.db.openHelper.readableDatabase
         db.beginTransaction()
         try { return buildJsonObject {
-            put("format", FORMAT); put("app", "lingwrite"); put("exportedAt", System.currentTimeMillis()); put("schema", 8)
+            put("format", FORMAT); put("app", "lingwrite"); put("exportedAt", System.currentTimeMillis()); put("schema", db.version)
             putJsonObject("tables") {
                 (tables.map { it.name } + "providers").forEach { t ->
                     putJsonArray(t) {
-                        db.query("SELECT * FROM $t").use { c ->
+                        // 自动历史版本每章最多 50 个；默认只备份最近 3 个，手动/回滚/AI 版本全保留。
+                        val sql = if (t == "chapter_versions" && !includeAllVersions) {
+                            "SELECT * FROM chapter_versions WHERE kind != 'auto' OR id IN (" +
+                                "SELECT id FROM (SELECT id, ROW_NUMBER() OVER (PARTITION BY chapterId ORDER BY createdAt DESC) rn " +
+                                "FROM chapter_versions WHERE kind = 'auto') WHERE rn <= 3)"
+                        } else "SELECT * FROM $t"
+                        db.query(sql).use { c ->
                             while (c.moveToNext()) addJsonObject {
                                 for (i in 0 until c.columnCount) {
                                     val col = c.getColumnName(i)
@@ -78,10 +84,10 @@ object Backup {
         } } finally { db.endTransaction() }
     }
 
-    fun writeZip(out: OutputStream, ctx: Context, prefs: AppPrefs) {
+    fun writeZip(out: OutputStream, ctx: Context, prefs: AppPrefs, includeAllVersions: Boolean = false) {
         ZipOutputStream(out).use { z ->
             z.putNextEntry(ZipEntry("lingwrite.json"))
-            val j = JsonObject(dump() + ("prefs" to LingJson.encodeToJsonElement(AppPrefs.serializer(), prefs.copy(writingModel = "", autoModel = "", embedModel = ""))))
+            val j = JsonObject(dump(includeAllVersions) + ("prefs" to LingJson.encodeToJsonElement(AppPrefs.serializer(), prefs.copy(writingModel = "", autoModel = "", embedModel = ""))))
             z.write(j.toString().toByteArray()); z.closeEntry()
             File(ctx.filesDir, "maps").listFiles()?.forEach { f -> z.putNextEntry(ZipEntry("maps/${f.name}")); f.inputStream().use { it.copyTo(z) }; z.closeEntry() }
             File(ctx.filesDir, "covers").listFiles()?.filter { it.isFile && it.name.matches(Regex("[0-9]+\\.png")) }?.forEach { f -> z.putNextEntry(ZipEntry("covers/${f.name}")); f.inputStream().use { it.copyTo(z) }; z.closeEntry() }
@@ -301,7 +307,7 @@ object Backup {
         return f
     }
 
-    fun autoBackups(ctx: Context): List<File> = File(ctx.filesDir, "backups").listFiles()?.sortedByDescending { it.name }.orEmpty()
+    fun autoBackups(ctx: Context): List<File> = File(ctx.filesDir, "backups").listFiles { f -> f.isFile && f.name.startsWith("auto-") }?.sortedByDescending { it.name }.orEmpty()
 }
 
 /** 文本导出。 */

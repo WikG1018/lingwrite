@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong
 import androidx.room.withTransaction
 import java.util.concurrent.ConcurrentHashMap
 
-class BookRepository(private val db: LingDatabase) {
+class BookRepository(private val db: LingDatabase, private val filesDir: java.io.File? = null) {
     private val books = db.books()
     private val ch = db.chapters()
     private val plan = db.plan()
@@ -89,29 +89,52 @@ class BookRepository(private val db: LingDatabase) {
     /** 书架顶部“继续写作”：最近编辑的作品里最近编辑的一章。 */
     suspend fun hero(bookId: Long): HeroInfo? {
         val b = books.get(bookId) ?: return null
-        val all = ch.chaptersOnce(bookId)
+        // 只取章节元数据；正文只取最近编辑的一章，避免长篇把全部正文读进内存。
+        val all = ch.headersOnce(bookId)
         val last = all.maxByOrNull { it.updatedAt }
+        val totals = books.totals(bookId)
         val vols = ch.volumesOnce(bookId).sortedBy { it.sort }
         val vol = last?.let { l -> vols.firstOrNull { it.id == l.volumeId } }
         val volLabel = vol?.let { v -> VolumeLabel.full(vols.indexOf(v) + 1, v.title) }
-        val total = all.sumOf { it.wordCount }
-        val excerpt = last?.content?.trim()?.lines()?.lastOrNull { it.isNotBlank() }?.takeLast(60)?.let { it + "……" }
+        val excerpt = ch.lastContent(bookId)?.trim()?.lines()?.lastOrNull { it.isNotBlank() }?.takeLast(60)?.let { it + "……" }
             ?: b.blurb.ifBlank { "还没开写。点继续写，从第一章开始。" }
         return HeroInfo(
             bookId = b.id, chapterId = last?.id, title = b.title,
             subline = listOfNotNull(volLabel, last?.let { ChapterLabel.full(it.number, it.title) }).joinToString("　"),
             excerpt = excerpt, highlight = null,
-            words = if (total >= 10_000) "%.1f".format(total / 10_000f) else Words.grouped(total), wordsUnit = if (total >= 10_000) "万字" else "字",
-            chapters = all.size,
+            words = if (totals.words >= 10_000) "%.1f".format(totals.words / 10_000f) else Words.grouped(totals.words),
+            wordsUnit = if (totals.words >= 10_000) "万字" else "字",
+            chapters = totals.chapters,
         )
     }
 
     suspend fun updateBook(b: BookEntity) = books.update(b.copy(updatedAt = System.currentTimeMillis()))
-    suspend fun deleteBook(id: Long) = db.withTransaction {
-        listOf("ideas", "reader_reports", "breakdowns", "word_days", "call_logs").forEach {
-            db.openHelper.writableDatabase.execSQL("DELETE FROM $it WHERE bookId = ?", arrayOf(id))
+    /** 删书：连带清掉 FTS（没有外键）、地图/封面文件，避免反复建删后 DB 与磁盘只增不减。 */
+    suspend fun deleteBook(id: Long) {
+        val dbFile = db.openHelper.writableDatabase
+        val passages = ArrayList<Long>()
+        dbFile.query("SELECT id FROM passages WHERE bookId = ?", arrayOf(id)).use { c ->
+            while (c.moveToNext()) passages += c.getLong(0)
         }
-        books.delete(id)
+        val mapFiles = ArrayList<java.io.File>()
+        dbFile.query("SELECT image FROM maps WHERE bookId = ?", arrayOf(id)).use { c ->
+            while (c.moveToNext()) {
+                val rel = c.getString(0) ?: continue
+                filesDir?.let { mapFiles += java.io.File(it, rel) }
+            }
+        }
+        db.withTransaction {
+            passages.chunked(500).forEach { ids ->
+                val marks = ids.joinToString(",") { "?" }
+                dbFile.execSQL("DELETE FROM passages_fts WHERE rowid IN ($marks)", Array<Any?>(ids.size) { ids[it] })
+            }
+            listOf("ideas", "reader_reports", "breakdowns", "word_days", "call_logs").forEach {
+                dbFile.execSQL("DELETE FROM $it WHERE bookId = ?", arrayOf(id))
+            }
+            books.delete(id)
+        }
+        mapFiles.forEach { runCatching { it.delete() } }
+        filesDir?.let { runCatching { java.io.File(it, "covers/$id.png").delete() } }
     }
 
     suspend fun addVolume(bookId: Long, title: String): Long {
@@ -162,20 +185,31 @@ class BookRepository(private val db: LingDatabase) {
         renumber(bookId); books.touch(bookId); id
     }
 
+    private fun invalidateIndex(ids: Collection<Long>) {
+        if (ids.isEmpty()) return
+        val list = ids.toList()
+        val marks = list.joinToString(",") { "?" }
+        db.openHelper.writableDatabase.execSQL(
+            "DELETE FROM chapter_index WHERE chapterId IN ($marks)",
+            Array<Any?>(list.size) { list[it] },
+        )
+    }
+
     /** 全书章号按卷顺序连续编号；章内容随章走。不改章节的修改时间。 */
     suspend fun renumber(bookId: Long) = db.withTransaction {
         val before = ch.chaptersOnce(bookId)
         val order = ch.volumesOnce(bookId).withIndex().associate { (i, v) -> v.id to i }
         val sorted = before.sortedWith(compareBy({ order[it.volumeId] ?: 0 }, { it.number }, { it.id }))
+        val changed = ArrayList<Long>()
         sorted.forEachIndexed { i, c ->
-            if (c.number != i + 1) ch.position(c.id, i + 1, c.volumeId)
+            if (c.number != i + 1) { changed += c.id; ch.position(c.id, i + 1, c.volumeId) }
         }
         val newById = sorted.mapIndexed { i, c -> c.id to (i + 1) }.toMap()
         val oldToNew = LinkedHashMap<Int, Int>()
         before.forEach { c -> oldToNew.putIfAbsent(c.number, newById.getValue(c.id)) }
         remapChapterNumbers(bookId, newById, oldToNew)
-        // 索引同时缓存章号，重排即失效；不能仅依赖时间戳的毫秒精度。
-        db.openHelper.writableDatabase.execSQL("DELETE FROM chapter_index WHERE chapterId IN (SELECT id FROM chapters WHERE bookId = ?)", arrayOf(bookId))
+        // 索引同时缓存章号，只有章号真的变了的章节需要重建，避免整书重索引。
+        invalidateIndex(changed)
     }
 
     /** 已有章节的章号跟着章节走；还没写到的未来章号保持不变。 */
@@ -223,6 +257,7 @@ class BookRepository(private val db: LingDatabase) {
         val c = ch.get(id) ?: return
         val vols = ch.volumesOnce(c.bookId)
         val list = ch.chaptersOnce(c.bookId).sortedBy { it.number }
+        val before = list.associate { it.id to it.number }
         val i = list.indexOfFirst { it.id == id }
         val j = i + delta
         if (j !in list.indices) {
@@ -235,6 +270,9 @@ class BookRepository(private val db: LingDatabase) {
         val reordered = list.toMutableList().apply { removeAt(i); add(j, c.copy(volumeId = o.volumeId)) }
         db.withTransaction { reordered.forEachIndexed { k, item -> ch.position(item.id, k + 1, item.volumeId) } }
         renumber(c.bookId)
+        // 上面的 position 已先改了章号，renumber 可能看不到差异；按前后章号对比补失效。
+        val after = ch.headersOnce(c.bookId)
+        invalidateIndex(after.filter { before[it.id] != it.number }.map { it.id })
     }
 
     suspend fun moveVolumeIn(bookId: Long, id: Long, delta: Int) {

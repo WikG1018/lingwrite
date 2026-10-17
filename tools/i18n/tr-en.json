@@ -1379,5 +1379,12 @@
 "stats_031": "Month",
 "reader_013": "[Reader %1$s] %2$s",
 "editor_79": "The selection is too long (over 4,000 characters). Please rewrite it in smaller parts so the AI output is not truncated.",
-"editor_80": "The AI output looks truncated (much shorter than the original). Your draft was left unchanged; please retry or shorten the selection."
+"editor_80": "The AI output looks truncated (much shorter than the original). Your draft was left unchanged; please retry or shorten the selection.",
+"data_47": "Include all history versions (larger file)",
+"data_48": "By default only the latest 3 automatic versions per chapter are backed up; manual, rollback and AI snapshots are kept.",
+"data_49": "Pre-upgrade database snapshots",
+"data_50": "Original database saved before an upgrade; backup only, no automatic restore.",
+"data_51": "Export snapshot",
+"data_52": "Delete snapshot",
+"data_53": "Pre-upgrade snapshot exported"
 }

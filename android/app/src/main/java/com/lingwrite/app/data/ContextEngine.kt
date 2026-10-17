@@ -86,6 +86,8 @@ object ContextHooks {
 data class CtxSnapshot(val chapterId: Long, val system: String, val parts: List<CtxPart>, val budget: Int, val at: Long = System.currentTimeMillis())
 
 object ContextEngine {
+    /** 每个检索词的 SQL 上限；最终结果再按调用方 limit 截断，避免把整本书命中读进内存。 */
+    private const val PER_TERM = 200
     var last: CtxSnapshot? = null
         private set
 
@@ -106,8 +108,8 @@ object ContextEngine {
 
     /** 把有改动的章节补进索引（可选：补算向量）。 */
     suspend fun refresh(bookId: Long, except: Long = -1) {
-        val state = db.context().indexState(bookId).associate { it.chapterId to it.at }
-        db.chapters().chaptersOnce(bookId).filter { it.id != except && (state[it.id] ?: 0) < it.updatedAt }.forEach { reindex(it) }
+        // 只取过期章节，避免每次生成都全量扫描全书正文。
+        db.chapters().staleIds(bookId, except).forEach { id -> db.chapters().get(id)?.let { reindex(it) } }
         val p = AppGraph.prefs.flow.first()
         if (p.semanticSearch && p.embedModel.isNotBlank()) {
             db.context().unvectored(bookId).chunked(32).forEach { batch ->
@@ -123,8 +125,8 @@ object ContextEngine {
         return runCatching {
             val sets = terms.map { term ->
                 val q = Grams.phrase(term)
-                if (q != null) db.context().search(q, bookId, Int.MAX_VALUE)
-                else db.context().searchUnis(Grams.unis(listOf(term)) ?: return emptyList(), bookId, Int.MAX_VALUE)
+                if (q != null) db.context().search(q, bookId, PER_TERM)
+                else db.context().searchUnis(Grams.unis(listOf(term)) ?: return emptyList(), bookId, PER_TERM)
             }
             val ids = if (or) sets.flatMap { it.map(Hit::id) }.toSet() else sets.map { it.map(Hit::id).toSet() }.reduceOrNull { a, b -> a intersect b }.orEmpty()
             sets.flatten().distinctBy { it.id }.filter { it.id in ids }.take(limit)
@@ -178,7 +180,7 @@ object ContextEngine {
         if (prev.isNotEmpty()) parts += CtxPart("tail", "前几章结尾", 6.0, prev.reversed().joinToString("\n\n") { "（第 ${it.number} 章 ${it.title} 结尾）\n" + it.content.takeLast(if (it == prev.first()) 800 else 400) })
         // 分层摘要：最近 10 章用章摘要；之前的卷用卷摘要
         val sums = db.context().summaries(bookId).associateBy { it.chapterId }
-        val all = db.chapters().chaptersOnce(bookId).filter { it.number < chapter.number - prev.size }
+        val all = db.chapters().headersOnce(bookId).filter { it.number < chapter.number - prev.size }
         val recent = all.filter { it.number >= chapter.number - 12 }
         val vols = db.chapters().volumesOnce(bookId)
         val vsum = db.context().volumeSummaries(bookId).associateBy { it.volumeId }
@@ -232,7 +234,7 @@ object ContextEngine {
                     is Part.ChapterPlan -> chapterId?.let { db.plan().chapterOnce(it) }?.takeIf { !it.isEmpty() }
                         ?.let { out += CtxPart("plan", "当前章纲", 2.0, it.asPrompt()) }
                     is Part.PrevSummaries -> {
-                        val chapterNumbers = db.chapters().chaptersOnce(bookId).filter { chapter == null || it.number < chapter.number }.associate { it.id to it.number }
+                        val chapterNumbers = db.chapters().headersOnce(bookId).filter { chapter == null || it.number < chapter.number }.associate { it.id to it.number }
                         val sums = db.context().summaries(bookId).filter { it.chapterId in chapterNumbers }.sortedByDescending { chapterNumbers[it.chapterId] }
                         val n = part.n
                         val text = sums.take(n).sortedBy { chapterNumbers[it.chapterId] }.map { s ->
@@ -277,7 +279,7 @@ object ContextEngine {
         val c = db.chapters().get(chapterId) ?: return emptyList()
         val summary = db.context().summaryOnce(chapterId)?.text.orEmpty().ifBlank { c.content.takeLast(800) }
         if (summary.isBlank()) return emptyList()
-        val recent = db.chapters().chaptersOnce(bookId).filter { it.title.isNotBlank() }.sortedByDescending { it.number }.take(10).joinToString("、") { it.title }
+        val recent = db.chapters().headersOnce(bookId).filter { it.title.isNotBlank() }.sortedByDescending { it.number }.take(10).joinToString("、") { it.title }
         val titleUser = buildString {
             append("【本章摘要】").append(summary)
             append("\n【本书已有章名风格】").append(recent)
@@ -311,7 +313,7 @@ object ContextEngine {
         }
         // A13：章名为空时顺带生成 3 个标题候选，存进 chapter_plans.titleIdeas
         if (c.title.isBlank()) titleIdeas(c.bookId, chapterId)
-        val inVol = db.chapters().chaptersOnce(c.bookId).filter { it.volumeId == c.volumeId }
+        val inVol = db.chapters().headersOnce(c.bookId).filter { it.volumeId == c.volumeId }
         val sums = db.context().summaries(c.bookId).associateBy { it.chapterId }
         val have = inVol.mapNotNull { sums[it.id] }
         val vs = db.context().volumeSummary(c.volumeId)

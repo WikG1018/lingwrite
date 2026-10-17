@@ -125,14 +125,28 @@ fun BackupRoute(nav: NavHostController) {
     var msg by remember { mutableStateOf<String?>(null) }
     var pending by remember { mutableStateOf<Backup.Archive?>(null) }
     var autos by remember { mutableStateOf(Backup.autoBackups(ctx)) }
+    var snapshots by remember { mutableStateOf(UpgradeGuard.snapshots(ctx)) }
+    var allVersions by remember { mutableStateOf(false) }
+    var snapToExport by remember { mutableStateOf<File?>(null) }
     var busy by remember { mutableStateOf(false) }
     val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri: Uri? ->
         uri ?: return@rememberLauncherForActivityResult
         busy = true
         scope.launch {
             val p = AppGraph.prefs.flow.first()
-            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { Backup.writeZip(it, ctx, p) } }; tr(R.string.data_017) }.getOrElse { tr(R.string.data_018, it.message) }
+            msg = runCatching { withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { Backup.writeZip(it, ctx, p, includeAllVersions = allVersions) } }; tr(R.string.data_017) }.getOrElse { tr(R.string.data_018, it.message) }
             busy = false
+        }
+    }
+    val snapSaver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri: Uri? ->
+        val file = snapToExport
+        if (uri == null || file == null) { snapToExport = null; return@rememberLauncherForActivityResult }
+        scope.launch {
+            msg = runCatching {
+                withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { out -> file.inputStream().use { it.copyTo(out) } } }
+                tr(R.string.data_53)
+            }.getOrElse { tr(R.string.data_018, it.message) }
+            snapToExport = null
         }
     }
     val opener = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -146,6 +160,8 @@ fun BackupRoute(nav: NavHostController) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(tr(R.string.data_020), style = Ling.type.titleSmall, color = c.onSurface)
                     Text(tr(R.string.data_021), style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
+                    CheckRow(tr(R.string.data_47), allVersions) { allVersions = it }
+                    Text(tr(R.string.data_48), style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
                     LingButton(if (busy) tr(R.string.data_022) else tr(R.string.data_023), icon = LingIcons.Lock, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
                         saver.launch(tr(R.string.data_024, java.text.SimpleDateFormat("yyyyMMdd-HHmm", java.util.Locale.ROOT).format(java.util.Date())))
                     }
@@ -159,6 +175,22 @@ fun BackupRoute(nav: NavHostController) {
                 }
             }
             msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(horizontal = 8.dp)) }
+            if (snapshots.isNotEmpty()) {
+                SectionLabel(tr(R.string.data_49))
+                LingCard {
+                    snapshots.forEachIndexed { i, f ->
+                        if (i > 0) InsetDivider(16.dp)
+                        Row(Modifier.fillMaxWidth().rowClick { snapToExport = f; snapSaver.launch(f.name) }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text(f.name.removePrefix("upgrade-").removeSuffix(".zip"), style = Ling.type.body, color = c.onSurface)
+                                Text(tr(R.string.data_50), style = Ling.type.caption, color = c.onSurfaceVariant)
+                            }
+                            Text("${f.length() / 1024} KB", style = Ling.type.caption, color = c.onSurfaceVariant)
+                            LingButton(tr(R.string.data_51), BtnKind.Text, height = 34.dp) { snapToExport = f; snapSaver.launch(f.name) }
+                        }
+                    }
+                }
+            }
             if (autos.isNotEmpty()) {
                 SectionLabel(tr(R.string.data_028))
                 LingCard {

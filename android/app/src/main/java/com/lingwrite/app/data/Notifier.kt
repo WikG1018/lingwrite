@@ -75,7 +75,7 @@ object Notifier {
         var sent = 0
         AppGraph.db.checks().allOpen().groupBy { it.bookId }.forEach { (bookId, fs) ->
             val book = AppGraph.db.books().get(bookId) ?: return@forEach
-            val cur = AppGraph.db.chapters().chaptersOnce(bookId).filter { it.wordCount > 0 }.maxOfOrNull { it.number } ?: 1
+            val cur = AppGraph.db.chapters().maxNumberWithWords(bookId) ?: 1
             val over = fs.count { fsState(it, cur) == FsState.Overdue }; val due = fs.count { fsState(it, cur) == FsState.Due }
             if (over + due == 0) return@forEach
             val text = listOfNotNull(
