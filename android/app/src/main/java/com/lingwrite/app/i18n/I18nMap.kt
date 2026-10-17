@@ -1239,8 +1239,10 @@ private fun part4(m: HashMap<String, Int>) {
     m["日"] = R.string.stats_029
     m["周"] = R.string.stats_030
     m["月"] = R.string.stats_031
+    m["选区太长（超过 4000 字），请分段改写，避免 AI 输出被截断。"] = R.string.editor_79
+    m["AI 输出可能被截断（明显短于原文），已保留原稿。请重试或缩短选区。"] = R.string.editor_80
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2450).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2454).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

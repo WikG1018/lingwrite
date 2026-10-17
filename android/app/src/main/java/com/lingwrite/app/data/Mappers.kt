@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable data class AiMark(val s: Int, val e: Int, val k: String = "gen")
 
-val LingJson = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+val LingJson = Json { ignoreUnknownKeys = true; encodeDefaults = true; isLenient = true }
 
 fun parseMarks(json: String): List<AiMark> = runCatching { LingJson.decodeFromString<List<AiMark>>(json) }.getOrDefault(emptyList())
 fun encodeMarks(m: List<AiMark>): String = LingJson.encodeToString(kotlinx.serialization.builtins.ListSerializer(AiMark.serializer()), m)

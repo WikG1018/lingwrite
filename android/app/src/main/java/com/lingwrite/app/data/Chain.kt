@@ -181,7 +181,7 @@ object ChainRunner {
     /** ④ 拆卷候选。 */
     suspend fun volumes(bookId: Long, n: Int): List<ChainPrompts.VolumeDraft> {
         val bp = AppGraph.db.plan().bookOnce(bookId) ?: BookPlanEntity(bookId)
-        val att = JsonReply.completeJson("outline", ChainPrompts.SYS, ChainPrompts.volumes(ChainPrompts.upstream(bp), n), bookId, null, 2000)
+        val att = JsonReply.completeJson("outline", ChainPrompts.SYS, ChainPrompts.volumes(ChainPrompts.upstream(bp), n), bookId, null, (n * 320 + 800).coerceAtMost(6000))
         if (att.error != null) return emptyList()
         ChainStore.putCands(bookId, 4, att.raw)
         return ChainPrompts.parseVolumes(att.raw)
@@ -196,10 +196,11 @@ object ChainRunner {
         val plans = dao.chaptersOnce(bookId).associateBy { it.chapterId }
         val prev = chs.mapNotNull { ch -> plans[ch.id]?.takeIf { !it.isEmpty() }?.let { ChapterLabel.short(ch.number) + "：" + it.event } }
             .takeLast(5).joinToString("\n")
+        val count = n.coerceIn(1, 20)
         val att = JsonReply.completeJson(
-            "outline", OutlinePrompts.SYS,
-            OutlinePrompts.chapters(bp.synopsis, vo.ifBlank { "（未写，按总纲推进）" }, prev, n.coerceIn(1, 20), parseList(bp.fields), hint),
-            bookId, null, 3000,
+            "outline", ChainPrompts.SYS,
+            OutlinePrompts.chapters(bp.synopsis, vo.ifBlank { "（未写，按总纲推进）" }, prev, count, parseList(bp.fields), hint),
+            bookId, null, (count * 220 + 900).coerceAtMost(8000),
         )
         if (att.error != null) return emptyList()
         ChainStore.putCands(bookId, 5, att.raw)

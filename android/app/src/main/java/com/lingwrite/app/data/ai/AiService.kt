@@ -46,15 +46,17 @@ class AiService(private val dao: AiDao, private val prefs: Prefs) {
     fun stream(
         task: String, slot: Slot, system: String, messages: List<ChatMessage>, maxTokens: Int = 1500,
         bookId: Long? = null, chapterId: Long? = null, scope: String = "", temperature: Double = 0.85,
-        outcome: String = "pending",
+        outcome: String = "pending", outputLang: Boolean = true,
     ): Flow<AiStream> = flow {
         val r = resolve(slot)
         if (r == null) { emit(AiStream.Error(com.lingwrite.app.i18n.trText("还没有可用的模型。去 设置 › 模型设置 添加服务商和 Key。"))); return@flow }
-        val lang = OutputLang.resolve(prefs.flow.first().aiOutputLang, bookId)
+        val lang = if (outputLang) OutputLang.resolve(prefs.flow.first().aiOutputLang, bookId) else null
         val sys = if (lang != null) system + OutputLang.directive(lang) else system
         val sb = StringBuilder()
         var inT: Int? = null; var outT: Int? = null; var err: String? = null
-        try { providerFor(r.endpoint).stream(ChatRequest(sys, messages, r.model, maxTokens, temperature)).collect { e ->
+        // 小预算任务（章名 200、章纲落实 300 等）在推理模型上会被 reasoning 吃光，这里给一个保底；测试连接保持极小预算。
+        val budget = if (task == "test") maxTokens else maxTokens.coerceAtLeast(600)
+        try { providerFor(r.endpoint).stream(ChatRequest(sys, messages, r.model, budget, temperature)).collect { e ->
             when (e) {
                 is LlmEvent.Delta -> { sb.append(e.text); emit(AiStream.Partial(sb.toString())) }
                 is LlmEvent.Done -> { inT = e.inputTokens; outT = e.outputTokens }
@@ -74,9 +76,12 @@ class AiService(private val dao: AiDao, private val prefs: Prefs) {
     }
 
     /** 非交互调用（自动任务），返回完整文本。 */
-    suspend fun complete(task: String, system: String, user: String, bookId: Long? = null, chapterId: Long? = null, maxTokens: Int = 1500, slot: Slot = Slot.Auto): Result<String> {
+    suspend fun complete(
+        task: String, system: String, user: String, bookId: Long? = null, chapterId: Long? = null,
+        maxTokens: Int = 1500, slot: Slot = Slot.Auto, outputLang: Boolean = true,
+    ): Result<String> {
         var out: Result<String> = Result.failure(IllegalStateException("无结果"))
-        stream(task, slot, system, listOf(ChatMessage("user", user)), maxTokens, bookId, chapterId, temperature = 0.3, outcome = "auto").collect {
+        stream(task, slot, system, listOf(ChatMessage("user", user)), maxTokens, bookId, chapterId, temperature = 0.3, outcome = "auto", outputLang = outputLang).collect {
             when (it) { is AiStream.Finished -> out = Result.success(it.text); is AiStream.Error -> out = Result.failure(IllegalStateException(it.message)); else -> {} }
         }
         return out
@@ -105,6 +110,7 @@ class AiService(private val dao: AiDao, private val prefs: Prefs) {
     fun streamMany(
         task: String, slot: Slot, system: String, messages: List<ChatMessage>, n: Int,
         maxTokens: Int = 1500, bookId: Long? = null, chapterId: Long? = null, scope: String = "", temperature: Double = 0.85,
+        outputLang: Boolean = true,
     ): Flow<AiMulti> = flow {
         var prev = ""
         var ok = 0
@@ -113,7 +119,7 @@ class AiService(private val dao: AiDao, private val prefs: Prefs) {
                 ChatMessage(messages.last().role, messages.last().content + "\n\n（请给出与前面不同的写法，不要重复：“${prev.take(40)}…”）")
             var failed: String? = null
             var result: AiStream.Finished? = null
-            stream(task, slot, system, msgs, maxTokens, bookId, chapterId, scope = scope, temperature = temperature + i * 0.05).collect { e ->
+            stream(task, slot, system, msgs, maxTokens, bookId, chapterId, scope = scope, temperature = temperature + i * 0.05, outputLang = outputLang).collect { e ->
                 when (e) {
                     is AiStream.Partial -> emit(AiMulti.Partial(i, e.text))
                     is AiStream.Finished -> result = e

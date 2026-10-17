@@ -180,11 +180,11 @@ fun WizardScreen(step: Int, d: WizardData, onChange: (WizardData) -> Unit, onBac
     var busy by remember { mutableStateOf(false) }
     var err by remember(step) { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
-    fun ask(prompt: String, max: Int = 2000, apply: (JsonElement) -> WizardData?) {
+    fun ask(prompt: String, array: Boolean = true, max: Int = 2000, apply: (JsonElement) -> WizardData?) {
         busy = true; err = null
         scope.launch {
             AppGraph.ai.complete("wizard", WizardPrompts.SYS, prompt, bookId, null, max, Slot.Writing).onSuccess { raw ->
-                val j = extractJson(raw, array = raw.trimStart().let { s -> s.indexOf('[').let { a -> a >= 0 && (s.indexOf('{') < 0 || a < s.indexOf('{')) } })
+                val j = extractJson(raw, array = array)
                 val nd = j?.let { runCatching { apply(it) }.getOrNull() }
                 if (nd == null) err = tr(R.string.wizard_031) else onChange(nd)
             }.onFailure { err = it.message }
@@ -204,11 +204,11 @@ fun WizardScreen(step: Int, d: WizardData, onChange: (WizardData) -> Unit, onBac
                 when (s) {
                     0 -> StepIdea(d, onChange, busy) { ask(WizardPrompts.pitches(d.idea)) { j -> d.copy(pitches = j.jsonArray.map { val o = it.jsonObject; Pitch(o.str("title"), o.str("logline")) }) } }
                     1 -> StepStyle(d, onChange, busy, bookId) { e -> err = e }
-                    2 -> StepChars(d, onChange, busy) { ask(WizardPrompts.chars(d), 2500) { j -> d.copy(chars = j.jsonArray.map { val o = it.jsonObject; CharDraft(o.str("name"), o.str("role"), o.str("aliases"), o.str("identity"), o.str("personality"), o.str("motive"), o.str("cheat")) }) } }
+                    2 -> StepChars(d, onChange, busy) { ask(WizardPrompts.chars(d), max = 2500) { j -> d.copy(chars = j.jsonArray.map { val o = it.jsonObject; CharDraft(o.str("name"), o.str("role"), o.str("aliases"), o.str("identity"), o.str("personality"), o.str("motive"), o.str("cheat")) }) } }
                     3 -> StepWorld(d, onChange, busy) { ask(WizardPrompts.world(d)) { j -> d.copy(world = j.jsonArray.map { val o = it.jsonObject; WorldDraft(o.str("type").ifBlank { "term" }, o.str("name"), o.str("desc")) }) } }
-                    4 -> StepSynopsis(d, onChange, busy) { ask(WizardPrompts.synopsis(d)) { j -> val o = j.jsonObject; d.copy(synopsis = o.str("synopsis"), volumeTitle = Naming.stripVolume(o.str("volumeTitle")), volumeOutline = o.str("volumeOutline")) } }
-                    5 -> StepTitles(d, onChange, busy) { ask(WizardPrompts.titles(d)) { j -> val o = j.jsonObject; d.copy(titles = o["titles"]!!.jsonArray.map { it.jsonPrimitive.content }, blurbs = o["blurbs"]!!.jsonArray.map { it.jsonPrimitive.content }) } }
-                    6 -> StepChapters(d, onChange, busy) { ask(WizardPrompts.chapters(d, DEFAULT_GOLDEN), 2000) { j -> d.copy(chapters = j.jsonArray.map { val o = it.jsonObject; ChapterDraft(o.str("title"), o.str("event"), o.str("hook"), o.str("cliff")) }) } }
+                    4 -> StepSynopsis(d, onChange, busy) { ask(WizardPrompts.synopsis(d), array = false) { j -> val o = j.jsonObject; d.copy(synopsis = o.str("synopsis"), volumeTitle = Naming.stripVolume(o.str("volumeTitle")), volumeOutline = o.str("volumeOutline")) } }
+                    5 -> StepTitles(d, onChange, busy) { ask(WizardPrompts.titles(d), array = false) { j -> val o = j.jsonObject; d.copy(titles = o["titles"]!!.jsonArray.map { it.jsonPrimitive.content }, blurbs = o["blurbs"]!!.jsonArray.map { it.jsonPrimitive.content }) } }
+                    6 -> StepChapters(d, onChange, busy) { ask(WizardPrompts.chapters(d, DEFAULT_GOLDEN), max = 2000) { j -> d.copy(chapters = j.jsonArray.map { val o = it.jsonObject; ChapterDraft(o.str("title"), o.str("event"), o.str("hook"), o.str("cliff")) }) } }
                     else -> StepFirstChapter(bookId, d)
                 }
                 err?.let { Text(it, style = Ling.type.caption, color = c.error) }

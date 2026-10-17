@@ -278,8 +278,14 @@ object ContextEngine {
         val summary = db.context().summaryOnce(chapterId)?.text.orEmpty().ifBlank { c.content.takeLast(800) }
         if (summary.isBlank()) return emptyList()
         val recent = db.chapters().chaptersOnce(bookId).filter { it.title.isNotBlank() }.sortedByDescending { it.number }.take(10).joinToString("、") { it.title }
-        val raw = AppGraph.ai.complete("title", "你是网文编辑，擅长起章名。",
-            "【本章摘要】$summary\n【本书已有章名风格】$recent\n输出 3 个章名（每个≤8字，不剧透关键反转）。严格只输出 JSON 数组：[\"\",\"\",\"\"]", bookId, chapterId, 200)
+        val titleUser = buildString {
+            append("【本章摘要】").append(summary)
+            append("\n【本书已有章名风格】").append(recent)
+            append("\n给出 3 个章名：每个 ≤8 字，贴合本章核心事件，不剧透关键反转，风格与已有章名一致，彼此差异明显。\n")
+            append(com.lingwrite.app.data.ai.PromptContract.JSON_ARRAY).append('\n')
+            append("格式示例：[\"擂台余波\",\"断剑认主\",\"夜半来客\"]")
+        }
+        val raw = AppGraph.ai.complete("title", "你是网文编辑，擅长起章名。", titleUser, bookId, chapterId, 200)
             .getOrNull() ?: return emptyList()
         val titles = (com.lingwrite.app.data.ai.JsonReply.parse(raw) as? com.lingwrite.app.data.ai.JsonReply.Result.Ok)
             ?.json?.let { j -> runCatching { (j as kotlinx.serialization.json.JsonArray).map { e -> e.toString().trim('"') } }.getOrNull() }.orEmpty()
@@ -296,7 +302,8 @@ object ContextEngine {
         if (c.content.isBlank()) return
         val existing = db.context().summaryOnce(chapterId)
         if (existing?.confirmed != true) {
-            AppGraph.ai.complete("summary", "你是小说编辑，擅长写准确、信息密度高的章节摘要。", "用 200 字以内概括这一章：发生了什么、人物关系或状态有什么变化、留下了什么悬念。只输出摘要。\n\n${c.content.take(15000)}", c.bookId, c.id, 500)
+            AppGraph.ai.complete("summary", "你是小说编辑，擅长写准确、信息密度高的章节摘要。",
+                "用 200 字以内概括这一章，按顺序覆盖：①发生了什么（只写关键事件）②人物关系或状态有什么变化 ③留下了什么悬念。不要评价文笔、不要分点、不要复制大段原文，只输出摘要正文。\n\n${c.content.take(15000)}", c.bookId, c.id, 500)
                 .onSuccess { generated -> db.withTransaction {
                     if (db.context().summaryOnce(chapterId) == existing && db.chapters().get(chapterId)?.content == c.content)
                         db.context().upsertSummary(SummaryEntity(chapterId, c.bookId, generated.trim()))
@@ -309,7 +316,8 @@ object ContextEngine {
         val have = inVol.mapNotNull { sums[it.id] }
         val vs = db.context().volumeSummary(c.volumeId)
         if (have.size >= 3 && have.size - (vs?.chapters ?: 0) >= 5 && vs?.confirmed != true) {
-            AppGraph.ai.complete("summary", "你是小说编辑。", "把这一卷的章节摘要汇总成 300 字以内的卷摘要，保留主线进展、重要人物变化和未解决的悬念。只输出摘要。\n\n" + have.joinToString("\n") { it.text }, c.bookId, null, 700)
+            AppGraph.ai.complete("summary", "你是小说编辑。",
+                "把这一卷的章节摘要汇总成 300 字以内的卷摘要：主线进展、重要人物变化、未解决的悬念；按时间顺序写，不要分点、不要评价写作，只输出摘要正文。\n\n" + have.joinToString("\n") { it.text }, c.bookId, null, 700)
                 .onSuccess { generated -> db.withTransaction {
                     if (db.context().volumeSummary(c.volumeId) == vs)
                         db.context().upsertVolumeSummary(VolumeSummaryEntity(c.volumeId, c.bookId, generated.trim(), chapters = have.size))

@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.lingwrite.app.data.db.ChapterNoteEntity
@@ -23,13 +24,16 @@ import kotlinx.serialization.json.jsonPrimitive
 data class IssueFix(val type: String, val before: String, val after: String, val why: String)
 
 object IssueFixes {
-    const val SYS = "你是连载编辑，帮作者用最小改动消除前后矛盾。严格只输出 JSON。"
+    val SYS = "你是连载编辑，帮作者用最小改动消除前后矛盾。不改文风、不扩写。\n" + PromptContract.JSON_ARRAY
 
     fun prompt(issue: IssueEntity, context: String): String = buildString {
         append("【矛盾】类型 ${kindLabel(issue.kind)}；原文「${issue.quote}」；依据：${issue.basis}；说明：${issue.explain}\n")
         if (issue.note.isNotBlank()) append("【作者补充】").append(issue.note).append('\n')
         append("【原文上下文】\n").append(context)
-        append("\n输出：[{\"type\":\"text|lore|bridge\",\"before\":\"要改的原文（text 时必填）\",\"after\":\"改后/补充的一句\",\"why\":\"≤30字\"}] 1–2 条。")
+        append("\n给出 1–2 条最小改动方案。type 只能是：text（改正文，before 必填）/ lore（改设定，说明改哪张卡）/ bridge（补一句解释）。\n")
+        append(PromptContract.JSON_ARRAY).append('\n')
+        append(PromptContract.VERBATIM_QUOTE).append('\n')
+        append("格式示例：[{\"type\":\"text\",\"before\":\"林砚不过炼气三层\",\"after\":\"林砚虽已筑基，却刻意把气息压在炼气三层\",\"why\":\"补一句解释实力描述\"}]")
     }
 
     /** 生成改法（1–2 条）；缓存到 issues.fix。 */
@@ -37,7 +41,7 @@ object IssueFixes {
         val c = AppGraph.db.chapters().get(i.chapterId) ?: return emptyList()
         val at = locate(c.content, i.quote).coerceAtLeast(0)
         val ctx = c.content.substring((at - 300).coerceAtLeast(0), (at + i.quote.length + 300).coerceAtMost(c.content.length))
-        val raw = AppGraph.ai.complete("check", SYS, prompt(i, ctx), i.bookId, i.chapterId, 800).getOrThrow()
+        val raw = AppGraph.ai.complete("check", SYS, prompt(i, ctx), i.bookId, i.chapterId, 800, outputLang = false).getOrThrow()
         val arr = (JsonReply.parse(raw) as? JsonReply.Result.Ok)?.json
             ?: extractJson(raw) ?: error("模型没有按格式返回")
         val fixes = arr.jsonArray.map { e ->

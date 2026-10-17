@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -38,14 +39,22 @@ data class BreakdownResult(
 }
 
 object BreakdownPrompts {
-    const val SYS = "你是网文结构分析师。只分析结构和节奏，输出时不得复述原文句子（引用≤10字），不得保留原作人名地名，用“主角/对手/师门”等角色代称。严格只输出 JSON。"
+    val SYS = "你是网文结构分析师。只分析结构和节奏，输出时不得复述原文句子（引用≤10字），不得保留原作人名地名，用“主角/对手/师门”等角色代称。\n" + PromptContract.JSON_ONLY
 
-    fun chapter(n: Int, text: String): String =
-        "【第 $n 章】${text.take(6000)}\n输出：{\"event\":\"核心事件≤40字\",\"hook\":\"钩子≤20字\",\"cool\":\"爽点≤20字\",\"cliff\":\"章尾悬念≤20字\",\"intensity\":1-5,\"pattern\":\"抽象结构≤40字，用主角/对手等代称\"}"
+    fun chapter(n: Int, text: String): String = buildString {
+        append("【第 ").append(n).append(" 章】").append(text.take(6000)).append("\n\n")
+        append("分析这一章的结构与节奏。改名换姓：所有人物用“主角/对手/师门/同伴”等角代称，地名用“某地/宗门”等，不得保留原作的专名。\n")
+        append(PromptContract.JSON_ONLY).append('\n')
+        append("格式：{\"event\":\"核心事件（谁做了什么、局面怎么变，≤40字）\",\"hook\":\"开篇钩子≤20字\",\"cool\":\"爽点≤20字\",\"cliff\":\"章尾悬念≤20字\",\"intensity\":1-5 的整数,\"pattern\":\"抽象结构≤40字，用角代称\"}")
+        append("\n示例：{\"event\":\"主角在比试中故意示弱，引对手轻敌后一击定胜负\",\"hook\":\"断剑出鞘\",\"cool\":\"扮猪吃虎反杀\",\"cliff\":\"执事认出断剑来历\",\"intensity\":4,\"pattern\":\"示弱→轻敌→反转→埋钩\"}")
+    }
 
-    fun summary(chapters: List<BreakdownChapter>): String =
-        "【各章分析】" + chapters.joinToString("\n") { "第 ${it.n} 章：${it.event}｜${it.pattern}" } +
-            "\n输出：{\"template\":[{\"chapter\":1,\"pattern\":\"\"}],\"notes\":[\"节奏要点≤30字\"]}"
+    fun summary(chapters: List<BreakdownChapter>): String = buildString {
+        append("【各章分析】").append(chapters.joinToString("\n") { "第 ${it.n} 章：${it.event}｜${it.pattern}" }).append("\n\n")
+        append("把各章节奏抽象成可复用结构模板：template 按章序给出每章的结构模式，notes 写清这份模板的适用场景与必须避开的坑（用角代称，不得出现原作专名）。\n")
+        append(PromptContract.JSON_ONLY).append('\n')
+        append("格式：{\"template\":[{\"chapter\":1,\"pattern\":\"≤30字结构模式\"}],\"notes\":[\"节奏要点≤30字\"]}，template 章数必须与输入一致。")
+    }
 }
 
 object Breakdown {

@@ -53,7 +53,7 @@ import kotlinx.serialization.json.jsonObject
 
 /** 设定卡起名与字段补全的提示词（A4，ai-features §4）。 */
 object LoreAiPrompts {
-    const val NAMING_SYS = "你是网文起名顾问。名字要符合题材和本书已有的命名风格，好记、不撞常见网文主角名。严格只输出 JSON。"
+    val NAMING_SYS = "你是网文起名顾问。名字要符合题材和本书已有的命名风格，好记、不撞常见网文主角名。\n" + com.lingwrite.app.data.ai.PromptContract.JSON_ONLY
 
     fun naming(book: String, genre: String, style: String, sameKind: String, type: String, role: String, fields: String, ask: String) = buildString {
         append(trZh(R.string.lore_ai_001)).append(book).append(' ').append(genre)
