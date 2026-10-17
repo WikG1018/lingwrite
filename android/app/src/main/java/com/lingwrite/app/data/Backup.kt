@@ -95,13 +95,37 @@ object Backup {
         val exportedAt get() = json["exportedAt"]?.jsonPrimitive?.longOrNull ?: 0
     }
 
+    /** 单个 entry / 总解压 / 条目数上限：防 zip bomb 与超大备份把内存打爆。 */
+    private const val MAX_ENTRY_BYTES = 48 * 1024 * 1024
+    private const val MAX_TOTAL_BYTES = 256 * 1024 * 1024
+    private const val MAX_ENTRIES = 10000
+
+    private fun readLimited(z: ZipInputStream, max: Int): ByteArray {
+        val bos = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(64 * 1024)
+        var total = 0
+        while (true) {
+            val k = z.read(buf)
+            if (k < 0) break
+            total += k
+            if (total > max) error("备份文件过大或已损坏，未导入")
+            bos.write(buf, 0, k)
+        }
+        return bos.toByteArray()
+    }
+
     fun readZip(input: InputStream): Archive {
         var json: JsonObject? = null
         val files = mutableMapOf<String, ByteArray>()
+        var total = 0L
+        var entries = 0
         ZipInputStream(input).use { z ->
             while (true) {
                 val e = z.nextEntry ?: break
-                val bytes = z.readBytes()
+                if (++entries > MAX_ENTRIES) error("备份文件条目过多，未导入")
+                val bytes = readLimited(z, MAX_ENTRY_BYTES)
+                total += bytes.size
+                if (total > MAX_TOTAL_BYTES) error("备份文件过大，未导入")
                 if (e.name == "lingwrite.json") json = LingJson.parseToJsonElement(bytes.decodeToString()).jsonObject
                 else if ((e.name.startsWith("maps/") || e.name.startsWith("covers/")) && !e.name.contains("..")) files[e.name] = bytes
             }
@@ -225,9 +249,12 @@ object Backup {
             // 服务商：只补充本机没有的（Key 需重新填写）
             val have = db.query("SELECT name FROM providers").use { c -> buildSet { while (c.moveToNext()) add(c.getString(0)) } }
             val pc = columns("providers")
+            // 备份里的服务商默认停用并清空 Key 相关字段：地址来自不可信文件，启用前必须由作者重新填写 Key 并核对接口地址。
             a.tables["providers"]?.jsonArray?.forEach { p ->
                 val o = p.jsonObject
-                if (o.str("name") !in have) db.insert("providers", android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE, cv(JsonObject(o - "id" + ("keyCipher" to JsonPrimitive("")) + ("lastTest" to JsonPrimitive(""))), pc))
+                if (o.str("name") !in have) db.insert("providers", android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE, cv(
+                    JsonObject(o - "id" + ("keyCipher" to JsonPrimitive("")) + ("keyHint" to JsonPrimitive("")) +
+                        ("lastTest" to JsonPrimitive("")) + ("enabled" to JsonPrimitive(false))), pc))
             }
             a.files.filterKeys { it.startsWith("maps/") }.forEach { (n, _) ->
                 val name = n.removePrefix("maps/"); val target = File(dir, name)
@@ -260,6 +287,8 @@ object Backup {
             }
         }
         AppGraph.db.invalidationTracker.refreshVersionsAsync()
+        // 合并导入会重映射章节 id，旧的恢复位置锚点会指错章节，直接清空（回退到章号推断）。
+        if (!overwrite) RestoreHints.clear()
         return imported
     }
 

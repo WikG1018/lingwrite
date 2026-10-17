@@ -50,3 +50,10 @@ LingWrite's own source code is AGPL-3.0. The third-party components below are **
 | 仅用于测试：Robolectric、Roborazzi、MockWebServer | Apache License 2.0 |
 
 Apache License 2.0 全文：https://www.apache.org/licenses/LICENSE-2.0
+
+## 3. 许可全文随 App 分发
+
+Release APK 内置以下许可全文，可在 App「关于 › 开源许可」中直接查看：
+
+- `android/app/src/main/assets/licenses/Apache-2.0.txt` —— Apache License 2.0（覆盖 Compose、Kotlin、OkHttp 等组件）
+- `android/app/src/main/assets/licenses/AGPL-3.0.txt` —— GNU AGPL-3.0（灵写自身）

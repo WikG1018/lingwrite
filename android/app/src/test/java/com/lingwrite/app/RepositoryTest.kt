@@ -5,12 +5,14 @@ package com.lingwrite.app
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lingwrite.app.data.BookRepository
+import com.lingwrite.app.data.RestoreHints
 import com.lingwrite.app.data.Words
 import com.lingwrite.app.data.db.LingDatabase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -20,6 +22,9 @@ import org.robolectric.annotation.Config
 class RepositoryTest {
     private val db = LingDatabase.build(ApplicationProvider.getApplicationContext(), inMemory = true)
     private val repo = BookRepository(db)
+
+    /** 回收站恢复锚点是进程级状态；每个用例前清空，避免测试类之间章节 id 从 1 重开时串味。 */
+    @Before fun clearRestoreHints() { RestoreHints.clear() }
 
     @Test fun words() {
         assertEquals(6, Words.count("林砚说：好。"))
@@ -122,6 +127,46 @@ class RepositoryTest {
         val report = db.readerReports().once(id).single()
         assertEquals(3, report.fromChapter)
         assertEquals(3, report.toChapter)
+    }
+
+    /** 连续删两章后按任意顺序恢复，章节顺序必须回到原样（曾出现 1,3,2,4 的乱序）。 */
+    @Test fun restoreDeletedChaptersInReverseOrderKeepsOrder() = runBlocking {
+        val id = repo.createBook("乱序恢复", "仙侠")
+        val a = db.chapters().chaptersOnce(id).single().id
+        val b = repo.nextChapter(id)
+        val c = repo.nextChapter(id)
+        val d = repo.nextChapter(id)
+        repo.deleteChapter(b)
+        repo.deleteChapter(a)
+        repo.restoreChapter(b)
+        repo.restoreChapter(a)
+        assertEquals(listOf(a, b, c, d), db.chapters().chaptersOnce(id).map { it.id })
+    }
+
+    /** 删除后再新增章节，恢复的章节仍应回到原位置，而不是插到末尾。 */
+    @Test fun restoreDeletedChapterAfterNewChapterKeepsOrder() = runBlocking {
+        val id = repo.createBook("恢复位置", "仙侠")
+        val a = db.chapters().chaptersOnce(id).single().id
+        val b = repo.nextChapter(id)
+        val c = repo.nextChapter(id)
+        repo.deleteChapter(b)
+        val n = repo.nextChapter(id)
+        repo.restoreChapter(b)
+        assertEquals(listOf(a, b, c, n), db.chapters().chaptersOnce(id).map { it.id })
+    }
+
+    /** 相邻两章都被删时，先恢复后一章、再恢复前一章，顺序仍正确。 */
+    @Test fun restoreAdjacentDeletedChaptersKeepsOrder() = runBlocking {
+        val id = repo.createBook("相邻恢复", "仙侠")
+        val a = db.chapters().chaptersOnce(id).single().id
+        val b = repo.nextChapter(id)
+        val c = repo.nextChapter(id)
+        val d = repo.nextChapter(id)
+        repo.deleteChapter(b)
+        repo.deleteChapter(c)
+        repo.restoreChapter(c)
+        repo.restoreChapter(b)
+        assertEquals(listOf(a, b, c, d), db.chapters().chaptersOnce(id).map { it.id })
     }
 
     @Test fun restoreDeletedMiddleChapterKeepsOrder() = runBlocking {

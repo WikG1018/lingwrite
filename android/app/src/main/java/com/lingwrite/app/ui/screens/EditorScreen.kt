@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalFocusManager
@@ -386,7 +387,7 @@ fun BeatsChecklist(beats: List<com.lingwrite.app.data.Beat>, onToggle: (Int) -> 
                             .size(20.dp)
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
                             .background(if (b.done) c.primary else c.surfaceContainer)
-                            .clickable { onToggle(i) },
+                            .clickable(role = Role.Checkbox) { onToggle(i) },
                         contentAlignment = Alignment.Center,
                     ) {
                         if (b.done) Icon(LingIcons.Check, tr(R.string.notes_drawer_009), tint = c.onPrimary, modifier = Modifier.size(14.dp))

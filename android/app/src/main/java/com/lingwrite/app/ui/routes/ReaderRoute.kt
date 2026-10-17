@@ -153,7 +153,7 @@ fun ReaderRoute(bookId: Long, startChapter: Int, nav: NavHostController) {
                         onSave = { advice ->
                             scope.launch {
                                 val ch = AppGraph.db.chapters().chaptersOnce(bookId).firstOrNull { it.number == scopeCh.toIntOrNull() } ?: AppGraph.db.chapters().chaptersOnce(bookId).last()
-                                AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = ch.id, kind = "fix", text = tr(R.string.reader_013, p, advice)))
+                                AppGraph.db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = ch.id, kind = "fix", text = tr(R.string.reader_013, p.name, advice)))
                             }
                         },
                         onJump = { quote ->

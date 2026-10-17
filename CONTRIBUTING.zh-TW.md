@@ -14,16 +14,16 @@
 
 ```bash
 cd android
-./gradlew assembleDebug testDebugUnitTest
+./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots
 ```
 
-需要 JDK 17 與 Android SDK（compileSdk 37）。第一次建置會下載 MiSans 字型，詳見 README。截圖測試預設輸出到 `/workspace/lingwrite-shots`，可以用 `-PshotDir=<目錄>` 更改。
+需要 JDK 17 與 Android SDK（compileSdk 37）。第一次建置會下載 MiSans 字型，詳見 README。截圖輸出目錄由 `-PshotDir` 控制：Gradle 預設的 `/workspace/lingwrite-shots` 在一般本機通常無法寫入，本機建議用 `./gradlew testDebugUnitTest -PshotDir=build/shots`。
 
 ## 送出 PR
 
 1. 從 `main` 開分支，名稱說明要做什麼，例如 `fix/outline-scroll`。
 2. 一個 PR 只做一件事。提交訊息要和內容相符，不要有空提交。
-3. 先在本機跑過 `./gradlew assembleDebug testDebugUnitTest`，CI 也會再跑一次。
+3. 先在本機跑過 `./gradlew assembleDebug testDebugUnitTest -PshotDir=build/shots`，CI 也會再跑一次。
 4. 改到介面的話，請附淺色、深色截圖。動效請遵守 [docs/motion-design.md](docs/motion-design.md)，卡片**不要用左側色條**。
 5. 新檔案開頭加上 SPDX 標頭：
    ```kotlin

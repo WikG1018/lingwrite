@@ -28,6 +28,7 @@ An Android app for writing serialized web fiction. It gives you a chapter editor
 | Long-form context | Chapter and volume summaries, token-budgeted context, full-text search, optional semantic search |
 | Checks | Consistency check (persona, power level, timeline, relationships), foreshadowing reminders, AI-flavor check |
 | Misc | Stats, TXT/Markdown export, full backup, in-app updates (SHA-256 and signature verified) |
+| Language | UI in Simplified Chinese, Traditional Chinese, English and Japanese; AI output language follows the work |
 
 ## Download
 
@@ -47,11 +48,12 @@ You need JDK 17 and the Android SDK (compileSdk 37).
 git clone https://github.com/WikG1018/lingwrite.git
 cd lingwrite/android
 ./gradlew assembleDebug
-./gradlew testDebugUnitTest
+./gradlew testDebugUnitTest -PshotDir=build/shots
 ./gradlew assembleRelease        # falls back to the debug key if no signing config is found
 ```
 
 - **Font.** MiSans is not distributed with this repository (see [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md)). The first build downloads the official font package from Xiaomi, which is about 220 MB, and caches it in `~/.gradle/caches/lingwrite-misans/`. Each file is checked against its SHA-256. If you are offline, or you pass `-Plingwrite.misans=off`, the app uses the system font instead and the build still succeeds.
+- **Screenshot tests.** Screenshot output goes to the directory passed with `-PshotDir`. The Gradle default, `/workspace/lingwrite-shots`, usually isn't writable on a normal machine, so run `./gradlew testDebugUnitTest -PshotDir=build/shots`.
 - **Signing.** The repository contains no signing keys. A release build you make yourself is signed with the debug key and cannot be installed over the official app.
 
 ## Privacy

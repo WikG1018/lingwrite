@@ -21,6 +21,9 @@ object AppGraph {
         db = LingDatabase.build(context.applicationContext, inMemory)
         books = BookRepository(db)
         prefs = com.lingwrite.app.data.Prefs(context.applicationContext)
+        com.lingwrite.app.data.RestoreHints.init(context.applicationContext)
+        // 非 Composable 场景（通知、错误文案、统计聚合等）也需要取本地化字符串；MainActivity 会再覆盖成 Activity。
+        if (com.lingwrite.app.i18n.L10n.ctx == null) com.lingwrite.app.i18n.L10n.ctx = context.applicationContext
         ai = com.lingwrite.app.data.ai.AiService(db.ai(), prefs)
         com.lingwrite.app.ui.routes.AboutModule.bind(context)
         ready = true

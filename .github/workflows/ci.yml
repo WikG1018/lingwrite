@@ -36,8 +36,9 @@ jobs:
         with:
           path: ~/.gradle/caches/lingwrite-misans
           key: misans-v1
-      - name: Build and unit tests
-        run: ./gradlew --no-daemon assembleDebug testDebugUnitTest -PshotDir=${{ runner.temp }}/shots
+      - name: Build, lint and unit tests
+        # release 构建会跑 R8/minify，能提前暴露 keep 规则问题；lint 拦住新错误。
+        run: ./gradlew --no-daemon assembleDebug assembleRelease lintDebug testDebugUnitTest -PshotDir=${{ runner.temp }}/shots
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -45,6 +46,14 @@ jobs:
           name: test-reports
           path: android/app/build/reports/tests/
           retention-days: 7
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: ${{ runner.temp }}/shots
+          retention-days: 7
+          if-no-files-found: ignore
 
   secret-scan:
     runs-on: ubuntu-latest

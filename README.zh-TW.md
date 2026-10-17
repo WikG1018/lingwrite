@@ -28,6 +28,7 @@
 | 長篇脈絡 | 章摘要與卷摘要、依 token 預算取捨、全文搜尋，可選語意搜尋 |
 | 檢查 | 一致性檢查（人設、實力、時間線、關係），伏筆到期提醒，AI 味檢查 |
 | 其他 | 統計、匯出 TXT／Markdown、整庫備份、App 內更新（會驗證 SHA-256 與簽章） |
+| 語言 | 介面支援簡體中文、繁體中文、英文與日文；AI 輸出語言預設跟隨作品語言 |
 
 ## 下載
 
@@ -47,11 +48,12 @@ f31f5b4f455617f50337dc1bf1643023811d26464c3074e6cc706e4f1f3fce52
 git clone https://github.com/WikG1018/lingwrite.git
 cd lingwrite/android
 ./gradlew assembleDebug
-./gradlew testDebugUnitTest
+./gradlew testDebugUnitTest -PshotDir=build/shots
 ./gradlew assembleRelease        # 沒有簽章設定時改用 debug 金鑰
 ```
 
 - **字型**：MiSans 不隨儲存庫散布（原因見 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md)）。第一次建置時會從小米官方網址下載字型包（約 220 MB），快取在 `~/.gradle/caches/lingwrite-misans/`，並逐一比對 SHA-256。離線或加上 `-Plingwrite.misans=off` 時會改用系統字型，建置一樣能完成。
+- **截圖測試**：截圖輸出目錄由 `-PshotDir` 控制；Gradle 預設的 `/workspace/lingwrite-shots` 在一般本機通常無法寫入，建議用 `./gradlew testDebugUnitTest -PshotDir=build/shots`。
 - **簽章**：儲存庫裡沒有任何簽章金鑰。自己建置的 release 版用 debug 金鑰簽章，無法覆蓋安裝官方版本。
 
 ## 隱私

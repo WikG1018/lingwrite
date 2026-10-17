@@ -183,6 +183,7 @@ fun BackupRoute(nav: NavHostController) {
                 Segmented(listOf(tr(R.string.data_030), tr(R.string.data_031)), if (overwrite) 1 else 0) { overwrite = it == 1 }
                 Text(if (overwrite) tr(R.string.data_032) else tr(R.string.data_033),
                     style = Ling.type.caption, color = if (overwrite) c.error else c.onSurfaceVariant)
+                Text(tr(R.string.data_46), style = Ling.type.caption, color = c.onSurfaceVariant)
                 Text(tr(R.string.data_034), style = Ling.type.caption, color = c.onSurfaceVariant)
                 LingButton(if (busy) tr(R.string.data_035) else tr(R.string.data_036), enabled = !busy, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 50.dp) { if (overwrite) confirm = true else doImport(a, false, ctx, { busy = it }) { msg = it; pending = null; autos = Backup.autoBackups(ctx) } }
             }
@@ -200,7 +201,13 @@ private fun doImport(a: Backup.Archive, overwrite: Boolean, ctx: android.content
             Backup.autoBackup(ctx, p)
             val n = Backup.restore(a, ctx, overwrite)
             if (overwrite) a.json["prefs"]?.let { j -> runCatching { LingJson.decodeFromJsonElement(AppPrefs.serializer(), j) }.getOrNull() }?.let { np ->
-                AppGraph.prefs.update { cur -> np.copy(writingModel = cur.writingModel, autoModel = cur.autoModel, embedModel = cur.embedModel, onboarded = true) }
+                // 安全相关偏好不从备份覆盖（更新源/自动检查可能被恶意备份投毒）；模型引用也保留本机设置。
+                AppGraph.prefs.update { cur -> np.copy(
+                    writingModel = cur.writingModel, autoModel = cur.autoModel, embedModel = cur.embedModel,
+                    mirror = cur.mirror, customMirror = cur.customMirror, autoUpdateCheck = cur.autoUpdateCheck,
+                    skippedVersion = cur.skippedVersion, lastUpdateCheck = cur.lastUpdateCheck,
+                    onboarded = true,
+                ) }
             }
             n
         }

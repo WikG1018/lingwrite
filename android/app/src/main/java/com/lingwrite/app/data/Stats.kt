@@ -2,24 +2,44 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.data
 
+import com.lingwrite.app.R
 import com.lingwrite.app.data.ai.AiService
 import com.lingwrite.app.data.db.CallLogEntity
 import com.lingwrite.app.data.db.ProviderEntity
+import com.lingwrite.app.i18n.tr
 import java.time.*
+import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
-enum class Period(val label: String) { Day("日"), Week("周"), Month("月") }
+enum class Period { Day, Week, Month }
 
 data class Range(val from: Long, val to: Long, val label: String, val start: LocalDate)
+
+// 统计页的日期区间按界面语言格式化（与 TimeFmt 的口径一致）。
+private fun fmtDay(d: LocalDate): String = when (UiLang.code()) {
+    "en" -> DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH).format(d)
+    else -> "${d.year} 年 ${d.monthValue} 月 ${d.dayOfMonth} 日"
+}
+
+private fun fmtMonth(d: LocalDate): String = when (UiLang.code()) {
+    "en" -> DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH).format(d)
+    else -> "${d.year} 年 ${d.monthValue} 月"
+}
+
+private fun fmtWeek(d: LocalDate, e: LocalDate): String = when (UiLang.code()) {
+    "en" -> DateTimeFormatter.ofPattern("MMM d", Locale.ENGLISH).format(d) + " – " + DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.ENGLISH).format(e)
+    else -> "${d.monthValue}月${d.dayOfMonth}日 – ${e.monthValue}月${e.dayOfMonth}日"
+}
 
 fun periodRange(p: Period, offset: Int, today: LocalDate = LocalDate.now(), zone: ZoneId = ZoneId.systemDefault()): Range {
     fun ms(d: LocalDate) = d.atStartOfDay(zone).toInstant().toEpochMilli()
     return when (p) {
-        Period.Day -> today.plusDays(offset.toLong()).let { d -> Range(ms(d), ms(d.plusDays(1)), "${d.year} 年 ${d.monthValue} 月 ${d.dayOfMonth} 日", d) }
+        Period.Day -> today.plusDays(offset.toLong()).let { d -> Range(ms(d), ms(d.plusDays(1)), fmtDay(d), d) }
         Period.Week -> today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).plusWeeks(offset.toLong()).let { d ->
-            val e = d.plusDays(6); Range(ms(d), ms(d.plusDays(7)), "${d.monthValue}月${d.dayOfMonth}日 – ${e.monthValue}月${e.dayOfMonth}日", d)
+            val e = d.plusDays(6); Range(ms(d), ms(d.plusDays(7)), fmtWeek(d, e), d)
         }
-        Period.Month -> today.withDayOfMonth(1).plusMonths(offset.toLong()).let { d -> Range(ms(d), ms(d.plusMonths(1)), "${d.year} 年 ${d.monthValue} 月", d) }
+        Period.Month -> today.withDayOfMonth(1).plusMonths(offset.toLong()).let { d -> Range(ms(d), ms(d.plusMonths(1)), fmtMonth(d), d) }
     }
 }
 
@@ -31,9 +51,16 @@ data class StatsData(
 )
 
 fun taskName(t: String) = when (t) {
-    "continue" -> "续写"; "directions" -> "给方向"; "rewrite" -> "改写"; "expand" -> "扩写"; "polish" -> "润色"; "deai" -> "去 AI 腔"; "dialog" -> "对话"
-    "describe" -> "描写"; "shorten" -> "缩写"; "annotate" -> "批注修改"; "summary" -> "摘要"; "check" -> "自动检查"; "extract" -> "设定提取"; "foreshadow" -> "伏笔建议"
-    "wizard" -> "创作向导"; "style" -> "文风学习"; "aitaste" -> "AI 味改法"; "ask" -> "随手问"; "outline" -> "拆章纲"; "embed" -> "语义检索"; else -> t
+    "continue" -> tr(R.string.editor_ai_011); "directions" -> tr(R.string.editor_ai_012)
+    "rewrite" -> tr(R.string.editor_ai_013); "expand" -> tr(R.string.editor_ai_014)
+    "polish" -> tr(R.string.editor_ai_015); "deai" -> tr(R.string.editor_ai_016)
+    "dialog" -> tr(R.string.editor_ai_017); "describe" -> tr(R.string.editor_ai_018)
+    "shorten" -> tr(R.string.editor_ai_019); "annotate" -> tr(R.string.editor_ai_020)
+    "summary" -> tr(R.string.editor_ai_021); "extract" -> tr(R.string.editor_ai_022)
+    "foreshadow" -> tr(R.string.editor_ai_023); "wizard" -> tr(R.string.editor_ai_024)
+    "style" -> tr(R.string.editor_ai_025); "aitaste" -> tr(R.string.editor_ai_026)
+    "check" -> tr(R.string.check_003); "ask" -> tr(R.string.ask_panel_018)
+    "outline" -> tr(R.string.dl_055); "embed" -> tr(R.string.context_012); else -> t
 }
 
 fun aggregate(logs: List<CallLogEntity>, period: Period, range: Range, providers: List<ProviderEntity>, zone: ZoneId = ZoneId.systemDefault()): StatsData {
