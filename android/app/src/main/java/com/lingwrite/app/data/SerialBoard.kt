@@ -46,7 +46,7 @@ object SerialBoard {
     suspend fun state(bookId: Long): SerialState {
         val db = AppGraph.db
         val b = db.books().get(bookId) ?: return SerialState(0, 0, 0, 5, 0, 0, 0)
-        val chs = db.chapters().chaptersOnce(bookId).sortedBy { it.number }
+        val chs = db.chapters().headersOnce(bookId)
         val buffer = chs.count { it.state == "done" && it.content.isNotBlank() && it.number > b.publishedUpTo }
         val plans = db.plan().chapters(bookId).first().associateBy { it.chapterId }
         // 章纲余量：已有章纲、正文还没写的章数
@@ -85,7 +85,7 @@ object SerialBoard {
     suspend fun plan(bookId: Long, s: SerialState): ShortUpdatePlan {
         val db = AppGraph.db
         val b = db.books().get(bookId) ?: return ShortUpdatePlan()
-        val chs = db.chapters().chaptersOnce(bookId).sortedBy { it.number }
+        val chs = db.chapters().headersOnce(bookId)
         val upcoming = chs.filter { it.number > b.publishedUpTo && (it.state != "done" || it.content.isBlank()) }.take(5).mapNotNull { ch ->
             db.plan().chapterOnce(ch.id)?.takeIf { !it.isEmpty() }?.let { "第 ${ch.number} 章：${it.event}" }
         }.joinToString("\n")

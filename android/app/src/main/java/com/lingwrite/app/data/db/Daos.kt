@@ -5,6 +5,8 @@ package com.lingwrite.app.data.db
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
+data class BookTotals(val words: Int, val chapters: Int)
+
 @Dao
 interface BookDao {
     @Query("""SELECT b.id, b.title, b.genre, b.status, b.coverIndex, b.wizardStep, b.updatedAt,
@@ -14,6 +16,8 @@ interface BookDao {
 
     @Query("SELECT * FROM books WHERE id = :id") fun book(id: Long): Flow<BookEntity?>
     @Query("SELECT * FROM books WHERE id = :id") suspend fun get(id: Long): BookEntity?
+    @Query("SELECT COALESCE(SUM(wordCount),0) AS words, COUNT(*) AS chapters FROM chapters WHERE bookId = :bookId AND deletedAt = 0")
+    suspend fun totals(bookId: Long): BookTotals
     @Query("SELECT * FROM books") suspend fun all(): List<BookEntity>
     @Insert suspend fun insert(b: BookEntity): Long
     @Update suspend fun update(b: BookEntity)
@@ -31,6 +35,21 @@ interface ChapterDao {
 
     @Query("SELECT id, bookId, volumeId, number, title, '' AS content, wordCount, state, aiMarks, updatedAt, deletedAt FROM chapters WHERE bookId = :bookId AND deletedAt = 0 ORDER BY number DESC")
     fun chapterHeaders(bookId: Long): Flow<List<ChapterEntity>>
+    /** 只要章号/标题/字数等元数据，不加载正文。 */
+    @Query("SELECT id, bookId, volumeId, number, title, '' AS content, wordCount, state, aiMarks, updatedAt, deletedAt FROM chapters WHERE bookId = :bookId AND deletedAt = 0 ORDER BY number")
+    suspend fun headersOnce(bookId: Long): List<ChapterEntity>
+    /** 最近编辑的一章正文，用于书架继续写作卡片。 */
+    @Query("SELECT content FROM chapters WHERE bookId = :bookId AND deletedAt = 0 ORDER BY updatedAt DESC LIMIT 1")
+    suspend fun lastContent(bookId: Long): String?
+    /** 最近 N 章正文（按章号倒序），用于输出语言判断。 */
+    @Query("SELECT content FROM chapters WHERE bookId = :bookId AND deletedAt = 0 ORDER BY number DESC LIMIT :n")
+    suspend fun lastNContent(bookId: Long, n: Int): List<String>
+    /** 当前进度章：最后一个有字数的章节。 */
+    @Query("SELECT MAX(number) FROM chapters WHERE bookId = :bookId AND deletedAt = 0 AND wordCount > 0")
+    suspend fun maxNumberWithWords(bookId: Long): Int?
+    /** 正文索引过期（未索引或 updatedAt 晚于索引时间）的章节 id。 */
+    @Query("SELECT c.id FROM chapters c LEFT JOIN chapter_index i ON i.chapterId = c.id WHERE c.bookId = :bookId AND c.deletedAt = 0 AND c.id != :except AND (i.at IS NULL OR i.at < c.updatedAt)")
+    suspend fun staleIds(bookId: Long, except: Long = -1): List<Long>
     @Query("SELECT * FROM chapters WHERE bookId = :bookId AND deletedAt = 0 ORDER BY number") suspend fun chaptersOnce(bookId: Long): List<ChapterEntity>
     @Query("SELECT * FROM chapters WHERE bookId = :bookId AND deletedAt != 0 ORDER BY deletedAt DESC") fun deletedChapters(bookId: Long): Flow<List<ChapterEntity>>
     @Query("SELECT * FROM chapters WHERE id = :id") fun chapter(id: Long): Flow<ChapterEntity?>
@@ -42,6 +61,7 @@ interface ChapterDao {
     fun todayWords(since: Long): Flow<Int>
     @Query("SELECT MAX(number) FROM chapters WHERE bookId = :bookId AND deletedAt = 0") suspend fun maxNumber(bookId: Long): Int?
     @Insert suspend fun insert(c: ChapterEntity): Long
+    @Insert suspend fun insertAll(c: List<ChapterEntity>): List<Long>
     @Update suspend fun update(c: ChapterEntity)
     @Query("UPDATE chapters SET content = :content, wordCount = :words, aiMarks = :marks, updatedAt = :at WHERE id = :id AND deletedAt = 0")
     suspend fun updateContent(id: Long, content: String, words: Int, marks: String, at: Long)

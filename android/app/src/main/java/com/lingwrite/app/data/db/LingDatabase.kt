@@ -10,6 +10,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.lingwrite.app.data.Naming
 
+/** 当前 schema 版本；迁移时同步改这里和 [LingDatabase] 的 version 注解。 */
+const val DB_VERSION = 8
+
 /**
  * v0.2 起命名规范：卷 / 章标题只存名称，编号显示时计算（docs/v0.2/naming-bug.md）。
  * 旧数据里写死的「第X卷」「第X章」前缀在迁移时剥离。
@@ -175,7 +178,7 @@ val MIGRATIONS: Array<Migration> = arrayOf(
         IssueEntity::class, ForeshadowEntity::class,
         WordDayEntity::class, IdeaEntity::class, ChapterNoteEntity::class, LoreSuggestionEntity::class,
         BreakdownEntity::class, ReaderReportEntity::class],
-    version = 8,
+    version = DB_VERSION,
     exportSchema = true,
 )
 abstract class LingDatabase : RoomDatabase() {

@@ -255,7 +255,7 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                             Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 LingButton(tr(R.string.check_035, idea.chapter), BtnKind.Tonal, height = 32.dp) {
                                     scope.launch {
-                                        val chs = AppGraph.db.chapters().chaptersOnce(d.bookId).sortedBy { it.number }
+                                        val chs = AppGraph.db.chapters().headersOnce(d.bookId)
                                         val target = chs.firstOrNull { it.number == idea.chapter }
                                         if (target != null) {
                                             applyBefore = AppGraph.db.plan().chapterOnce(target.id)?.note.orEmpty()
@@ -278,7 +278,7 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                         onDismiss = { applyIdea = null },
                         onConfirm = {
                             scope.launch {
-                                val chs = AppGraph.db.chapters().chaptersOnce(d.bookId).sortedBy { it.number }
+                                val chs = AppGraph.db.chapters().headersOnce(d.bookId)
                                 val target = chs.firstOrNull { it.number == idea.chapter }
                                 if (target != null) {
                                     val cp = AppGraph.db.plan().chapterOnce(target.id) ?: com.lingwrite.app.data.db.ChapterPlanEntity(target.id, d.bookId)
@@ -317,7 +317,7 @@ fun ForeshadowSheet(d: FsDraft, inline: Boolean = false, onDismiss: () -> Unit) 
                 Spacer(Modifier.weight(1f))
                 LingButton(if (e?.pending == true) tr(R.string.check_045) else tr(R.string.check_046), enabled = content.isNotBlank()) {
                     scope.launch {
-                        val cur = currentChapter(AppGraph.db.chapters().chaptersOnce(d.bookId))
+                        val cur = AppGraph.db.chapters().maxNumberWithWords(d.bookId) ?: 1
                         val f = (e ?: ForeshadowEntity(bookId = d.bookId, content = "", chapterId = d.chapterId, plantNumber = d.number, quoteStart = d.start)).copy(
                             content = content.trim(), quote = quote.trim(), payoff = payoff.toIntOrNull(), cardId = card, status = status, pending = false,
                             paidAt = if (status == "paid") (e?.paidAt ?: cur) else null)
