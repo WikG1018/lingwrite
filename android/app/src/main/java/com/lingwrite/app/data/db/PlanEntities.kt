@@ -70,6 +70,26 @@ data class ChapterPlanEntity(
     val beats: String = "[]",
     /** A13 章节标题候选 JSON ["…"] */
     val titleIdeas: String = "[]",
+    /** 作者标注的故事内时间，如「第三天清晨」；不是系统时间。 */
+    @ColumnInfo(defaultValue = "") val storyTime: String = "",
+)
+
+/** 章纲回写前的快照；恢复时按 planJson 原样写回。 */
+@Entity(
+    tableName = "chapter_plan_versions",
+    foreignKeys = [
+        ForeignKey(entity = ChapterEntity::class, parentColumns = ["id"], childColumns = ["chapterId"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = BookEntity::class, parentColumns = ["id"], childColumns = ["bookId"], onDelete = ForeignKey.CASCADE),
+    ],
+    indices = [Index("chapterId"), Index("bookId")],
+)
+data class ChapterPlanVersionEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val chapterId: Long,
+    val bookId: Long,
+    val planJson: String,
+    val note: String = "",
+    val createdAt: Long = System.currentTimeMillis(),
 )
 
 @Dao
@@ -88,4 +108,10 @@ interface PlanDao {
     @Upsert suspend fun upsertChapter(p: ChapterPlanEntity)
     @Query("UPDATE chapter_plans SET note = :before WHERE chapterId = :chapterId AND note = :expected")
     suspend fun restoreNoteIfUnchanged(chapterId: Long, expected: String, before: String): Int
+
+    @Query("SELECT * FROM chapter_plan_versions WHERE chapterId = :chapterId ORDER BY createdAt DESC") suspend fun planVersions(chapterId: Long): List<ChapterPlanVersionEntity>
+    @Query("SELECT * FROM chapter_plan_versions WHERE id = :id") suspend fun planVersion(id: Long): ChapterPlanVersionEntity?
+    @Insert suspend fun insertPlanVersion(v: ChapterPlanVersionEntity): Long
+    @Query("DELETE FROM chapter_plan_versions WHERE chapterId = :chapterId AND id NOT IN (SELECT id FROM chapter_plan_versions WHERE chapterId = :chapterId ORDER BY createdAt DESC LIMIT :keep)")
+    suspend fun prunePlanVersions(chapterId: Long, keep: Int)
 }
