@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lingwrite.app.data.LingJson
 import com.lingwrite.app.data.db.LingDatabase
 import com.lingwrite.app.data.db.MIGRATION_1_2
+import com.lingwrite.app.data.db.MIGRATION_8_9
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -194,6 +195,25 @@ class MigrationTest {
         db.close()
     }
 
+    @Test fun migrate8To9() {
+        val db = openAt(8)
+        db.execSQL("INSERT INTO books (id, title, genre, status, coverIndex, dailyTarget, blurb, wizardStep, createdAt, updatedAt, bufferTarget, publishedUpTo) VALUES (1, '测试书', '仙侠', 'serial', 0, 0, '', 0, 0, 0, 5, 0)")
+        db.execSQL("INSERT INTO volumes (id, bookId, title, sort) VALUES (1, 1, '山门', 0)")
+        db.execSQL("INSERT INTO chapters (id, bookId, volumeId, number, title, content, wordCount, state, aiMarks, updatedAt, deletedAt) VALUES (1, 1, 1, 1, '夜雨', '正文', 2, 'done', '[]', 0, 0)")
+        db.execSQL("INSERT INTO chapter_plans (chapterId, bookId, event, hook, cliff, note, custom, threads, fromAi, landed, beats, titleIdeas) VALUES (1, 1, '事件', '钩子', '悬念', '', '{}', '', 1, '', '[]', '[]')")
+
+        MIGRATION_8_9.migrate(db)
+
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM read_metrics"))
+        assertEquals("0", scalar(db, "SELECT COUNT(*) FROM chapter_plan_versions"))
+        assertEquals("", scalar(db, "SELECT storyTime FROM chapter_plans WHERE chapterId = 1"))
+        db.execSQL("INSERT INTO read_metrics (bookId, chapterNumber, platform, recordedAt, reads, completion, favorites, comments, note) VALUES (1, 1, '', 0, 100, 80, 10, 2, '')")
+        db.execSQL("INSERT INTO chapter_plan_versions (chapterId, bookId, planJson, note, createdAt) VALUES (1, 1, '{}', '', 0)")
+        assertEquals("100", scalar(db, "SELECT reads FROM read_metrics WHERE bookId = 1"))
+        assertEquals("{}", scalar(db, "SELECT planJson FROM chapter_plan_versions WHERE chapterId = 1"))
+        db.close()
+    }
+
     /**
      * 全链迁移走 Room（v0.2-plan §6 风险项）：按 v1 schema 建库并写数据，
      * 再用 Room（version 7 + MIGRATIONS）打开。Room 会把迁移结果与编译期 schema 逐项校验
@@ -231,7 +251,7 @@ class MigrationTest {
                 db.notes().insert(com.lingwrite.app.data.db.ChapterNoteEntity(chapterId = 1, kind = "direction", text = "迁移后可用"))
             }
             assertEquals("1", db.query("SELECT COUNT(*) FROM chapter_notes", null).use { c -> c.moveToFirst(); c.getString(0) })
-            assertEquals("8", db.query("PRAGMA user_version", null).use { c -> c.moveToFirst(); c.getString(0) })
+            assertEquals("9", db.query("PRAGMA user_version", null).use { c -> c.moveToFirst(); c.getString(0) })
         } finally {
             db.close()
             ctx.deleteDatabase(name)

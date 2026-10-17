@@ -250,6 +250,11 @@ class BookRepository(private val db: LingDatabase, private val filesDir: java.io
             val to = maxOf(from, mapPoint(r.toChapter, oldToNew))
             if (from != r.fromChapter || to != r.toChapter) db.readerReports().updateRange(r.id, from, to)
         }
+        // 追读数据按章号存；插删章后跟着章节走。
+        db.readStats().once(bookId).forEach { m ->
+            val mapped = mapPoint(m.chapterNumber, oldToNew)
+            if (mapped != m.chapterNumber) db.readStats().update(m.copy(chapterNumber = mapped))
+        }
     }
 
     /** 章节上移 / 下移一位（可跨卷）。 */

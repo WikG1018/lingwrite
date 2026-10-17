@@ -11,7 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.lingwrite.app.data.Naming
 
 /** 当前 schema 版本；迁移时同步改这里和 [LingDatabase] 的 version 注解。 */
-const val DB_VERSION = 8
+const val DB_VERSION = 9
 
 /**
  * v0.2 起命名规范：卷 / 章标题只存名称，编号显示时计算（docs/v0.2/naming-bug.md）。
@@ -160,6 +160,28 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
+/** v8 → v9（v0.5）：追读数据、章纲回写快照、故事内时间。 */
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `read_metrics` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `bookId` INTEGER NOT NULL, " +
+                "`chapterNumber` INTEGER NOT NULL, `platform` TEXT NOT NULL, `recordedAt` INTEGER NOT NULL, `reads` INTEGER NOT NULL, " +
+                "`completion` INTEGER NOT NULL, `favorites` INTEGER NOT NULL, `comments` INTEGER NOT NULL, `note` TEXT NOT NULL, " +
+                "FOREIGN KEY(`bookId`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_read_metrics_bookId_chapterNumber_recordedAt` ON `read_metrics` (`bookId`, `chapterNumber`, `recordedAt`)")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `chapter_plan_versions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `chapterId` INTEGER NOT NULL, " +
+                "`bookId` INTEGER NOT NULL, `planJson` TEXT NOT NULL, `note` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`chapterId`) REFERENCES `chapters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE, " +
+                "FOREIGN KEY(`bookId`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_chapter_plan_versions_chapterId` ON `chapter_plan_versions` (`chapterId`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_chapter_plan_versions_bookId` ON `chapter_plan_versions` (`bookId`)")
+        db.execSQL("ALTER TABLE `chapter_plans` ADD COLUMN `storyTime` TEXT NOT NULL DEFAULT ''")
+    }
+}
+
 val MIGRATIONS: Array<Migration> = arrayOf(
     MIGRATION_1_2,
     MIGRATION_2_3,
@@ -168,6 +190,7 @@ val MIGRATIONS: Array<Migration> = arrayOf(
     MIGRATION_5_6,
     MIGRATION_6_7,
     MIGRATION_7_8,
+    MIGRATION_8_9,
 )
 
 @Database(
@@ -177,7 +200,7 @@ val MIGRATIONS: Array<Migration> = arrayOf(
         SummaryEntity::class, VolumeSummaryEntity::class, PassageEntity::class, PassageFts::class, ChapterIndexEntity::class,
         IssueEntity::class, ForeshadowEntity::class,
         WordDayEntity::class, IdeaEntity::class, ChapterNoteEntity::class, LoreSuggestionEntity::class,
-        BreakdownEntity::class, ReaderReportEntity::class],
+        BreakdownEntity::class, ReaderReportEntity::class, ReadMetricEntity::class, ChapterPlanVersionEntity::class],
     version = DB_VERSION,
     exportSchema = true,
 )
@@ -194,6 +217,7 @@ abstract class LingDatabase : RoomDatabase() {
     abstract fun loreSuggest(): LoreSuggestDao
     abstract fun breakdowns(): BreakdownDao
     abstract fun readerReports(): ReaderReportDao
+    abstract fun readStats(): ReadStatsDao
 
     companion object {
         fun build(context: Context, inMemory: Boolean = false): LingDatabase {
