@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import com.lingwrite.app.data.db.ForeshadowEntity
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -15,14 +16,15 @@ import kotlinx.serialization.json.jsonObject
 data class PayoffIdea(val chapter: Int, val how: String, val setup: String = "")
 
 object PayoffIdeas {
-    const val SYS = "你是伏笔设计顾问。回收要合情理、有爽感，不能突兀。严格只输出 JSON。"
+    val SYS = "你是伏笔设计顾问。回收要合情理、有爽感，不能突兀。\n" + PromptContract.JSON_ARRAY
 
     fun prompt(f: ForeshadowEntity, current: Int, volumeOutline: String, upcoming: String, card: String): String = buildString {
         append("【伏笔】${f.content}，第 ${f.plantNumber} 章埋下，原文「${f.quote}」，计划第 ").append(f.payoff ?: 0).append(" 章回收，现在写到第 ").append(current).append(" 章\n")
         if (volumeOutline.isNotBlank()) append("【当前卷纲】").append(volumeOutline).append('\n')
         if (upcoming.isNotBlank()) append("【后续章纲】\n").append(upcoming).append('\n')
         if (card.isNotBlank()) append("【相关设定卡】").append(card)
-        append("\n输出：[{\"chapter\":数字,\"how\":\"≤60字\",\"setup\":\"需要提前铺垫什么，≤30字\"}] 3 条。")
+        append("\n给出 3 个不同的回收方案：chapter 必须是第 ").append((current + 1)).append(" 到 ").append(current + 50).append(" 章之间的整数，且尽量不超过计划回收章；how 写清“谁做什么、怎么回收、爽点在哪”；setup 写清回收前需要先铺垫什么。\n")
+        append(PromptContract.JSON_ARRAY).append("\n格式示例：[{\"chapter\":18,\"how\":\"沈师姐在比试中认出断剑缺口，当众揭穿执事，主角借此翻案\",\"setup\":\"先让沈师姐见过一次断剑\"}] 3 条。")
     }
 
     suspend fun generate(f: ForeshadowEntity): List<PayoffIdea> {

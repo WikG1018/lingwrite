@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.jsonArray
@@ -19,24 +20,35 @@ data class ProofIssue(
 )
 
 object ProofPrompts {
-    const val SYS = "你是严格的中文校对。只找错别字、的地得、标点误用、明显病句；不改风格、不改用词习惯、不改方言和口语、不改人物语言特色。严格只输出 JSON。"
+    val SYS = "你是严格的中文校对。只找错别字、的地得、标点误用、明显病句；不改风格、不改用词习惯、不改方言和口语、不改人物语言特色。\n" + PromptContract.JSON_ARRAY
 
-    fun user(seg: String) = "【段落】\n$seg\n\n输出：[{\"quote\":\"原文最短唯一片段\",\"fix\":\"改后\",\"type\":\"typo|de|punct|grammar\",\"why\":\"≤15字\"}]，没有问题输出 []。"
+    fun user(seg: String) = buildString {
+        append("校对下面这段正文。只报确实需要改的地方，最多 20 条；没有问题输出 []。\n")
+        append(PromptContract.JSON_ARRAY).append('\n')
+        append(PromptContract.VERBATIM_QUOTE).append(" quote 必须是本段中**只出现一次**的最短片段，否则无法定位。\n")
+        append("type 只能是 typo（错别字）/ de（的地得）/ punct（标点）/ grammar（病句）；fix 只改错处，不要顺手润色。\n")
+        append("格式示例：[{\"quote\":\"他走的很快\",\"fix\":\"他走得很快\",\"type\":\"de\",\"why\":\"应用地得的得\"}]\n\n")
+        append("【段落】\n").append(seg)
+    }
 }
 
 object Proof {
     /** 分段（每段 1500 字）校对；返回按出现顺序的全部问题。 */
     suspend fun run(bookId: Long, chapterId: Long, text: String): List<ProofIssue> {
         val out = mutableListOf<ProofIssue>()
+        var failedChunks = 0
         text.chunked(1500).forEach { seg ->
-            val raw = AppGraph.ai.complete("check", ProofPrompts.SYS, ProofPrompts.user(seg), bookId, chapterId, 1200).getOrThrow()
-            val arr = (JsonReply.parse(raw) as? JsonReply.Result.Ok)?.json
-                ?: extractJson(raw) ?: error("校对返回格式无效，请重试；未应用修改")
-            out += arr.jsonArray.map { e ->
-                val o = e.jsonObject
-                ProofIssue(o.str("quote"), o.str("fix"), o.str("type").ifBlank { "typo" }, o.str("why"))
-            }.filter { it.quote.isNotBlank() && it.fix.isNotBlank() }
+            runCatching {
+                val raw = AppGraph.ai.complete("check", ProofPrompts.SYS, ProofPrompts.user(seg), bookId, chapterId, 1600, outputLang = false).getOrThrow()
+                val arr = (JsonReply.parse(raw) as? JsonReply.Result.Ok)?.json
+                    ?: extractJson(raw) ?: error("校对返回格式无效")
+                out += arr.jsonArray.map { e ->
+                    val o = e.jsonObject
+                    ProofIssue(o.str("quote"), o.str("fix"), o.str("type").ifBlank { "typo" }, o.str("why"))
+                }.filter { it.quote.isNotBlank() && it.fix.isNotBlank() }
+            }.onFailure { failedChunks++ }
         }
+        if (out.isEmpty() && failedChunks > 0) error("校对失败：模型输出无法解析，请重试；未应用修改")
         return out
     }
 

@@ -1377,5 +1377,7 @@
 "stats_029": "Day",
 "stats_030": "Week",
 "stats_031": "Month",
-"reader_013": "[Reader %1$s] %2$s"
+"reader_013": "[Reader %1$s] %2$s",
+"editor_79": "The selection is too long (over 4,000 characters). Please rewrite it in smaller parts so the AI output is not truncated.",
+"editor_80": "The AI output looks truncated (much shorter than the original). Your draft was left unchanged; please retry or shorten the selection."
 }

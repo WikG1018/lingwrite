@@ -1456,4 +1456,6 @@
     <string name="stats_029">日</string>
     <string name="stats_030">周</string>
     <string name="stats_031">月</string>
+    <string name="editor_79">选区太长（超过 4000 字），请分段改写，避免 AI 输出被截断。</string>
+    <string name="editor_80">AI 输出可能被截断（明显短于原文），已保留原稿。请重试或缩短选区。</string>
 </resources>

@@ -1381,4 +1381,6 @@
     <string name="stats_029">Day</string>
     <string name="stats_030">Week</string>
     <string name="stats_031">Month</string>
+    <string name="editor_79">The selection is too long (over 4,000 characters). Please rewrite it in smaller parts so the AI output is not truncated.</string>
+    <string name="editor_80">The AI output looks truncated (much shorter than the original). Your draft was left unchanged; please retry or shorten the selection.</string>
 </resources>

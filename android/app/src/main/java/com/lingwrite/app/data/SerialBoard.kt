@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import com.lingwrite.app.data.db.BookEntity
 import com.lingwrite.app.data.db.ChapterEntity
 import kotlinx.coroutines.flow.first
@@ -69,13 +70,15 @@ object SerialBoard {
         return n
     }
 
-    const val SYS = "你是连载节奏顾问。帮作者在不注水的前提下维持更新。只给章纲级提纲，不写正文。严格只输出 JSON。"
+    val SYS = "你是连载节奏顾问。帮作者在不注水的前提下维持更新。只给章纲级提纲，不写正文。\n" + PromptContract.JSON_ONLY
 
     fun prompt(b: BookEntity, s: SerialState, upcoming: String, summaries: String): String = buildString {
         append("【存稿】").append(s.buffer).append(" 章，目标 ").append(s.bufferTarget).append('\n')
         if (upcoming.isNotBlank()) append("【后续章纲】\n").append(upcoming).append('\n')
         if (summaries.isNotBlank()) append("【最近 3 章摘要】\n").append(summaries)
-        append("\n输出：{\"split\":{\"from\":章号,\"a\":{\"event\":\"\",\"hook\":\"\",\"cliff\":\"\"},\"b\":{\"event\":\"\",\"hook\":\"\",\"cliff\":\"\"}},\"bridges\":[{\"event\":\"\",\"why\":\"≤30字\"}]}")
+        append("\n给出 1 个拆章方案：把 from 章拆成 a/b 两章（a/b 各自有完整的小事件、钩子和章尾悬念，不能注水），再给 1–2 个可插入的过渡章纲。\n")
+        append(PromptContract.JSON_ONLY).append('\n')
+        append("格式：{\"split\":{\"from\":章号,\"a\":{\"event\":\"\",\"hook\":\"\",\"cliff\":\"\"},\"b\":{\"event\":\"\",\"hook\":\"\",\"cliff\":\"\"}},\"bridges\":[{\"event\":\"\",\"why\":\"≤30字\"}]}")
     }
 
     /** 短更预案：拆下一章成两章 + 两个过渡章思路。 */

@@ -165,11 +165,14 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         s.anchor = range?.let { com.lingwrite.app.data.TextAnchor(text, it.first, it.last + 1) }
             ?: com.lingwrite.app.data.TextAnchor(text, cursor, cursor)
         val quote = range?.let { text.substring(it.first, it.last + 1) } ?: ""
+        if (quote.length > 4000) { s.streaming = false; s.error = tr(R.string.editor_79); s.run.fail(tr(R.string.editor_79)); return }
+        // 选区越长输出越长：按选区字数放大预算，避免半截正文被采纳。
+        val budget = maxOf(task.maxTokens, (quote.length / 1.2).toInt() + 500).coerceAtMost(4096)
         s.job = scope.launch {
             val ctx = PromptHooks.context(st.chapter.bookId, st.chapter.id, cursor, text)
             val system = Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p)
             val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + trZh(R.string.editor_ai_027) + task.instruction(quote, p)
-            AppGraph.ai.streamMany(task.id, Slot.Writing, system, listOf(ChatMessage("user", user)), n, task.maxTokens, st.chapter.bookId, st.chapter.id,
+            AppGraph.ai.streamMany(task.id, Slot.Writing, system, listOf(ChatMessage("user", user)), n, budget, st.chapter.bookId, st.chapter.id,
                 scope = if (quote.isNotEmpty()) tr(R.string.editor_ai_028, quote.length) else tr(R.string.editor_ai_029)).collect { e ->
                 when (e) {
                     is AiService.AiMulti.Partial -> {
@@ -215,6 +218,21 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                 AppGraph.db.plan().bookOnce(st.chapter.bookId) ?: com.lingwrite.app.data.db.BookPlanEntity(st.chapter.bookId)
             )
             val indices = if (only == null) (0 until n).toList() else listOf(only.coerceIn(0, n - 1))
+            // 起草不是盲写：带上总纲/卷纲/章纲/前情摘要/人物/伏笔，避免人物状态和伏笔断线。
+            val brief = runCatching {
+                com.lingwrite.app.data.ContextEngine.brief(
+                    st.chapter.bookId, st.chapter.id,
+                    setOf(
+                        com.lingwrite.app.data.ContextEngine.Part.Synopsis,
+                        com.lingwrite.app.data.ContextEngine.Part.VolumeOutline,
+                        com.lingwrite.app.data.ContextEngine.Part.ChapterPlan,
+                        com.lingwrite.app.data.ContextEngine.Part.PrevSummaries(3),
+                        com.lingwrite.app.data.ContextEngine.Part.Characters,
+                        com.lingwrite.app.data.ContextEngine.Part.OpenForeshadows,
+                        com.lingwrite.app.data.ContextEngine.Part.StyleCard,
+                    ),
+                )
+            }.getOrDefault("")
             for (i in indices) {
                 s.draftStreaming = i
                 while (s.draftSegs.size <= i) s.draftSegs += ""
@@ -222,10 +240,10 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                 // 这一段对应的节拍（每段 2 条）；段号用 1 起的全局段号。
                 val partBeats = beats.drop(i * 2).take(2).map { it.text }
                 val user = com.lingwrite.app.data.ChainPrompts.draft(
-                    upstream, partBeats, style, i + 1, n, done, first = st.chapter.number <= 1,
+                    upstream, partBeats, style, i + 1, n, done, first = st.chapter.number <= 1, brief = brief,
                 )
                 var seg = ""
-                AppGraph.ai.stream("draft", Slot.Writing, com.lingwrite.app.data.ai.Prompts.BASE, listOf(ChatMessage("user", user)), 1600, st.chapter.bookId, st.chapter.id, scope = trZh(R.string.editor_ai_031)).collect { e ->
+                AppGraph.ai.stream("draft", Slot.Writing, com.lingwrite.app.data.ai.Prompts.BASE, listOf(ChatMessage("user", user)), 2400, st.chapter.bookId, st.chapter.id, scope = trZh(R.string.editor_ai_031)).collect { e ->
                     when (e) {
                         is AiStream.Partial -> { seg = e.text; s.draftSegs[i] = e.text }
                         is AiStream.Finished -> { seg = e.text; s.draftSegs[i] = e.text }
@@ -255,11 +273,15 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
         s.anchor = range?.let { com.lingwrite.app.data.TextAnchor(text, it.first, it.last + 1) }
             ?: com.lingwrite.app.data.TextAnchor(text, cursor, cursor)
         val quote = range?.let { text.substring(it.first, it.last + 1) } ?: ""
+        if (quote.length > 4000) { s.streaming = false; s.error = tr(R.string.editor_79); s.run.fail(tr(R.string.editor_79)); return }
+        // 选区越长输出越长：按选区字数放大预算，避免半截正文被采纳。
+        val budget = maxOf(task.maxTokens, (quote.length / 1.2).toInt() + 500).coerceAtMost(4096)
         s.job = scope.launch {
             val ctx = PromptHooks.context(st.chapter.bookId, st.chapter.id, cursor, text)
             val system = Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p)
-            val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + trZh(R.string.editor_ai_027) + task.instruction(quote, p)
-            AppGraph.ai.stream(task.id, Slot.Writing, system, listOf(ChatMessage("user", user)), task.maxTokens, st.chapter.bookId, st.chapter.id,
+            val variation = if (s.round > 1) com.lingwrite.app.data.ai.Prompts.VARIATION_HINT else ""
+            val user = (if (ctx.isNotBlank()) "$ctx\n\n" else "") + trZh(R.string.editor_ai_027) + task.instruction(quote, p) + variation
+            AppGraph.ai.stream(task.id, Slot.Writing, system, listOf(ChatMessage("user", user)), budget, st.chapter.bookId, st.chapter.id,
                 scope = if (quote.isNotEmpty()) tr(R.string.editor_ai_028, quote.length) else tr(R.string.editor_ai_029)).collect { e ->
                 when (e) {
                     is AiStream.Partial -> { s.text = e.text; s.run.stream(e.text) }
@@ -294,6 +316,11 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                 val anchor = s.anchor ?: run { s.error = tr(R.string.editor_ai_033); return@launch }
                 if (!anchor.valid(cur)) { s.error = tr(R.string.editor_ai_033); return@launch }
                 val r = s.target
+                // 改写/润色类：输出明显短于选区时视为被截断，拒绝覆盖正文。
+                if (r != null) {
+                    val originalLen = r.last - r.first + 1
+                    if (originalLen > 80 && text.length < originalLen * 0.5) { s.error = tr(R.string.editor_80); return@launch }
+                }
                 // 辅助模式改选中的句子：改的是作者自己写的字，按“AI 建议 + 人工修改”计
                 val kind = if (s.mode == WriteMode.Assist && r != null) "edited" else if (edited) "edited" else "gen"
                 if (r != null) st.replace(r.first, r.last + 1, text, kind)
@@ -321,6 +348,10 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
                 val anchor = s.anchor ?: run { s.error = tr(R.string.editor_ai_033); return@launch }
                 if (!anchor.valid(cur)) { s.error = tr(R.string.editor_ai_033); return@launch }
                 val r = s.target
+                if (r != null) {
+                    val originalLen = r.last - r.first + 1
+                    if (originalLen > 80 && cand.display.length < originalLen * 0.5) { s.error = tr(R.string.editor_80); return@launch }
+                }
                 val kind = if (cand.edited != null) "edited" else "gen"
                 if (r != null) st.replace(r.first, r.last + 1, cand.display, kind)
                 else {
@@ -441,6 +472,11 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             if (s.annotations.isNotEmpty() && t == null) AnnotationBar(s.annotations.size, s.annotating, onClear = { s.annotations.clear() }) {
                 sendAnnotations(st, s, scope)
             }
+            // 批注失败：保留批注与原任务，点重试重新走 annotate（不要错跑成 rewrite）。
+            if (t == null && s.error != null && s.annotations.isNotEmpty() && !s.annotating) {
+                AiErrorCard(s.error!!, onRetry = { s.error = null; sendAnnotations(st, s, scope) },
+                    onChangeModel = EditorHooks.onOpenModels?.let { f -> { f() } })
+            }
             // 工具条胶囊（modes.md §5）：辅助模式常驻「卡文急救」；「校对本章」两种模式都有
             val chips = buildList {
                 // 传给 ToolChips 的必须是原始 label：显示由 ToolChips 内部 trText 完成，点击也按原始 label 匹配。
@@ -498,17 +534,17 @@ private fun sendAnnotations(st: EditorState, s: AiSession, scope: kotlinx.corout
     s.annotating = true
     scope.launch {
         val p = AppGraph.prefs.flow.first()
-        val r = AppGraph.ai.complete("annotate", Prompts.BASE + "\n" + PromptHooks.style(st.chapter.bookId, p),
-            Prompts.annotateInstruction(items.map { it.quote to it.note }), st.chapter.bookId, st.chapter.id, 2000, Slot.Writing)
+        val r = AppGraph.ai.complete("annotate", com.lingwrite.app.data.ai.PromptContract.ANNOTATE_SYS,
+            Prompts.annotateInstruction(items.map { it.quote to it.note }), st.chapter.bookId, st.chapter.id, 2400, Slot.Writing, outputLang = false)
         s.annotating = false
         r.onSuccess { raw ->
-            val arr = runCatching { LingJson.parseToJsonElement(raw.substring(raw.indexOf('['), raw.lastIndexOf(']') + 1)).jsonArray }.getOrNull()
-            if (arr == null) { s.error = tr(R.string.editor_ai_052); s.tool = Prompts.rewrite; return@onSuccess }
+            val arr = runCatching { com.lingwrite.app.data.extractJson(raw)?.jsonArray }.getOrNull()
+            if (arr == null) { s.error = tr(R.string.editor_ai_052); return@onSuccess }
             s.revisions = items.mapIndexed { i, a ->
                 val rev = arr.firstOrNull { it.jsonObject["id"]?.jsonPrimitive?.intOrNull == i + 1 }?.jsonObject?.get("revised")?.jsonPrimitive?.contentOrNull
                 Revision(a, rev ?: a.quote, rev != null)
             }
-        }.onFailure { s.error = it.message; s.tool = Prompts.rewrite }
+        }.onFailure { s.error = it.message }
     }
 }
 

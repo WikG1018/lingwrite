@@ -35,6 +35,6 @@ class JsonReplyTest {
         assertEquals(null, retry)
         val (bad, retryHint) = JsonReply.parseOrRetry("不是 JSON")
         assertEquals(null, bad)
-        assertTrue(retryHint!!.contains("只输出 JSON"))
+        assertTrue(retryHint!!.contains("只输出") && retryHint.contains("JSON"))
     }
 }

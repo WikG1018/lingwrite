@@ -68,7 +68,7 @@ import kotlinx.serialization.json.jsonObject
 
 /** 书名、简介、卖点文案的提示词（A10，ai-features §10）。 */
 object BookAiPrompts {
-    const val SYS = "你是资深网文策划，熟悉起点、番茄、晋江等平台的上架包装。严格只输出 JSON。"
+    val SYS = "你是资深网文策划，熟悉起点、番茄、晋江等平台的上架包装。文案要具体、有卖点，不写空话。\n" + com.lingwrite.app.data.ai.PromptContract.JSON_ONLY
 
     fun pitch(synopsis: String, volumeOutline: String, recentSummaries: String, title: String, blurb: String, platform: String): String = buildString {
         if (synopsis.isNotBlank()) append(trZh(R.string.book_ai_001)).append(synopsis).append('\n')

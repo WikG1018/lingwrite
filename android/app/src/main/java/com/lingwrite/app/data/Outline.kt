@@ -10,13 +10,9 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.*
 
-/** 取出模型回复里的第一个 JSON 数组 / 对象（容忍前后多余文字和 ```json 包裹）。 */
-fun extractJson(raw: String, array: Boolean = true): JsonElement? {
-    val (o, c) = if (array) '[' to ']' else '{' to '}'
-    val a = raw.indexOf(o); val b = raw.lastIndexOf(c)
-    if (a < 0 || b <= a) return null
-    return runCatching { LingJson.parseToJsonElement(raw.substring(a, b + 1)) }.getOrNull()
-}
+/** 取出模型回复里的第一个完整 JSON 数组 / 对象（容忍代码块、前后文字、字符串内括号与截断）。 */
+fun extractJson(raw: String, array: Boolean = true): JsonElement? =
+    com.lingwrite.app.data.ai.JsonExtract.extract(raw, array)
 
 fun JsonObject.str(k: String) = (this[k] as? JsonPrimitive)?.contentOrNull.orEmpty()
 
@@ -87,12 +83,19 @@ fun ChapterPlanEntity.asPrompt(): String = buildString {
 fun ChapterPlanEntity.isEmpty() = event.isBlank() && hook.isBlank() && cliff.isBlank() && note.isBlank() && parseMap(custom).values.all { it.isBlank() }
 
 object OutlinePrompts {
-    const val SYS = "你是资深网文策划编辑。只输出要求的内容，不要解释。"
-    fun volumes(synopsis: String, n: Int) = "根据下面的总纲，拆出 $n 卷的卷纲。严格只输出 JSON 数组：[{\"title\":\"卷名\",\"outline\":\"150 字以内卷纲\"}]\n\n【总纲】\n$synopsis"
+    val SYS = "你是资深网文策划编辑。只输出要求的内容，不要解释。\n" + com.lingwrite.app.data.ai.PromptContract.JSON_ONLY
+    fun volumes(synopsis: String, n: Int) = buildString {
+        append("根据下面的总纲，拆出 $n 卷的卷纲：卷与卷之间要递进（舞台/对手/主角实力或关系至少一项变化），卷名只写名字，不要“第几卷”。\n")
+        append(com.lingwrite.app.data.ai.PromptContract.JSON_ARRAY).append('\n')
+        append("格式：[{\"title\":\"卷名\",\"outline\":\"150 字以内卷纲：本卷目标、主要冲突、卷末状态\"}]，数组长度必须正好 $n。\n\n")
+        append("【总纲】\n").append(synopsis)
+    }
     fun chapters(synopsis: String, volume: String, prev: String, n: Int, fields: List<String>, hint: String) = buildString {
         append("根据卷纲拆出接下来 $n 章的章纲。每章写清核心事件、开篇钩子、章尾悬念")
         if (fields.isNotEmpty()) append("，以及：").append(fields.joinToString("、"))
-        append("。严格只输出 JSON 数组：[{\"title\":\"章名\",\"event\":\"…\",\"hook\":\"…\",\"cliff\":\"…\"")
+        append("。\n")
+        append(com.lingwrite.app.data.ai.PromptContract.JSON_ARRAY).append('\n')
+        append("格式：[{\"title\":\"章名（≤8字）\",\"event\":\"核心事件（谁做了什么、局面怎么变）\",\"hook\":\"…\",\"cliff\":\"…\"")
         fields.forEach { append(",\"").append(it).append("\":\"…\"") }
         append("}]\n")
         if (hint.isNotBlank()) append("【写法要求】").append(hint).append('\n')
@@ -100,9 +103,14 @@ object OutlinePrompts {
         append("\n【卷纲】\n").append(volume).append('\n')
         if (prev.isNotBlank()) append("\n【已有章纲（接着往后拆）】\n").append(prev).append('\n')
     }
-    fun landed(plan: String, text: String) = "对照章纲检查正文是否写到。严格只输出 JSON：{\"event\":true/false,\"hook\":true/false,\"cliff\":true/false,\"note\":\"若有偏离，30 字内说明\"}\n\n【章纲】\n$plan\n\n【正文】\n${text.take(12000)}"
+    fun landed(plan: String, text: String) = "对照章纲检查正文是否写到。\n" + com.lingwrite.app.data.ai.PromptContract.JSON_ONLY +
+        "\n格式：{\"event\":true/false,\"hook\":true/false,\"cliff\":true/false,\"note\":\"若有偏离，30 字内说明；没偏离给空串\"}" +
+        "\n判断标准：只看“是否写到”，不评价写得好不好；正文明确写到了才给 true。\n\n【章纲】\n$plan\n\n【正文】\n${text.take(12000)}"
     fun golden(items: List<String>, chapters: List<ChapterEntity>) = buildString {
-        append("你在审读一部网文的前三章。逐项判断下列检查项是否满足，并引用原文作为依据（20 字以内原句）。严格只输出 JSON 数组：[{\"item\":\"检查项原文\",\"pass\":true/false,\"evidence\":\"原文依据或缺什么\",\"chapter\":章号}]\n\n【检查项】\n")
+        append("你在审读一部网文的前三章。逐项判断下列检查项是否满足：满足时引用 20 字以内原文作依据，不满足时写清缺什么。\n")
+        append(com.lingwrite.app.data.ai.PromptContract.JSON_ARRAY).append('\n')
+        append(com.lingwrite.app.data.ai.PromptContract.VERBATIM_QUOTE).append('\n')
+        append("格式：[{\"item\":\"检查项原文（照抄下面的条目）\",\"pass\":true/false,\"evidence\":\"原文依据或缺什么\",\"chapter\":章号}]，条目数量必须与检查项一致。\n\n【检查项】\n")
         items.forEachIndexed { i, s -> append("${i + 1}. $s\n") }
         chapters.forEach { append("\n【第 ${it.number} 章 ${it.title}】\n").append(it.content.take(6000)).append('\n') }
     }

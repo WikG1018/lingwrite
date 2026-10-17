@@ -28,7 +28,7 @@ object LoreSuggest {
         // 第一步：抽取事实（与 Consistency.check 同源；当次没有跑检查时单独抽一次）
         val facts = mutableListOf<kotlinx.serialization.json.JsonElement>()
         c.content.chunked(6000).forEach { seg ->
-            val r = AppGraph.ai.complete("extract", Consistency.SYS, Consistency.extractPrompt(seg), c.bookId, c.id, 1500).getOrNull() ?: return@forEach
+            val r = AppGraph.ai.complete("extract", Consistency.SYS, Consistency.extractPrompt(seg), c.bookId, c.id, 1500, outputLang = false).getOrNull() ?: return@forEach
             extractJson(r)?.let { j -> runCatching { facts.addAll(j.jsonArray) } }
         }
         if (facts.isEmpty()) return 0

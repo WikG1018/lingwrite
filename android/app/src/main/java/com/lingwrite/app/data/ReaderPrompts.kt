@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.jsonArray
@@ -38,7 +39,7 @@ data class ReaderReport(
 data class ReaderDrop(val quote: String, val why: String)
 
 object ReaderPrompts {
-    const val SYS = "你在扮演一位网文读者，刚读完下面的章节。用读者口吻、诚实地反馈，不要客气，也不要替作者改写。严格只输出 JSON。"
+    val SYS = "你在扮演一位网文读者，刚读完下面的章节。用读者口吻、诚实地反馈，不要客气，也不要替作者改写。\n" + PromptContract.JSON_ONLY
 
     fun user(persona: ReaderPersona, customDesc: String, blurb: String, prev: String, text: String): String {
         val desc = if (persona.id == "custom") customDesc.ifBlank { "普通网文读者" } else "${persona.name}（${persona.desc}）"
@@ -48,7 +49,11 @@ object ReaderPrompts {
             if (prev.isNotBlank()) append("【前情摘要】\n").append(prev).append('\n')
             append("【你的画像】").append(desc).append('\n')
             append("【章节】").append(body).append('\n')
-            append("输出：{\"stars\":1-5,\"oneLine\":\"≤30字\",\"drops\":[{\"quote\":\"≤20字\",\"why\":\"≤30字\"}],\"hooks\":[\"爽点或期待点\"],\"wantNext\":\"≤40字\",\"advice\":[\"≤40字\"×3]}")
+            append(PromptContract.JSON_ONLY).append('\n')
+            append(PromptContract.VERBATIM_QUOTE).append('\n')
+            append("输出：{\"stars\":1-5 的整数,\"oneLine\":\"≤30字整体评价\",\"drops\":[{\"quote\":\"原文≤20字\",\"why\":\"≤30字为什么想弃书\"}]（0–3 条，没有就 []）,")
+            append("\"hooks\":[\"爽点或期待点，0–3 条\"],\"wantNext\":\"≤40字想不想看下一章及原因\",\"advice\":[\"≤40字建议\"×最多3条]}")
+            append("\n示例：{\"stars\":4,\"oneLine\":\"开局够狠，中段有点拖\",\"drops\":[{\"quote\":\"他缓缓抬起头\",\"why\":\"动作拖沓\"}],\"hooks\":[\"断剑来历\"],\"wantNext\":\"想知道师父死因\",\"advice\":[\"删掉两段环境描写\"]}")
         }
     }
 
@@ -65,7 +70,7 @@ object ReaderFeedback {
         val sums = db.context().summaries(bookId).associateBy { it.chapterId }
         val prev = chs.mapNotNull { c -> sums[c.id]?.let { "第 ${c.number} 章：${it.text}" } }.take(3).joinToString("\n")
         val raw = AppGraph.ai.complete("ask", ReaderPrompts.SYS,
-            ReaderPrompts.user(persona, customDesc, b.blurb, prev, text), bookId, chs.firstOrNull()?.id, 1000).getOrThrow()
+            ReaderPrompts.user(persona, customDesc, b.blurb, prev, text), bookId, chs.firstOrNull()?.id, 1000, outputLang = false).getOrThrow()
         val o = (JsonReply.parse(raw, array = false) as? JsonReply.Result.Ok)?.json as? kotlinx.serialization.json.JsonObject
             ?: extractJson(raw, array = false)?.jsonObject ?: error("模型没有按格式返回")
         val r = ReaderReport(

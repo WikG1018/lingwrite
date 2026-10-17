@@ -4,6 +4,7 @@ package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
 import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import com.lingwrite.app.data.db.IdeaEntity
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -19,18 +20,22 @@ data class IdeaExpansion(val title: String, val idea: String)
 data class IdeaClassify(val kind: String, val name: String, val type: String = "character", val fields: String = "", val content: String = "", val payoffIn: Int = 0, val chapter: Int = 1, val note: String = "")
 
 object IdeaExpand {
-    const val SYS = "你是网文创意顾问。给的方向要彼此不同、可落地。严格只输出 JSON。"
+    val SYS = "你是网文创意顾问。给的方向要彼此不同、可落地，写清“谁做什么、冲突/爽点在哪”，不要空泛。\n" + PromptContract.JSON_ONLY
 
     fun expandPrompt(text: String, synopsis: String): String = buildString {
         append("【灵感】").append(text)
         if (synopsis.isNotBlank()) append("\n【所属作品总纲】").append(synopsis)
-        append("\n输出：[{\"title\":\"≤10字\",\"idea\":\"≤60字\"}] 3 个，方向要彼此不同。")
+        append("\n输出 3 个方向，彼此差异要明显（不同切入点/不同冲突/不同后果）。\n")
+        append(PromptContract.JSON_ARRAY).append("\n格式示例：[{\"title\":\"让断剑认主\",\"idea\":\"主角在危急时被迫滴血，断剑认主却引来师父旧敌\"}] 3 个。")
     }
 
     fun classifyPrompt(text: String, cardNames: String): String = buildString {
         append("【灵感】").append(text)
         if (cardNames.isNotBlank()) append("\n【作品设定卡名列表】").append(cardNames)
-        append("\n输出：{\"kind\":\"card|foreshadow|outline\",\"card\":{\"type\":\"character|faction|place|item|power|term\",\"name\":\"\",\"fields\":{\"字段\":\"值\"}},\"foreshadow\":{\"content\":\"\",\"payoffIn\":章数},\"outline\":{\"chapter\":章号,\"note\":\"\"}}")
+        append("\n判断这条灵感最适合转成设定卡、伏笔还是章纲，并给出可直接预填的内容。\n")
+        append(PromptContract.JSON_ONLY).append('\n')
+        append("格式：{\"kind\":\"card|foreshadow|outline\",\"card\":{\"type\":\"character|faction|place|item|power|term\",\"name\":\"\",\"fields\":{\"字段\":\"值\"}},\"foreshadow\":{\"content\":\"\",\"payoffIn\":章数},\"outline\":{\"chapter\":章号,\"note\":\"\"}}")
+        append("\n只填与 kind 对应的那一块，其余块给 {}；payoffIn 是 1–200 的整数。")
     }
 
     /** 展开 3 个方向，缓存到 ideas.expansions。 */

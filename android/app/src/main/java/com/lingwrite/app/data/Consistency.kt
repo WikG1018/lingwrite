@@ -3,6 +3,8 @@
 package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
+import com.lingwrite.app.data.ai.JsonReply
+import com.lingwrite.app.data.ai.PromptContract
 import com.lingwrite.app.data.db.*
 import kotlinx.serialization.json.*
 
@@ -32,15 +34,27 @@ fun suppressed(kind: String, quote: String, intended: List<IssueEntity>) = inten
 fun kindLabel(k: String) = when (k) { "persona" -> "人设"; "power" -> "等级实力"; "time" -> "时间线"; "relation" -> "关系/生死"; else -> "其他" }
 
 object Consistency {
-    const val SYS = "你是严谨的长篇小说审校编辑，专门找前后矛盾。只输出要求的 JSON，不要解释。"
+    val SYS = "你是严谨的长篇小说审校编辑，专门找前后矛盾。\n" + PromptContract.JSON_ARRAY
 
     /** 第一步：抽取本段里人物的陈述、状态、能力和时间信息。 */
-    fun extractPrompt(seg: String) = "从下面的正文中抽取与人物相关的事实陈述（言行、境界实力、生死、关系、时间、谁知道什么）。严格只输出 JSON 数组：[{\"who\":\"人物\",\"claim\":\"一句话事实\",\"quote\":\"对应原文（不超过 30 字，必须是原文片段）\"}]\n\n【正文】\n$seg"
+    fun extractPrompt(seg: String) = buildString {
+        append("从下面这段正文中抽取与人物相关的事实陈述：言行、境界实力、生死、关系、时间、谁知道什么。\n")
+        append(PromptContract.JSON_ARRAY).append('\n')
+        append(PromptContract.VERBATIM_QUOTE).append('\n')
+        append("输出 0–12 条，每条只写一个独立事实；没有可抽的内容就输出 []。格式示例：")
+        append("[{\"who\":\"林砚\",\"claim\":\"林砚此时只知道断剑是师父遗物\",\"quote\":\"林砚把断剑收回袖里\"}]\n\n")
+        append("【正文】\n").append(seg)
+    }
 
     /** 第二步：与设定、当章状态、前情比对。 */
-    fun comparePrompt(facts: String, basis: String) = "对照【设定与前情】，判断下面每条事实是否与之矛盾。只报告确实矛盾的（不确定、可能是人物说谎或视角受限的不要报）。" +
-        "类型 kind 取 persona（人设崩：言行与性格动机不符）/ power（等级实力前后不一）/ time（时间错乱、年龄、人物此时不该知道某事）/ relation（关系或生死矛盾）。" +
-        "严格只输出 JSON 数组（没有就输出 []）：[{\"kind\":\"…\",\"quote\":\"原文片段\",\"basis\":\"引用的设定或前文依据\",\"explain\":\"40 字内说明\"}]\n\n【设定与前情】\n$basis\n\n【本章事实】\n$facts"
+    fun comparePrompt(facts: String, basis: String) = buildString {
+        append("对照【设定与前情】，判断下面每条事实是否与之矛盾。只报告确实矛盾的：不确定、可能是人物说谎、视角受限或故意隐瞒的，不要报。\n")
+        append("kind 只能是：persona（人设崩）/ power（等级实力前后不一）/ time（时间错乱、年龄、人物此时不该知道某事）/ relation（关系或生死矛盾）。\n")
+        append(PromptContract.JSON_ARRAY).append('\n')
+        append(PromptContract.VERBATIM_QUOTE).append('\n')
+        append("没有矛盾就输出 []。格式示例：[{\"kind\":\"power\",\"quote\":\"林砚不过炼气三层\",\"basis\":\"第三章已写他筑基成功\",\"explain\":\"实力描述前后矛盾\"}]\n\n")
+        append("【设定与前情】\n").append(basis).append("\n\n【本章事实】\n").append(facts)
+    }
 
     suspend fun basis(c: ChapterEntity): String {
         val db = AppGraph.db
@@ -68,12 +82,19 @@ object Consistency {
         val c = db.chapters().get(chapterId) ?: return 0
         if (c.content.isBlank()) return 0
         val facts = mutableListOf<JsonElement>()
-        c.content.chunked(6000).forEach { seg ->
-            val r = AppGraph.ai.complete("extract", SYS, extractPrompt(seg), c.bookId, c.id, 1500).getOrThrow()
-            extractJson(r)?.let { j -> runCatching { facts.addAll(j.jsonArray) } }
+        var failedChunks = 0
+        c.content.chunked(4000).forEach { seg ->
+            runCatching {
+                val r = AppGraph.ai.complete("extract", SYS, extractPrompt(seg), c.bookId, c.id, 2000, outputLang = false).getOrThrow()
+                val arr = (JsonReply.parse(r) as? JsonReply.Result.Ok)?.json?.jsonArray
+                    ?: error("事实抽取返回格式无效")
+                facts.addAll(arr)
+            }.onFailure { failedChunks++ }
         }
+        // 任何一段抽不出来都算这次检查失败：宁可让作者重试，也不能把「没抽到」当成「没有矛盾」清空问题。
+        if (failedChunks > 0) error("一致性检查未完成：有 $failedChunks 段模型输出无法解析，已保留原有问题，请重试")
         if (facts.isEmpty()) { db.checks().clearOpen(chapterId); return 0 }
-        val raw = AppGraph.ai.complete("check", SYS, comparePrompt(JsonArray(facts).toString(), basis(c)), c.bookId, c.id, 1500).getOrThrow()
+        val raw = AppGraph.ai.complete("check", SYS, comparePrompt(JsonArray(facts).toString(), basis(c)), c.bookId, c.id, 2400, outputLang = false).getOrThrow()
         val arr = extractJson(raw)?.let { runCatching { it.jsonArray }.getOrNull() } ?: error("模型没有按格式返回")
         val intended = db.checks().intended(c.bookId)
         db.checks().clearOpen(chapterId)
@@ -94,7 +115,15 @@ object Consistency {
         val c = db.chapters().get(chapterId) ?: return
         if (c.content.isBlank()) return
         val known = db.checks().foreshadowsOnce(c.bookId).joinToString("；") { it.content }
-        val raw = AppGraph.ai.complete("foreshadow", SYS, "找出这一章里埋下、之后需要回收的伏笔（悬而未决的线索、反常细节、承诺、未揭晓的身份）。不要重复已有伏笔。最多 3 条，没有就输出 []。严格只输出 JSON 数组：[{\"content\":\"伏笔是什么、预期怎么回收（40 字内）\",\"quote\":\"原文片段（30 字内）\",\"payoffIn\":建议多少章后回收}]\n\n【已有伏笔】$known\n\n【第 ${c.number} 章】\n${c.content.take(12000)}", c.bookId, c.id, 800).getOrNull() ?: return
+        val user = buildString {
+            append("找出这一章里埋下、之后需要回收的伏笔：悬而未决的线索、反常细节、承诺、未揭晓的身份。不要重复已有伏笔；没有就输出 []，最多 3 条。\n")
+            append(PromptContract.JSON_ARRAY).append('\n')
+            append(PromptContract.VERBATIM_QUOTE).append('\n')
+            append("payoffIn 是建议多少章之后回收，必须是 1–200 的整数。格式示例：")
+            append("[{\"content\":\"断剑上的缺口与师父死因有关，应在主角查旧案时回收\",\"quote\":\"断剑的缺口是新的\",\"payoffIn\":12}]\n\n")
+            append("【已有伏笔】").append(known).append("\n\n【第 ").append(c.number).append(" 章】\n").append(c.content.take(12000))
+        }
+        val raw = AppGraph.ai.complete("foreshadow", SYS, user, c.bookId, c.id, 800, outputLang = false).getOrNull() ?: return
         extractJson(raw)?.let { runCatching { it.jsonArray }.getOrNull() }?.forEach { e ->
             val o = e.jsonObject
             if (o.str("content").isBlank()) return@forEach
