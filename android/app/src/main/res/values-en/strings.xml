@@ -1484,4 +1484,20 @@
     <string name="read_017">Below median</string>
     <string name="read_018">No chapter-end hook in plan</string>
     <string name="read_019">Short chapter</string>
+    <string name="outline_094">Story time</string>
+    <string name="outline_095">Update outline from text</string>
+    <string name="outline_096">When the draft diverges from the outline, let AI draft an updated outline from the text; the old outline is snapshotted first.</string>
+    <string name="outline_097">AI draft (field diff)</string>
+    <string name="outline_098">Apply</string>
+    <string name="outline_099">Outline updated</string>
+    <string name="outline_100">Undo update</string>
+    <string name="outline_101">Undone</string>
+    <string name="outline_102">Generating…</string>
+    <string name="outline_103">No changes to write back</string>
+    <string name="outline_104" formatted="false">Volume chapters: planned %1$d / actual %2$d</string>
+    <string name="outline_105">Not enough outline ahead; plan the next 3–5 chapters</string>
+    <string name="outline_106">Plan next 3–5 chapters</string>
+    <string name="outline_107">Old outline</string>
+    <string name="outline_108">New outline</string>
+    <string name="outline_109" formatted="false">Fields: %1$s</string>
 </resources>

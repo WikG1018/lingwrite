@@ -1559,4 +1559,20 @@
     <string name="read_017">低於中位數</string>
     <string name="read_018">章綱無章尾鉤子</string>
     <string name="read_019">字數偏短</string>
+    <string name="outline_094">故事內時間</string>
+    <string name="outline_095">以正文更新章綱</string>
+    <string name="outline_096">正文寫完、章綱偏離時，用 AI 依正文生成章綱草稿；確認後先保存舊章綱。</string>
+    <string name="outline_097">AI 草稿（欄位對比）</string>
+    <string name="outline_098">確認回寫</string>
+    <string name="outline_099">已回寫章綱</string>
+    <string name="outline_100">撤銷回寫</string>
+    <string name="outline_101">已撤銷</string>
+    <string name="outline_102">生成中…</string>
+    <string name="outline_103">沒有可回寫的變化</string>
+    <string name="outline_104" formatted="false">卷章數：計畫 %1$d / 實際 %2$d</string>
+    <string name="outline_105">章綱餘量不足，建議先補後 3–5 章</string>
+    <string name="outline_106">規劃後 3–5 章</string>
+    <string name="outline_107">舊章綱</string>
+    <string name="outline_108">新章綱</string>
+    <string name="outline_109" formatted="false">欄位：%1$s</string>
 </resources>
