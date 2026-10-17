@@ -1465,4 +1465,23 @@
     <string name="quick_012" formatted="false">第 %1$d 章</string>
     <string name="quick_013" formatted="false">第 %1$d 章で伏線・第 %2$d 章で回収予定</string>
     <string name="quick_014">回収章は未定</string>
+    <string name="read_001">追読データ</string>
+    <string name="read_002">貼り付けて取り込む</string>
+    <string name="read_003">手動入力</string>
+    <string name="read_004">章</string>
+    <string name="read_005">追読</string>
+    <string name="read_006" formatted="false">完読率 %</string>
+    <string name="read_007">お気に入り</string>
+    <string name="read_008">コメント</string>
+    <string name="read_009">取り込む</string>
+    <string name="read_010">保存</string>
+    <string name="read_011">追読データはまだありません。プラットフォームのデータは手動で貼り付けてください。霊写は管理画面を取得しません。</string>
+    <string name="read_012">管理画面の表を下に貼り付けてください。見出しに章/追読/完読率が必要です。</string>
+    <string name="read_013" formatted="false">解析できませんでした：%1$s</string>
+    <string name="read_014" formatted="false">%1$d 行を取り込みました</string>
+    <string name="read_015">完読率の推移</string>
+    <string name="read_016" formatted="false">落ち込み %1$d%%</string>
+    <string name="read_017">中央値より低い</string>
+    <string name="read_018">章末フックが章綱にない</string>
+    <string name="read_019">文字数が短い</string>
 </resources>

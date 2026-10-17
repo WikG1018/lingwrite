@@ -1540,4 +1540,23 @@
     <string name="quick_012" formatted="false">第 %1$d 章</string>
     <string name="quick_013" formatted="false">埋設第 %1$d 章 · 計畫第 %2$d 章回收</string>
     <string name="quick_014">未定回收章</string>
+    <string name="read_001">追讀資料</string>
+    <string name="read_002">貼上匯入</string>
+    <string name="read_003">手動輸入</string>
+    <string name="read_004">章號</string>
+    <string name="read_005">追讀</string>
+    <string name="read_006" formatted="false">完讀率 %</string>
+    <string name="read_007">收藏</string>
+    <string name="read_008">評論</string>
+    <string name="read_009">匯入</string>
+    <string name="read_010">儲存</string>
+    <string name="read_011">暫無追讀資料。平台資料需要手動貼上；靈寫不抓取後台。</string>
+    <string name="read_012">把平台後台的表格貼到下面，表頭含章/追讀/完讀率即可。</string>
+    <string name="read_013" formatted="false">解析失敗：%1$s</string>
+    <string name="read_014" formatted="false">已匯入 %1$d 列</string>
+    <string name="read_015">完讀率曲線</string>
+    <string name="read_016" formatted="false">掉點 %1$d%%</string>
+    <string name="read_017">低於中位數</string>
+    <string name="read_018">章綱無章尾鉤子</string>
+    <string name="read_019">字數偏短</string>
 </resources>
