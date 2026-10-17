@@ -534,7 +534,7 @@ private fun sendAnnotations(st: EditorState, s: AiSession, scope: kotlinx.corout
     s.annotating = true
     scope.launch {
         val p = AppGraph.prefs.flow.first()
-        val r = AppGraph.ai.complete("annotate", Prompts.ANNOTATE_SYS,
+        val r = AppGraph.ai.complete("annotate", com.lingwrite.app.data.ai.PromptContract.ANNOTATE_SYS,
             Prompts.annotateInstruction(items.map { it.quote to it.note }), st.chapter.bookId, st.chapter.id, 2400, Slot.Writing, outputLang = false)
         s.annotating = false
         r.onSuccess { raw ->

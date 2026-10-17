@@ -25,7 +25,7 @@ object ProofPrompts {
     fun user(seg: String) = buildString {
         append("校对下面这段正文。只报确实需要改的地方，最多 20 条；没有问题输出 []。\n")
         append(PromptContract.JSON_ARRAY).append('\n')
-        append(PromptContract.VERBATIM_QUOTE).append(' quote 必须是本段中**只出现一次**的最短片段，否则无法定位。\n')
+        append(PromptContract.VERBATIM_QUOTE).append(" quote 必须是本段中**只出现一次**的最短片段，否则无法定位。\n")
         append("type 只能是 typo（错别字）/ de（的地得）/ punct（标点）/ grammar（病句）；fix 只改错处，不要顺手润色。\n")
         append("格式示例：[{\"quote\":\"他走的很快\",\"fix\":\"他走得很快\",\"type\":\"de\",\"why\":\"应用地得的得\"}]\n\n")
         append("【段落】\n").append(seg)
