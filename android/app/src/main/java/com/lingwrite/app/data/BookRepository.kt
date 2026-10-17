@@ -185,6 +185,16 @@ class BookRepository(private val db: LingDatabase, private val filesDir: java.io
         renumber(bookId); books.touch(bookId); id
     }
 
+    private fun invalidateIndex(ids: Collection<Long>) {
+        if (ids.isEmpty()) return
+        val list = ids.toList()
+        val marks = list.joinToString(",") { "?" }
+        db.openHelper.writableDatabase.execSQL(
+            "DELETE FROM chapter_index WHERE chapterId IN ($marks)",
+            Array<Any?>(list.size) { list[it] },
+        )
+    }
+
     /** 全书章号按卷顺序连续编号；章内容随章走。不改章节的修改时间。 */
     suspend fun renumber(bookId: Long) = db.withTransaction {
         val before = ch.chaptersOnce(bookId)
@@ -199,12 +209,7 @@ class BookRepository(private val db: LingDatabase, private val filesDir: java.io
         before.forEach { c -> oldToNew.putIfAbsent(c.number, newById.getValue(c.id)) }
         remapChapterNumbers(bookId, newById, oldToNew)
         // 索引同时缓存章号，只有章号真的变了的章节需要重建，避免整书重索引。
-        if (changed.isNotEmpty()) {
-            db.openHelper.writableDatabase.execSQL(
-                "DELETE FROM chapter_index WHERE chapterId IN (${changed.joinToString(",") { "?" }})",
-                Array<Any?>(changed.size) { changed[it] },
-            )
-        }
+        invalidateIndex(changed)
     }
 
     /** 已有章节的章号跟着章节走；还没写到的未来章号保持不变。 */
@@ -252,6 +257,7 @@ class BookRepository(private val db: LingDatabase, private val filesDir: java.io
         val c = ch.get(id) ?: return
         val vols = ch.volumesOnce(c.bookId)
         val list = ch.chaptersOnce(c.bookId).sortedBy { it.number }
+        val before = list.associate { it.id to it.number }
         val i = list.indexOfFirst { it.id == id }
         val j = i + delta
         if (j !in list.indices) {
@@ -264,6 +270,9 @@ class BookRepository(private val db: LingDatabase, private val filesDir: java.io
         val reordered = list.toMutableList().apply { removeAt(i); add(j, c.copy(volumeId = o.volumeId)) }
         db.withTransaction { reordered.forEachIndexed { k, item -> ch.position(item.id, k + 1, item.volumeId) } }
         renumber(c.bookId)
+        // 上面的 position 已先改了章号，renumber 可能看不到差异；按前后章号对比补失效。
+        val after = ch.headersOnce(c.bookId)
+        invalidateIndex(after.filter { before[it.id] != it.number }.map { it.id })
     }
 
     suspend fun moveVolumeIn(bookId: Long, id: Long, delta: Int) {

@@ -47,10 +47,10 @@ object SerialBoard {
         val db = AppGraph.db
         val b = db.books().get(bookId) ?: return SerialState(0, 0, 0, 5, 0, 0, 0)
         val chs = db.chapters().headersOnce(bookId)
-        val buffer = chs.count { it.state == "done" && it.content.isNotBlank() && it.number > b.publishedUpTo }
+        val buffer = chs.count { it.state == "done" && it.wordCount > 0 && it.number > b.publishedUpTo }
         val plans = db.plan().chapters(bookId).first().associateBy { it.chapterId }
         // 章纲余量：已有章纲、正文还没写的章数
-        val planAhead = chs.count { it.content.isBlank() && plans[it.id]?.isEmpty() == false }
+        val planAhead = chs.count { it.wordCount == 0 && plans[it.id]?.isEmpty() == false }
         val today = db.stats().wordDay(TimeFmt.day(System.currentTimeMillis()), bookId)?.words ?: 0
         val streak = streakDates(db.stats().bookWordDays(bookId).first().filter { it.words > 0 }.map { it.day })
         return SerialState(today, b.dailyTarget, buffer, b.bufferTarget, streak, planAhead, b.publishedUpTo)
@@ -86,7 +86,7 @@ object SerialBoard {
         val db = AppGraph.db
         val b = db.books().get(bookId) ?: return ShortUpdatePlan()
         val chs = db.chapters().headersOnce(bookId)
-        val upcoming = chs.filter { it.number > b.publishedUpTo && (it.state != "done" || it.content.isBlank()) }.take(5).mapNotNull { ch ->
+        val upcoming = chs.filter { it.number > b.publishedUpTo && (it.state != "done" || it.wordCount == 0) }.take(5).mapNotNull { ch ->
             db.plan().chapterOnce(ch.id)?.takeIf { !it.isEmpty() }?.let { "第 ${ch.number} 章：${it.event}" }
         }.joinToString("\n")
         val sums = db.context().summaries(bookId).associateBy { it.chapterId }
