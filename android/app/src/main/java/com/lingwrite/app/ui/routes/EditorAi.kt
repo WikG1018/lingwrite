@@ -211,7 +211,9 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
             s.draftTotal = n
             if (only == null) s.draftSegs.clear()
             val style = com.lingwrite.app.data.ai.PromptHooks.style(st.chapter.bookId, p)
-            val upstream = AppGraph.db.plan().bookOnce(st.chapter.bookId) ?: com.lingwrite.app.data.db.BookPlanEntity(st.chapter.bookId)
+            val upstream = com.lingwrite.app.data.ChainPrompts.upstream(
+                AppGraph.db.plan().bookOnce(st.chapter.bookId) ?: com.lingwrite.app.data.db.BookPlanEntity(st.chapter.bookId)
+            )
             val indices = if (only == null) (0 until n).toList() else listOf(only.coerceIn(0, n - 1))
             for (i in indices) {
                 s.draftStreaming = i
