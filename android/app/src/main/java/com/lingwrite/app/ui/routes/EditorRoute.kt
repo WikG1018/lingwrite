@@ -157,7 +157,6 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     var exitFocusConfirm by remember { mutableStateOf(false) }
     var focusStartWords by rememberSaveable(chapterId) { mutableIntStateOf(0) }
     var focusStartAt by rememberSaveable(chapterId) { mutableLongStateOf(0L) }
-    var focusTick by remember { mutableLongStateOf(0L) }
     // C5 节拍清单（链路第 ⑥ 步）：正文上方的可勾选清单
     var beats by remember(chapterId) { mutableStateOf(emptyList<com.lingwrite.app.data.Beat>()) }
     LaunchedEffect(chapterId) {
@@ -261,15 +260,19 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
     val focusTarget = p?.focusTarget?.coerceAtLeast(1) ?: 2000
     val focusWords = (words - focusStartWords).coerceAtLeast(0)
     val focusPercent = (focusWords.toFloat() / focusTarget).coerceIn(0f, 1f)
-    val focusElapsed = ((focusTick - focusStartAt).coerceAtLeast(0) / 1000).let { sec -> "%02d:%02d".format(sec / 60, sec % 60) }
+    // 只在本次专注第一次开始时记录起点：旋转 / 深色 / 切语言导致 Activity 重建时，rememberSaveable 已恢复起点，不能清零。
+    // 计时器不在这里读（每秒改值会让整个编辑器重组），交给 EditorScreen 里的 FocusClock。
     LaunchedEffect(focus) {
         if (focus) {
-            focusStartWords = Words.count(st.value.text)
-            focusStartAt = System.currentTimeMillis()
-            focusTick = focusStartAt
-            while (true) { delay(1000); focusTick = System.currentTimeMillis() }
-        }
+            if (focusStartAt == 0L) {
+                focusStartWords = Words.count(st.value.text)
+                focusStartAt = System.currentTimeMillis()
+            }
+        } else { focusStartAt = 0L; focusStartWords = 0 }
     }
+    val exitFocus = { if (focusWords >= focusTarget) focus = false else exitFocusConfirm = true }
+    // 系统返回键在专注模式下走同一个退出流程（未达标先确认），不直接离开编辑器。
+    androidx.activity.compose.BackHandler(enabled = focus && !exitFocusConfirm) { exitFocus() }
     val focusView = androidx.compose.ui.platform.LocalView.current
     DisposableEffect(focus, focusView) {
         focusView.keepScreenOn = focus
@@ -374,10 +377,10 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
             onQuickRef = { quickRef = true },
         ),
         focusMode = focus,
-        onExitFocus = { if (focusWords >= focusTarget) focus = false else exitFocusConfirm = true },
+        onExitFocus = exitFocus,
         focusWords = focusWords,
         focusTarget = focusTarget,
-        focusElapsed = focusElapsed,
+        focusStartAt = focusStartAt,
         focusPercent = focusPercent,
         typewriter = p?.focusTypewriter ?: true,
         directory = { EditorDirectory(st, nav) },
