@@ -1568,4 +1568,27 @@
     <string name="fc_005" formatted="false">About %1$d days at the last 7-day pace</string>
     <string name="fc_006" formatted="false">%1$d without a payoff chapter</string>
     <string name="fc_007">No new foreshadowing in the last 3 chapters; consider adding one</string>
+    <string name="series_001">Series</string>
+    <string name="series_002">Series bible</string>
+    <string name="series_003">New series</string>
+    <string name="series_004">Series name</string>
+    <string name="series_005">Create</string>
+    <string name="series_006">No series yet. Group books set in the same world; shared lore is a reference library only.</string>
+    <string name="series_007">Books</string>
+    <string name="series_008">Add to series</string>
+    <string name="series_009">Books not in a series</string>
+    <string name="series_010">Shared lore</string>
+    <string name="series_011">Add shared card</string>
+    <string name="series_012">Name</string>
+    <string name="series_013">Type</string>
+    <string name="series_014">Role</string>
+    <string name="series_015">Fields (one k=v per line)</string>
+    <string name="series_016">Save</string>
+    <string name="series_017">Copy to book</string>
+    <string name="series_018">Choose a book</string>
+    <string name="series_019">Copied</string>
+    <string name="series_020">Series cards are a reference library; consistency checks use them only after copying into a book.</string>
+    <string name="series_021">Delete series</string>
+    <string name="series_022">Deleted</string>
+    <string name="series_023">No shared cards yet</string>
 </resources>

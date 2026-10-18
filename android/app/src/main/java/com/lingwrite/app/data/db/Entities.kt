@@ -8,7 +8,11 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
 
-@Entity(tableName = "books")
+@Entity(
+    tableName = "books",
+    foreignKeys = [ForeignKey(entity = SeriesEntity::class, parentColumns = ["id"], childColumns = ["seriesId"], onDelete = ForeignKey.SET_NULL)],
+    indices = [Index("seriesId")],
+)
 data class BookEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
@@ -25,6 +29,8 @@ data class BookEntity(
     val bufferTarget: Int = 5,
     /** A11 标记已发布到第 N 章 */
     val publishedUpTo: Int = 0,
+    /** 所属系列；null = 未加入 */
+    val seriesId: Long? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
 )
