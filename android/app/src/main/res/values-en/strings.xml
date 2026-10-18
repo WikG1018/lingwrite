@@ -1651,4 +1651,5 @@
     <string name="wf_025">%1$s: %2$s</string>
     <string name="wf_026">Opening directions</string>
     <string name="usage_015">Only the latest %1$d calls are counted</string>
+    <string name="read_021">No data rows found</string>
 </resources>

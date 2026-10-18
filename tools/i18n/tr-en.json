@@ -1647,5 +1647,6 @@
 "wf_024": " (payoff planned for %1$s)",
 "wf_025": "%1$s: %2$s",
 "wf_026": "Opening directions",
-"usage_015": "Only the latest %1$d calls are counted"
+"usage_015": "Only the latest %1$d calls are counted",
+"read_021": "No data rows found"
 }

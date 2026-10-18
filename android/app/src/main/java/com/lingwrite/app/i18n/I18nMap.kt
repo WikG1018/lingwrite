@@ -1496,8 +1496,9 @@ private fun part5(m: HashMap<String, Int>) {
     m["无法暂存原地图，恢复取消"] = R.string.bak_012
     m["无法恢复地图，恢复取消"] = R.string.bak_013
     m["开场方向"] = R.string.wf_026
+    m["没有识别到数据"] = R.string.read_021
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2960).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2962).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

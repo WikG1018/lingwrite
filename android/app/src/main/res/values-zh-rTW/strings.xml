@@ -1726,4 +1726,5 @@
     <string name="wf_025">%1$s：%2$s</string>
     <string name="wf_026">開場方向</string>
     <string name="usage_015">只統計最近 %1$d 次呼叫</string>
+    <string name="read_021">沒有識別到資料</string>
 </resources>

@@ -224,7 +224,7 @@ fun AiStreamCursor(modifier: Modifier = Modifier) {
     )
 }
 
-/** 生成模式的候选卡：amber 竖条、页码点、左右滑动 peek、弹簧吸附（ui-spec §1 / motion §20–21）。 */
+/** 生成模式的候选卡：amber 色调卡（ToneCard，无左侧竖条）、页码点、左右滑动 peek、弹簧吸附（ui-spec §1 / motion §20–21）。 */
 @Composable
 fun AiCandidateCard(
     header: String,

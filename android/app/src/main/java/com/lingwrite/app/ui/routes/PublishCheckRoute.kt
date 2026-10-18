@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -84,8 +85,8 @@ fun PublishCheckRoute(bookId: Long, chapterId: Long, nav: NavHostController) {
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
         LingTopBar(tr(R.string.publish_001), book?.title, onBack = { nav.popBackStack() })
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item {
-                LingCard {
+            item(key = "summary") {
+                LingCard(Modifier.fillMaxWidth().enterStagger(0)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         val r = report
                         if (r != null) {
@@ -110,13 +111,13 @@ fun PublishCheckRoute(bookId: Long, chapterId: Long, nav: NavHostController) {
                     }
                 }
             }
-            item {
-                LingCard {
+            item(key = "words") {
+                LingCard(Modifier.fillMaxWidth().enterStagger(1)) {
                     Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(tr(R.string.publish_009), style = Ling.type.label, color = c.onSurface)
                             Text(
-                                if (words.isEmpty()) tr(R.string.publish_010) else words.take(8).joinToString("、") + if (words.size > 8) "…" else "",
+                                if (words.isEmpty()) tr(R.string.publish_010) else words.take(8).joinToString(tr(R.string.data_043)) + if (words.size > 8) "…" else "",
                                 style = Ling.type.caption, color = c.onSurfaceVariant,
                             )
                         }
@@ -125,15 +126,17 @@ fun PublishCheckRoute(bookId: Long, chapterId: Long, nav: NavHostController) {
                 }
             }
             val issues = report?.issues.orEmpty()
-            if (report != null && issues.isEmpty()) item {
-                Text(tr(R.string.publish_004), style = Ling.type.body, color = c.good, modifier = Modifier.padding(12.dp))
+            // 首次检查超过 150ms 才出骨架，避免闪一下（motion §15）。
+            if (report == null && busy) item(key = "skeleton") { DelayedSkeleton(true, cards = 3) }
+            if (report != null && issues.isEmpty()) item(key = "clean") {
+                Text(tr(R.string.publish_004), style = Ling.type.body, color = c.good, modifier = Modifier.padding(12.dp).enterStagger(2).animateItem())
             }
             listOf(CheckSeverity.Must to tr(R.string.publish_005), CheckSeverity.Warn to tr(R.string.publish_006)).forEach { (sev, label) ->
                 val list = issues.filter { it.severity == sev }
                 if (list.isNotEmpty()) {
-                    item { SectionLabel("$label · ${list.size}") }
-                    items(list) { issue ->
-                        LingCard {
+                    item(key = "h-$sev") { SectionLabel("$label · ${list.size}", Modifier.enterStagger(2).animateItem()) }
+                    itemsIndexed(list, key = { i, it -> "$sev-${it.chapterId}-${it.offset}-$i" }) { i, issue ->
+                        LingCard(Modifier.fillMaxWidth().enterStagger(3 + i.coerceAtMost(5)).animateItem()) {
                             Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Column(Modifier.weight(1f)) {
                                     Text("${ChapterLabel.short(issue.chapterNumber)} · ${issue.message}", style = Ling.type.body, color = c.onSurface)
@@ -150,7 +153,7 @@ fun PublishCheckRoute(bookId: Long, chapterId: Long, nav: NavHostController) {
                     }
                 }
             }
-            item {
+            item(key = "foot") {
                 error?.let { Text(it, style = Ling.type.body, color = c.error, modifier = Modifier.padding(8.dp)) }
                 msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(8.dp)) }
                 Spacer(Modifier.height(24.dp))

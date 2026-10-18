@@ -1651,4 +1651,5 @@
     <string name="wf_025">%1$s：%2$s</string>
     <string name="wf_026">書き出しの方向</string>
     <string name="usage_015">直近 %1$d 回の呼び出しのみ集計</string>
+    <string name="read_021">データ行が見つかりません</string>
 </resources>

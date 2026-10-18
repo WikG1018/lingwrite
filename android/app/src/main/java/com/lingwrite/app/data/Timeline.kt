@@ -24,6 +24,7 @@ object Timeline {
         val cardMap = cards.associateBy { it.id }
         val headers = db.chapters().headersOnce(bookId)
         val chapterIdByNumber = headers.associate { it.number to it.id }
+        val numberById = headers.associate { it.id to it.number }
         val planList = db.plan().chaptersOnce(bookId)
         val out = ArrayList<TimelineEvent>()
 
@@ -49,7 +50,7 @@ object Timeline {
             f.payoff?.let { p -> out += TimelineEvent(chapter = p, kind = "payoff", title = f.content.take(60), detail = "", chapterId = chapterIdByNumber[p]) }
         }
         planList.forEach { p ->
-            val number = headers.firstOrNull { it.id == p.chapterId }?.number ?: return@forEach
+            val number = numberById[p.chapterId] ?: return@forEach
             val text = p.event.ifBlank { p.note }.ifBlank { p.cliff }
             if (text.isNotBlank() || p.storyTime.isNotBlank()) {
                 out += TimelineEvent(

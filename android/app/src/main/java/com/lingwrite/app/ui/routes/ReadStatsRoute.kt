@@ -13,6 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import com.lingwrite.app.ui.theme.Motion
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -57,8 +69,8 @@ fun ReadStatsRoute(bookId: Long, nav: NavHostController) {
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
         LingTopBar(tr(R.string.read_001), book?.title, onBack = { nav.popBackStack() })
         LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item {
-                LingCard {
+            item(key = "chart") {
+                LingCard(Modifier.fillMaxWidth().enterStagger(0)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (latest.isEmpty()) {
                             Text(tr(R.string.read_011), style = Ling.type.body, color = c.onSurfaceVariant)
@@ -78,10 +90,10 @@ fun ReadStatsRoute(bookId: Long, nav: NavHostController) {
                     }
                 }
             }
-            if (latest.isNotEmpty()) item { SectionLabel(tr(R.string.read_001)) }
-            items(latest) { m ->
+            if (latest.isNotEmpty()) item(key = "rowsHeader") { SectionLabel(tr(R.string.read_001), Modifier.enterStagger(1)) }
+            items(latest, key = { "m" + it.chapterNumber }) { m ->
                 val ins = byChapter[m.chapterNumber]
-                LingCard {
+                LingCard(Modifier.fillMaxWidth().enterStagger(2).animateItem()) {
                     Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(ChapterLabel.short(m.chapterNumber), style = Ling.type.body, color = c.onSurface)
@@ -102,7 +114,7 @@ fun ReadStatsRoute(bookId: Long, nav: NavHostController) {
                     }
                 }
             }
-            item {
+            item(key = "foot") {
                 error?.let { Text(it, style = Ling.type.body, color = c.error, modifier = Modifier.padding(8.dp)) }
                 msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(8.dp)) }
                 Spacer(Modifier.height(24.dp))
@@ -117,7 +129,7 @@ fun ReadStatsRoute(bookId: Long, nav: NavHostController) {
             LingButton(tr(R.string.read_009), enabled = importText.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 48.dp) {
                 runCatching {
                     val rows = ReadStats.parseTable(importText)
-                    if (rows.isEmpty()) error("没有识别到数据")
+                    if (rows.isEmpty()) error(tr(R.string.read_021))
                     scope.launch {
                         rows.forEach { r -> AppGraph.db.readStats().insert(ReadMetricEntity(bookId = bookId, chapterNumber = r.chapter, platform = r.platform, reads = r.reads, completion = r.completion, favorites = r.favorites, comments = r.comments)) }
                         importOpen = false
@@ -148,22 +160,46 @@ fun ReadStatsRoute(bookId: Long, nav: NavHostController) {
     }
 }
 
+/**
+ * 完读率曲线：0 / 50 / 100 三条参考线 + 刻度；数据变化时路径从左向右重新生长
+ * （motion §13，Long · EmphasizedDecelerate；减弱动效时直接画完）。
+ */
 @Composable
 private fun CompletionChart(rows: List<ReadMetricEntity>, modifier: Modifier = Modifier) {
     val c = Ling.colors
     val pts = rows.filter { it.completion >= 0 }
-    Canvas(modifier) {
-        if (pts.size < 2) return@Canvas
-        val pad = 12.dp.toPx()
-        val w = size.width - pad * 2
+    val reduced = Motion.reduced()
+    val grow = remember { Animatable(if (reduced) 1f else 0f) }
+    LaunchedEffect(pts.map { it.chapterNumber to it.completion }) {
+        if (reduced) grow.snapTo(1f) else { grow.snapTo(0f); grow.animateTo(1f, tween(Motion.Long * 2, easing = Motion.EmphasizedDecelerate)) }
+    }
+    val measurer = rememberTextMeasurer()
+    val tick = Ling.type.caption.copy(fontSize = 10.sp, color = c.onSurfaceVariant)
+    val grid = c.outlineVariant
+    Canvas(modifier.semantics { contentDescription = pts.joinToString { "${ChapterLabel.short(it.chapterNumber)} ${it.completion}%" } }) {
+        val left = 28.dp.toPx(); val pad = 8.dp.toPx()
+        val w = size.width - left - pad
         val h = size.height - pad * 2
-        val path = Path()
-        pts.forEachIndexed { i, m ->
-            val x = pad + w * i / (pts.size - 1)
-            val y = pad + h * (1f - m.completion / 100f)
-            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-            drawCircle(c.primary, radius = 2.5.dp.toPx(), center = Offset(x, y))
+        listOf(0, 50, 100).forEach { v ->
+            val y = pad + h * (1f - v / 100f)
+            drawLine(grid, Offset(left, y), Offset(size.width - pad, y), strokeWidth = 1.dp.toPx(),
+                pathEffect = if (v == 50) PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 4.dp.toPx())) else null)
+            val t = measurer.measure("$v", tick)
+            drawText(t, topLeft = Offset(left - t.size.width - 6.dp.toPx(), y - t.size.height / 2f))
         }
-        drawPath(path, c.primary, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx()))
+        if (pts.isEmpty()) return@Canvas
+        val xs = pts.indices.map { i -> if (pts.size == 1) left + w / 2 else left + w * i / (pts.size - 1) }
+        val ys = pts.map { pad + h * (1f - it.completion / 100f) }
+        val path = Path()
+        xs.indices.forEach { i -> if (i == 0) path.moveTo(xs[i], ys[i]) else path.lineTo(xs[i], ys[i]) }
+        val p = grow.value
+        // 只画到当前进度对应的 x，点在曲线经过后再出现。
+        clipRect(right = left + (w + pad) * p) {
+            drawPath(path, c.primary, style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+        }
+        xs.indices.forEach { i ->
+            val shown = xs[i] <= left + (w + pad) * p
+            if (shown) drawCircle(c.primary, radius = 2.5.dp.toPx(), center = Offset(xs[i], ys[i]))
+        }
     }
 }

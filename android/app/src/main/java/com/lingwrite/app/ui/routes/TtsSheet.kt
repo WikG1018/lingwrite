@@ -2,6 +2,19 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import com.lingwrite.app.ui.theme.Motion
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -35,20 +48,27 @@ fun TtsSheet(text: String, from: Int, initialRate: Float, bookId: Long? = null, 
 
     LingSheet(onDismiss, tr(R.string.tts_001)) {
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(tr(R.string.tts_008), style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant)
-            if (error != null) Text(tr(R.string.tts_005), style = Ling.type.body, color = c.error)
-            else if (!ready) Text(tr(R.string.tts_006), style = Ling.type.body, color = c.onSurfaceVariant)
-            Text(tr(R.string.tts_004), style = Ling.type.label, color = c.primary)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(tr(R.string.tts_008), style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant, modifier = Modifier.enterStagger(0))
+            // 引擎状态：出现 / 消失走展开 + 淡入，不跳动（motion §6）。
+            AnimatedVisibility(error != null || !ready, enter = fadeIn(tween(Motion.Medium)) + expandVertically(tween(Motion.Medium, easing = Motion.EmphasizedDecelerate)),
+                exit = fadeOut(tween(Motion.Short)) + shrinkVertically(tween(Motion.Short, easing = Motion.EmphasizedAccelerate))) {
+                if (error != null) Text(tr(R.string.tts_005), style = Ling.type.body, color = c.error, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+                else Text(tr(R.string.tts_006), style = Ling.type.body, color = c.onSurfaceVariant)
+            }
+            Text(tr(R.string.tts_004), style = Ling.type.label, color = c.primary, modifier = Modifier.enterStagger(1))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.enterStagger(2)) {
                 listOf(0.8f to "0.8×", 1.0f to "1.0×", 1.2f to "1.2×").forEach { (v, label) ->
                     LingChip(rate == v, { rate = v }, label)
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
-                if (speaking) {
-                    LingButton(tr(R.string.tts_003), BtnKind.Filled, icon = LingIcons.Stop, height = 48.dp, enabled = ready, modifier = Modifier.weight(1f)) { engine.stop() }
+            // 播放 / 停止互换：交叉淡入 + 轻微缩放（motion §6，Short）。
+            AnimatedContent(speaking, transitionSpec = {
+                (fadeIn(tween(Motion.Short)) + scaleIn(tween(Motion.Short), initialScale = 0.96f)) togetherWith fadeOut(tween(Motion.Short))
+            }, label = "ttsPlay", modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp).enterStagger(3)) { on ->
+                if (on) {
+                    LingButton(tr(R.string.tts_003), BtnKind.Filled, icon = LingIcons.Stop, height = 48.dp, enabled = ready, modifier = Modifier.fillMaxWidth()) { engine.stop() }
                 } else {
-                    LingButton(tr(R.string.tts_002), BtnKind.Filled, icon = LingIcons.Play, height = 48.dp, enabled = ready && text.isNotBlank(), modifier = Modifier.weight(1f)) {
+                    LingButton(tr(R.string.tts_002), BtnKind.Filled, icon = LingIcons.Play, height = 48.dp, enabled = ready && text.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
                         engine.speak(text, from, rate)
                     }
                 }
