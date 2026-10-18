@@ -83,6 +83,7 @@ interface LoreDao {
     @Query("SELECT * FROM lore_cards WHERE id = :id") fun card(id: Long): Flow<LoreCardEntity?>
     @Query("SELECT * FROM lore_cards WHERE id = :id") suspend fun cardOnce(id: Long): LoreCardEntity?
     @Insert suspend fun insertCard(c: LoreCardEntity): Long
+    @Query("SELECT * FROM lore_cards WHERE bookId = :bookId AND name = :name LIMIT 1") suspend fun cardByName(bookId: Long, name: String): LoreCardEntity?
     @Update suspend fun updateCard(c: LoreCardEntity)
     @Query("DELETE FROM lore_cards WHERE id = :id") suspend fun deleteCard(id: Long)
 

@@ -50,7 +50,7 @@ object Backup {
         TableSpec("series_lore", "id", mapOf("seriesId" to "series")),
     )
 
-    private val nullableFks = setOf("map_marks.cardId", "foreshadows.chapterId", "foreshadows.cardId", "lore_suggestions.cardId", "ideas.bookId", "ideas.chapterId", "call_logs.bookId", "call_logs.chapterId", "breakdowns.bookId")
+    private val nullableFks = setOf("map_marks.cardId", "foreshadows.chapterId", "foreshadows.cardId", "lore_suggestions.cardId", "books.seriesId", "ideas.bookId", "ideas.chapterId", "call_logs.bookId", "call_logs.chapterId", "breakdowns.bookId")
 
     private fun value(c: Cursor, i: Int): JsonElement = when (c.getType(i)) {
         Cursor.FIELD_TYPE_NULL -> JsonNull
@@ -212,11 +212,27 @@ object Backup {
         var success = false
         try {
             val skipBooks = mutableSetOf<Long>()
+            val reuseSeries = mutableMapOf<Long, Long>()
+            val skipSeries = mutableSetOf<Long>()
             if (overwrite) {
                 (tables.reversed().map { it.name } + listOf("passages_fts", "passages", "chapter_index")).forEach { db.execSQL("DELETE FROM $it") }
             } else {
                 val existing = db.query("SELECT title, createdAt FROM books").use { c -> buildSet { while (c.moveToNext()) add(c.getString(0) + "|" + c.getLong(1)) } }
                 a.tables["books"]?.jsonArray?.forEach { b -> val o = b.jsonObject; if (o.str("title") + "|" + o["createdAt"]!!.jsonPrimitive.long in existing) skipBooks += o["id"]!!.jsonPrimitive.long }
+                // 系列去重（审查 #21）：同名同创建时间的系列复用本机已有的，不再重复导入它的共享卡；
+                // 备份里引用某系列的书全部被跳过时，这个系列也跳过。
+                val haveSeries = db.query("SELECT id, name, createdAt FROM series").use { c -> buildMap { while (c.moveToNext()) put(c.getString(1) + "|" + c.getLong(2), c.getLong(0)) } }
+                val bookRows = a.tables["books"]?.jsonArray.orEmpty().map { it.jsonObject }
+                a.tables["series"]?.jsonArray?.forEach { r ->
+                    val o = r.jsonObject
+                    val oldId = o["id"]?.jsonPrimitive?.longOrNull ?: return@forEach
+                    val key = o.str("name") + "|" + (o["createdAt"]?.jsonPrimitive?.longOrNull ?: 0L)
+                    val refs = bookRows.filter { it["seriesId"]?.jsonPrimitive?.longOrNull == oldId }.mapNotNull { it["id"]?.jsonPrimitive?.longOrNull }
+                    when {
+                        key in haveSeries -> reuseSeries[oldId] = haveSeries.getValue(key)
+                        refs.isNotEmpty() && refs.all { it in skipBooks } -> skipSeries += oldId
+                    }
+                }
             }
             for (spec in tables) {
                 val cols = columns(spec.name)
@@ -226,6 +242,15 @@ object Backup {
                     if (spec.name == "lore_cards" && o.str("type") == "concept") o = JsonObject(o + ("type" to JsonPrimitive("term")))
                     val bookRef = if (spec.name == "books") o["id"]?.jsonPrimitive?.longOrNull else o["bookId"]?.jsonPrimitive?.longOrNull
                     if (bookRef != null && bookRef in skipBooks) continue@rows
+                    if (!overwrite && spec.name == "series") {
+                        val old = o["id"]?.jsonPrimitive?.longOrNull
+                        if (old != null && old in reuseSeries) { map[old] = reuseSeries.getValue(old); continue@rows }
+                        if (old != null && old in skipSeries) continue@rows
+                    }
+                    if (!overwrite && spec.name == "series_lore") {
+                        val sid = o["seriesId"]?.jsonPrimitive?.longOrNull
+                        if (sid != null && (sid in reuseSeries || sid in skipSeries)) continue@rows
+                    }
                     if (!overwrite) {
                         val m = o.toMutableMap()
                         for ((col, target) in spec.fks) {
@@ -297,8 +322,8 @@ object Backup {
             }
         }
         AppGraph.db.invalidationTracker.refreshVersionsAsync()
-        // 合并导入会重映射章节 id，旧的恢复位置锚点会指错章节，直接清空（回退到章号推断）。
-        if (!overwrite) RestoreHints.clear()
+        // 合并导入会重映射章节 id，覆盖导入后旧锚点的 id 也可能对上新库里另一章：都清空（回退到章号推断）。
+        if (success) RestoreHints.clear()
         return imported
     }
 

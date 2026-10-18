@@ -19,6 +19,9 @@ interface BookDao {
     @Query("SELECT COALESCE(SUM(wordCount),0) AS words, COUNT(*) AS chapters FROM chapters WHERE bookId = :bookId AND deletedAt = 0")
     suspend fun totals(bookId: Long): BookTotals
     @Query("SELECT * FROM books") suspend fun all(): List<BookEntity>
+    /** 系列页：加入 / 移出系列后列表自动刷新（审查 #21）。 */
+    @Query("SELECT * FROM books WHERE seriesId = :seriesId ORDER BY updatedAt DESC") fun inSeries(seriesId: Long): Flow<List<BookEntity>>
+    @Query("SELECT * FROM books WHERE seriesId IS NULL ORDER BY updatedAt DESC") fun unlinked(): Flow<List<BookEntity>>
     @Insert suspend fun insert(b: BookEntity): Long
     @Update suspend fun update(b: BookEntity)
     @Query("DELETE FROM books WHERE id = :id") suspend fun delete(id: Long)
