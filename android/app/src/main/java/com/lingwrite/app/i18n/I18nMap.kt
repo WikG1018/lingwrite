@@ -1394,10 +1394,10 @@ private fun part5(m: HashMap<String, Int>) {
     m["播放"] = R.string.tts_002
     m["停止"] = R.string.tts_003
     m["语速"] = R.string.tts_004
-    m["系统语音引擎不可用，或缺少中文语音包。"] = R.string.tts_005
+    m["系统语音引擎不可用，或缺少这部作品语言的语音数据。"] = R.string.tts_005
     m["正在初始化语音…"] = R.string.tts_006
     m["从当前段开始"] = R.string.tts_007
-    m["系统语音引擎可能联网，由系统设置决定；灵写不保存音频。"] = R.string.tts_008
+    m["系统语音引擎是否联网由系统设置决定；灵写不保存音频。关闭面板会停止朗读。"] = R.string.tts_008
     m["写这一章"] = R.string.wf_001
     m["写前"] = R.string.wf_002
     m["写中"] = R.string.wf_003
@@ -1454,8 +1454,19 @@ private fun part5(m: HashMap<String, Int>) {
     m["正在备份数据…"] = R.string.upgrade_001
     m["升级前先给作品留一份副本，通常只要几秒，请不要关闭灵写。"] = R.string.upgrade_002
     m["完读率（%）"] = R.string.read_020
+    m["未命名系列"] = R.string.series_024
+    m["系列来源"] = R.string.series_025
+    m["更多"] = R.string.series_026
+    m["还没有作品加入这个系列"] = R.string.series_027
+    m["移出"] = R.string.series_028
+    m["重命名系列"] = R.string.series_029
+    m["所有作品都已在系列里"] = R.string.series_030
+    m["移出系列"] = R.string.series_031
+    m["书不会被删除，只是移出系列；系列里的共享卡会被删除。已复制到各本书的设定卡不受影响。"] = R.string.series_035
+    m["编辑共享卡"] = R.string.series_036
+    m["删除共享卡"] = R.string.series_037
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2876).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2898).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

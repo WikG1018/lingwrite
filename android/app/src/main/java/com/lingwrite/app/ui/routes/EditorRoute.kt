@@ -389,7 +389,7 @@ fun EditorRoute(chapterId: Long, nav: NavHostController) {
         onConfirm = { exitFocusConfirm = false; focus = false },
         extra = { Text(tr(R.string.focus_006), style = Ling.type.caption, color = Ling.colors.onSurfaceVariant) },
     )
-    if (ttsOpen) TtsSheet(st.value.text, st.value.selection.start, p?.ttsSpeed ?: 1f, onDismiss = { ttsOpen = false })
+    if (ttsOpen) TtsSheet(st.value.text, st.value.selection.start, p?.ttsSpeed ?: 1f, bookId = ch.bookId, onDismiss = { ttsOpen = false })
     if (writeFlow) WriteFlowSheet(ch.bookId, chapterId, ch.number, onDismiss = { writeFlow = false },
         onStuck = { writeFlow = false; stuck = true }, onAsk = { writeFlow = false; aiOpen.value = true })
     if (quickRef) EditorQuickRef(

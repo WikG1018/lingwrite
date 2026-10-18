@@ -8036,7 +8036,7 @@
    "TtsSheet.kt"
   ],
   "tts_005": [
-   "系统语音引擎不可用，或缺少中文语音包。",
+   "系统语音引擎不可用，或缺少这部作品语言的语音数据。",
    0,
    "TtsSheet.kt"
   ],
@@ -8051,7 +8051,7 @@
    "TtsSheet.kt"
   ],
   "tts_008": [
-   "系统语音引擎可能联网，由系统设置决定；灵写不保存音频。",
+   "系统语音引擎是否联网由系统设置决定；灵写不保存音频。关闭面板会停止朗读。",
    0,
    "TtsSheet.kt"
   ],
@@ -8334,6 +8334,81 @@
    "完读率（%）",
    0,
    "ReadStatsRoute.kt"
+  ],
+  "series_024": [
+   "未命名系列",
+   0,
+   "Series.kt"
+  ],
+  "series_025": [
+   "系列来源",
+   0,
+   "Series.kt"
+  ],
+  "series_026": [
+   "更多",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_027": [
+   "还没有作品加入这个系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_028": [
+   "移出",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_029": [
+   "重命名系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_030": [
+   "所有作品都已在系列里",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_031": [
+   "移出系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_032": [
+   "《%1$s》会移出这个系列。作品本身、已复制到这本书的设定卡都不受影响。",
+   1,
+   "SeriesRoute.kt"
+  ],
+  "series_033": [
+   "《%2$s》里已有同名卡「%1$s」，没有重复复制。",
+   2,
+   "SeriesRoute.kt"
+  ],
+  "series_034": [
+   "复制失败：%1$s",
+   1,
+   "SeriesRoute.kt"
+  ],
+  "series_035": [
+   "书不会被删除，只是移出系列；系列里的共享卡会被删除。已复制到各本书的设定卡不受影响。",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_036": [
+   "编辑共享卡",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_037": [
+   "删除共享卡",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_038": [
+   "删除「%1$s」？已复制到各本书的设定卡不受影响。",
+   1,
+   "SeriesRoute.kt"
   ]
  },
  "skipped": [

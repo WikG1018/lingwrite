@@ -1534,10 +1534,10 @@
     <string name="tts_002">Play</string>
     <string name="tts_003">Stop</string>
     <string name="tts_004">Speed</string>
-    <string name="tts_005">The system speech engine is unavailable or Chinese voice data is missing.</string>
+    <string name="tts_005">The system speech engine is unavailable, or voice data for this book\'s language is missing.</string>
     <string name="tts_006">Initializing speech…</string>
     <string name="tts_007">Start from current paragraph</string>
-    <string name="tts_008">The system speech engine may use the network depending on system settings; LingWrite stores no audio.</string>
+    <string name="tts_008">The system speech engine may use the network depending on system settings; LingWrite stores no audio. Closing this panel stops playback.</string>
     <string name="wf_001">Write this chapter</string>
     <string name="wf_002">Before</string>
     <string name="wf_003">During</string>
@@ -1594,4 +1594,19 @@
     <string name="upgrade_001">Backing up your data…</string>
     <string name="upgrade_002">Saving a copy of your work before the upgrade. This usually takes a few seconds — please keep LingWrite open.</string>
     <string name="read_020" formatted="false">Completion (%)</string>
+    <string name="series_024">Untitled series</string>
+    <string name="series_025">From series</string>
+    <string name="series_026">More</string>
+    <string name="series_027">No books in this series yet</string>
+    <string name="series_028">Remove</string>
+    <string name="series_029">Rename series</string>
+    <string name="series_030">Every book is already in a series</string>
+    <string name="series_031">Remove from series</string>
+    <string name="series_032">“%1$s” will be removed from this series. The book and any cards already copied into it are not affected.</string>
+    <string name="series_033">“%2$s” already has a card named “%1$s”, so nothing was copied.</string>
+    <string name="series_034">Copy failed: %1$s</string>
+    <string name="series_035">Books are not deleted, only removed from the series. The series\' shared cards will be deleted; cards already copied into books are kept.</string>
+    <string name="series_036">Edit shared card</string>
+    <string name="series_037">Delete shared card</string>
+    <string name="series_038">Delete “%1$s”? Cards already copied into books are kept.</string>
 </resources>

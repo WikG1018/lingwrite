@@ -18,7 +18,7 @@ import com.lingwrite.app.ui.theme.Ling
 
 /** 听稿面板：播放/停止、语速；系统 TTS 不可用时降级提示。 */
 @Composable
-fun TtsSheet(text: String, from: Int, initialRate: Float, onDismiss: () -> Unit) {
+fun TtsSheet(text: String, from: Int, initialRate: Float, bookId: Long? = null, onDismiss: () -> Unit) {
     val c = Ling.colors
     val ctx = LocalContext.current
     val engine = remember { TtsEngine(ctx) }
@@ -27,6 +27,11 @@ fun TtsSheet(text: String, from: Int, initialRate: Float, onDismiss: () -> Unit)
     val error by engine.error.collectAsState()
     var rate by remember { mutableFloatStateOf(initialRate.coerceIn(0.5f, 2f)) }
     DisposableEffect(Unit) { onDispose { engine.shutdown() } }
+    // 按作品语言选语音（英文 / 日文作品不再用中文语音读）；判断不出时按简体中文，不支持再退回系统语言。
+    LaunchedEffect(bookId) {
+        val lang = bookId?.let { id -> runCatching { com.lingwrite.app.data.ai.OutputLang.ofBook(id) }.getOrNull() }
+        engine.setLanguage(lang)
+    }
 
     LingSheet(onDismiss, tr(R.string.tts_001)) {
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

@@ -1609,10 +1609,10 @@
     <string name="tts_002">播放</string>
     <string name="tts_003">停止</string>
     <string name="tts_004">语速</string>
-    <string name="tts_005">系统语音引擎不可用，或缺少中文语音包。</string>
+    <string name="tts_005">系统语音引擎不可用，或缺少这部作品语言的语音数据。</string>
     <string name="tts_006">正在初始化语音…</string>
     <string name="tts_007">从当前段开始</string>
-    <string name="tts_008">系统语音引擎可能联网，由系统设置决定；灵写不保存音频。</string>
+    <string name="tts_008">系统语音引擎是否联网由系统设置决定；灵写不保存音频。关闭面板会停止朗读。</string>
     <string name="wf_001">写这一章</string>
     <string name="wf_002">写前</string>
     <string name="wf_003">写中</string>
@@ -1669,4 +1669,19 @@
     <string name="upgrade_001">正在备份数据…</string>
     <string name="upgrade_002">升级前先给作品留一份副本，通常只要几秒，请不要关闭灵写。</string>
     <string name="read_020" formatted="false">完读率（%）</string>
+    <string name="series_024">未命名系列</string>
+    <string name="series_025">系列来源</string>
+    <string name="series_026">更多</string>
+    <string name="series_027">还没有作品加入这个系列</string>
+    <string name="series_028">移出</string>
+    <string name="series_029">重命名系列</string>
+    <string name="series_030">所有作品都已在系列里</string>
+    <string name="series_031">移出系列</string>
+    <string name="series_032">《%1$s》会移出这个系列。作品本身、已复制到这本书的设定卡都不受影响。</string>
+    <string name="series_033">《%2$s》里已有同名卡「%1$s」，没有重复复制。</string>
+    <string name="series_034">复制失败：%1$s</string>
+    <string name="series_035">书不会被删除，只是移出系列；系列里的共享卡会被删除。已复制到各本书的设定卡不受影响。</string>
+    <string name="series_036">编辑共享卡</string>
+    <string name="series_037">删除共享卡</string>
+    <string name="series_038">删除「%1$s」？已复制到各本书的设定卡不受影响。</string>
 </resources>
