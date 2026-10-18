@@ -1609,4 +1609,5 @@
     <string name="series_036">Edit shared card</string>
     <string name="series_037">Delete shared card</string>
     <string name="series_038">Delete “%1$s”? Cards already copied into books are kept.</string>
+    <string name="outline_110">Notes</string>
 </resources>

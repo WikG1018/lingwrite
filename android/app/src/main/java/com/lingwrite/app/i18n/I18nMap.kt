@@ -1465,8 +1465,9 @@ private fun part5(m: HashMap<String, Int>) {
     m["书不会被删除，只是移出系列；系列里的共享卡会被删除。已复制到各本书的设定卡不受影响。"] = R.string.series_035
     m["编辑共享卡"] = R.string.series_036
     m["删除共享卡"] = R.string.series_037
+    m["备注"] = R.string.outline_110
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2898).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2900).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

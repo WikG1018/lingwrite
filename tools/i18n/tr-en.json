@@ -1605,5 +1605,6 @@
 "series_035": "Books are not deleted, only removed from the series. The series' shared cards will be deleted; cards already copied into books are kept.",
 "series_036": "Edit shared card",
 "series_037": "Delete shared card",
-"series_038": "Delete “%1$s”? Cards already copied into books are kept."
+"series_038": "Delete “%1$s”? Cards already copied into books are kept.",
+"outline_110": "Notes"
 }

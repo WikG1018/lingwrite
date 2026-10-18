@@ -8409,6 +8409,11 @@
    "删除「%1$s」？已复制到各本书的设定卡不受影响。",
    1,
    "SeriesRoute.kt"
+  ],
+  "outline_110": [
+   "备注",
+   0,
+   "OutlineRoute.kt"
   ]
  },
  "skipped": [

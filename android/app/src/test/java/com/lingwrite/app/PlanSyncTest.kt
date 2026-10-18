@@ -58,4 +58,49 @@ class PlanSyncTest {
         assertTrue(prompt.contains("storyTime"))
         assertTrue(prompt.contains("未落实项"))
     }
+
+    // 审查 #14：采纳只合并 diff 字段，不覆盖作者在提议之后的手改。
+    @Test fun applyMergesOnlyDiffFields() = runBlocking {
+        val book = AppGraph.books.createBook("合并")
+        val chapter = AppGraph.db.chapters().chaptersOnce(book).single()
+        val dao = AppGraph.db.plan()
+        val old = ChapterPlanEntity(chapterId = chapter.id, bookId = book, event = "旧事件", hook = "旧钩子", note = "作者备注")
+        dao.upsertChapter(old)
+        val after = old.copy(event = "AI 事件")
+        val proposal = PlanProposal(chapter.id, old, after, PlanSync.diff(old, after))
+        // 提议出来之后，作者手动改了钩子
+        dao.upsertChapter(old.copy(hook = "作者新钩子"))
+        PlanSync.apply(proposal)
+        val now = dao.chapterOnce(chapter.id)!!
+        assertEquals("AI 事件", now.event)
+        assertEquals("作者手改保留", "作者新钩子", now.hook)
+        assertEquals("作者备注", now.note)
+    }
+
+    @Test fun restoreSnapshotsCurrentSoUndoIsUndoable() = runBlocking {
+        val book = AppGraph.books.createBook("撤销")
+        val chapter = AppGraph.db.chapters().chaptersOnce(book).single()
+        val dao = AppGraph.db.plan()
+        val old = ChapterPlanEntity(chapterId = chapter.id, bookId = book, event = "A")
+        dao.upsertChapter(old)
+        val after = old.copy(event = "B")
+        val v = PlanSync.apply(PlanProposal(chapter.id, old, after, PlanSync.diff(old, after)))
+        assertEquals("B", dao.chapterOnce(chapter.id)!!.event)
+        PlanSync.restore(chapter.id, v)
+        assertEquals("A", dao.chapterOnce(chapter.id)!!.event)
+        val versions = dao.planVersions(chapter.id)
+        assertEquals(2, versions.size)
+        // 最新快照是撤销前的 B，可以再恢复回去
+        val redo = versions.maxBy { it.id }
+        PlanSync.restore(chapter.id, redo.id)
+        assertEquals("B", dao.chapterOnce(chapter.id)!!.event)
+    }
+
+    @Test fun fieldLabelsAreNotInternalIds() {
+        listOf("event", "hook", "cliff", "note", "storyTime").forEach { f ->
+            val label = PlanSync.fieldLabel(f)
+            assertNotEquals(f, label)
+            assertTrue(label.isNotBlank())
+        }
+    }
 }

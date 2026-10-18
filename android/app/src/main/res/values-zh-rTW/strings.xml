@@ -1684,4 +1684,5 @@
     <string name="series_036">編輯共享卡</string>
     <string name="series_037">刪除共享卡</string>
     <string name="series_038">刪除「%1$s」？已複製到各本書的設定卡不受影響。</string>
+    <string name="outline_110">備註</string>
 </resources>
