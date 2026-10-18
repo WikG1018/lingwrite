@@ -169,15 +169,16 @@ fun PublishCheckRoute(bookId: Long, chapterId: Long, nav: NavHostController) {
     }
 }
 
+/** 导出报告：按界面语言（章号用 ChapterLabel）。 */
 private fun reportText(book: String, oneChapter: Boolean, r: PublishReport): String = buildString {
-    append("# ").append(book.ifBlank { "发布前检查" }).append('\n')
-    append(if (oneChapter) "本章" else "全书 ${r.checkedChapters} 章").append('\n')
-    append("AI 生成 ${r.share.genPercent}% · 人工修改 ${r.share.editedPercent}%（共 ${r.share.totalChars} 字）\n")
-    append("本地检查只覆盖格式、自定义风险词和 AI 标记，不构成平台合规保证。\n\n")
+    append("# ").append(book.ifBlank { tr(R.string.publish_001) }).append('\n')
+    append(if (oneChapter) tr(R.string.publish_017) else tr(R.string.publish_016, r.checkedChapters)).append('\n')
+    append(tr(R.string.publish_008, r.share.genPercent, r.share.editedPercent, r.share.totalChars)).append('\n')
+    append(tr(R.string.publish_015)).append("\n\n")
     r.issues.forEach { i ->
-        append("- [").append(if (i.severity == CheckSeverity.Must) "必须改" else "建议看").append("] ")
-        append("第 ").append(i.chapterNumber).append(" 章 · ").append(i.message)
-        if (i.quote.isNotBlank()) append("：").append(i.quote.replace("\n", " "))
+        append("- [").append(if (i.severity == CheckSeverity.Must) tr(R.string.publish_005) else tr(R.string.publish_006)).append("] ")
+        append(ChapterLabel.short(i.chapterNumber)).append(" · ").append(i.message)
+        if (i.quote.isNotBlank()) append(tr(R.string.pubchk_010)).append(i.quote.replace("\n", " "))
         append('\n')
     }
 }

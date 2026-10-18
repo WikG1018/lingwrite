@@ -1466,8 +1466,38 @@ private fun part5(m: HashMap<String, Int>) {
     m["编辑共享卡"] = R.string.series_036
     m["删除共享卡"] = R.string.series_037
     m["备注"] = R.string.outline_110
+    m["章节正文为空"] = R.string.pubchk_001
+    m["章节标题为空"] = R.string.pubchk_002
+    m["章节标题超过 40 字"] = R.string.pubchk_003
+    m["全书有同名章节"] = R.string.pubchk_004
+    m["连续标点"] = R.string.pubchk_006
+    m["段首有半角空格"] = R.string.pubchk_007
+    m["："] = R.string.pubchk_010
+    m["导入作品"] = R.string.imp_001
+    m["文件里没有可导入的正文"] = R.string.imp_002
+    m["Word 只导入正文段落；图片、批注和脚注不会导入。"] = R.string.imp_004
+    m["没有识别到章节，整篇作为一章导入。"] = R.string.imp_005
+    m["没有识别到至少两个章节标题，已改为按长度拆分；可在预览里切换拆分方式。"] = R.string.imp_007
+    m["文件没有正文。"] = R.string.imp_008
+    m["无法读取文件"] = R.string.imp_010
+    m["文件超过 20MB，请先拆分再导入"] = R.string.imp_011
+    m["Word 文档过大"] = R.string.imp_012
+    m["Word 文档缺少 document.xml"] = R.string.imp_013
+    m["备份文件过大或已损坏，未导入"] = R.string.bak_001
+    m["备份文件条目过多，未导入"] = R.string.bak_002
+    m["备份文件过大，未导入"] = R.string.bak_003
+    m["不是灵写的备份文件"] = R.string.bak_004
+    m["备份来自更新的版本，请先升级灵写"] = R.string.bak_005
+    m["备份数据库来自更新的版本，请先升级灵写"] = R.string.bak_006
+    m["备份缺少数据表"] = R.string.bak_007
+    m["备份文件路径无效，未导入"] = R.string.bak_009
+    m["分卷引用缺失作品"] = R.string.bak_010
+    m["章节引用缺失作品或分卷"] = R.string.bak_011
+    m["无法暂存原地图，恢复取消"] = R.string.bak_012
+    m["无法恢复地图，恢复取消"] = R.string.bak_013
+    m["开场方向"] = R.string.wf_026
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2900).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2960).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

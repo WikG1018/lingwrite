@@ -48,7 +48,9 @@ object WriteFlow {
             append("【本章标的故事内时间】").append(d.plan?.storyTime.orEmpty()).append('\n')
         }
         val attempt = JsonReply.completeJson("directions", PromptContract.JSON_ONLY, user, bookId, chapterId, 500, array = true)
-        val arr = attempt.json?.let { runCatching { it.jsonArray }.getOrNull() } ?: return emptyList()
+        // 失败时把原因抛给界面（错误卡显示原因 + 重试 / 换模型），不再静默返回空列表。
+        val arr = attempt.json?.let { runCatching { it.jsonArray }.getOrNull() }
+            ?: if (attempt.error != null) error(attempt.error) else return emptyList()
         return arr.mapNotNull { runCatching { it.jsonPrimitive.content }.getOrNull()?.trim()?.takeIf { s -> s.isNotEmpty() } }.take(n)
     }
 

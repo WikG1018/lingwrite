@@ -37,10 +37,13 @@ data class AiUsageReport(
 
 /** 只统计 App 内标记的 AI 段落与 call_logs；不联网、不评判平台合规。 */
 object AiUsage {
+    /** 统计的调用日志上限；达到时界面注明「只统计最近 N 次」。 */
+    const val MAX_LOGS = 5000
+
     suspend fun report(bookId: Long): AiUsageReport {
         val db = AppGraph.db
         val headers = db.chapters().headersOnce(bookId)
-        val logs = db.ai().logs(bookId, 5000).first().filter { it.task != "test" }
+        val logs = db.ai().logs(bookId, MAX_LOGS).first().filter { it.task != "test" }
         val byChapter = logs.groupBy { it.chapterId }
         var gen = 0; var edited = 0; var total = 0; var gParas = 0; var eParas = 0
         var calls = 0; var accepted = 0; var editedN = 0; var rejected = 0

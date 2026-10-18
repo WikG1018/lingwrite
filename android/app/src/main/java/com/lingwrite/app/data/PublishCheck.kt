@@ -3,11 +3,16 @@
 package com.lingwrite.app.data
 
 import com.lingwrite.app.AppGraph
+import com.lingwrite.app.R
+import com.lingwrite.app.i18n.trOr
 import com.lingwrite.app.data.db.ChapterEntity
 
 enum class CheckSeverity { Must, Warn }
 
-/** 发布前检查的一条结果；[offset] 用于跳回正文，找不到时为 -1。 */
+/**
+ * 发布前检查的一条结果；[offset] 用于跳回正文，找不到时为 -1。
+ * [kind] 是稳定的规则 id；[message] 已按界面语言取字符串资源（trOr，纯 JVM 下回退中文）。
+ */
 data class PublishIssue(
     val severity: CheckSeverity,
     val chapterId: Long,
@@ -54,27 +59,27 @@ object PublishCheck {
             if (out.size < MAX_ISSUES_PER_CHAPTER) out += PublishIssue(sev, c.id, c.number, kind, msg, at, quote)
         }
         val text = c.content
-        if (text.isBlank()) { add(CheckSeverity.Must, "empty", "章节正文为空"); return out }
-        if (c.title.isBlank()) add(CheckSeverity.Must, "title_empty", "章节标题为空")
-        if (c.title.length > 40) add(CheckSeverity.Warn, "title_long", "章节标题超过 40 字")
-        if (c.title.isNotBlank() && (bookTitles[c.title.trim()] ?: 0) > 1) add(CheckSeverity.Warn, "title_duplicate", "全书有同名章节")
-        if (c.wordCount < minWords) add(CheckSeverity.Warn, "short", "本章 ${c.wordCount} 字，低于设定的 $minWords 字")
+        if (text.isBlank()) { add(CheckSeverity.Must, "empty", trOr(R.string.pubchk_001, "章节正文为空")); return out }
+        if (c.title.isBlank()) add(CheckSeverity.Must, "title_empty", trOr(R.string.pubchk_002, "章节标题为空"))
+        if (c.title.length > 40) add(CheckSeverity.Warn, "title_long", trOr(R.string.pubchk_003, "章节标题超过 40 字"))
+        if (c.title.isNotBlank() && (bookTitles[c.title.trim()] ?: 0) > 1) add(CheckSeverity.Warn, "title_duplicate", trOr(R.string.pubchk_004, "全书有同名章节"))
+        if (c.wordCount < minWords) add(CheckSeverity.Warn, "short", trOr(R.string.pubchk_005, "本章 ${c.wordCount} 字，低于设定的 $minWords 字", c.wordCount, minWords))
 
         repeatedPunct.findAll(text).take(10).forEach { m ->
-            add(CheckSeverity.Warn, "punct", "连续标点", m.range.first, m.value)
+            add(CheckSeverity.Warn, "punct", trOr(R.string.pubchk_006, "连续标点"), m.range.first, m.value)
         }
         asciiLineStart.findAll(text).take(10).forEach { m ->
-            add(CheckSeverity.Warn, "indent", "段首有半角空格", m.range.first, text.substring(m.range.first, (m.range.first + 8).coerceAtMost(text.length)))
+            add(CheckSeverity.Warn, "indent", trOr(R.string.pubchk_007, "段首有半角空格"), m.range.first, text.substring(m.range.first, (m.range.first + 8).coerceAtMost(text.length)))
         }
         val pairs = listOf('“' to '”', '‘' to '’', '（' to '）', '【' to '】')
         pairs.forEach { (a, b) ->
             val na = text.count { it == a }; val nb = text.count { it == b }
-            if (na != nb) add(CheckSeverity.Warn, "quote", "「$a」「$b」数量不一致（$na/$nb）")
+            if (na != nb) add(CheckSeverity.Warn, "quote", trOr(R.string.pubchk_008, "「$a」「$b」数量不一致（$na/$nb）", a.toString(), b.toString(), na, nb))
         }
         riskWords.filter { it.isNotBlank() }.take(200).forEach { w ->
             var i = text.indexOf(w)
             while (i >= 0 && out.size < MAX_ISSUES_PER_CHAPTER) {
-                add(CheckSeverity.Warn, "risk_word", "风险词：$w", i, text.substring(i, (i + w.length + 12).coerceAtMost(text.length)))
+                add(CheckSeverity.Warn, "risk_word", trOr(R.string.pubchk_009, "风险词：$w", w), i, text.substring(i, (i + w.length + 12).coerceAtMost(text.length)))
                 i = text.indexOf(w, i + w.length)
             }
         }
