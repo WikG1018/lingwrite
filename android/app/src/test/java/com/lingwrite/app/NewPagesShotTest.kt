@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.lingwrite.app.data.SeriesStore
 import com.lingwrite.app.data.db.CallLogEntity
+import com.lingwrite.app.data.db.ForeshadowEntity
 import com.lingwrite.app.data.db.ReadMetricEntity
 import com.lingwrite.app.i18n.L10n
 import com.lingwrite.app.ui.routes.*
@@ -41,6 +42,8 @@ abstract class NewPagesShotBase(private val lang: String) : RouteShotBase() {
             repeat(3 - i) { db.ai().insertLog(CallLogEntity(bookId = bookId, chapterId = ch.id, provider = "p", model = "m", task = "continue", outcome = "accepted")) }
             db.ai().insertLog(CallLogEntity(bookId = bookId, chapterId = ch.id, provider = "p", model = "m", task = "polish", outcome = "rejected"))
         }
+        db.checks().insertForeshadow(ForeshadowEntity(bookId = bookId, content = "师父留下的半块玉佩", chapterId = chapters[0].id, plantNumber = 1, quote = "玉佩缺了一角", payoff = 5))
+        db.checks().insertForeshadow(ForeshadowEntity(bookId = bookId, content = "藏经阁第三层为何上锁", chapterId = chapters.getOrNull(1)?.id, plantNumber = 2, payoff = 8))
         seriesId = SeriesStore.create("长夜宇宙")
         SeriesStore.addBook(seriesId, bookId)
     }

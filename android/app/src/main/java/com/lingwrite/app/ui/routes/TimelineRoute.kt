@@ -2,6 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import com.lingwrite.app.ui.theme.Motion
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.Crossfade
@@ -49,7 +55,17 @@ fun TimelineRoute(bookId: Long, nav: NavHostController) {
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
         LingTopBar(tr(R.string.timeline_001), book?.title, onBack = { nav.popBackStack() })
         Text(tr(R.string.timeline_009), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp))
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        // 筛选 chip 放不下时，可继续滚动的一侧渐隐，提示还能横向滑动（审查 #15 建议）。
+        val chipScroll = rememberScrollState()
+        Row(Modifier.fillMaxWidth()
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                drawContent()
+                val edge = 24.dp.toPx()
+                if (chipScroll.canScrollForward) drawRect(Brush.horizontalGradient(listOf(Color.Black, Color.Transparent), startX = size.width - edge, endX = size.width), blendMode = BlendMode.DstIn)
+                if (chipScroll.canScrollBackward) drawRect(Brush.horizontalGradient(listOf(Color.Transparent, Color.Black), startX = 0f, endX = edge), blendMode = BlendMode.DstIn)
+            }
+            .horizontalScroll(chipScroll).padding(horizontal = 16.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
                 "all" to tr(R.string.timeline_002), "person" to tr(R.string.timeline_003), "place" to tr(R.string.timeline_004),
                 "item" to tr(R.string.timeline_005), "power" to tr(R.string.timeline_006), "foreshadow" to tr(R.string.timeline_007), "plan" to tr(R.string.timeline_008),
