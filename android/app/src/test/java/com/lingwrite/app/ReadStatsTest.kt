@@ -52,4 +52,39 @@ class ReadStatsTest {
         assertTrue(at(2).shortChapter)
         assertTrue(at(2).belowMedian)
     }
+
+    // 审查 #13 B：带 % 的小数不能再放大 100 倍。
+    @Test fun percentHandlesSignFractionAndInvalid() {
+        assertEquals(45, ReadStats.percent("45%"))
+        assertEquals(45, ReadStats.percent("45"))
+        assertEquals(45, ReadStats.percent("0.45"))
+        assertEquals(46, ReadStats.percent("45.5%"))
+        assertEquals(46, ReadStats.percent(" 45.5 ％ "))
+        assertEquals(1, ReadStats.percent("1%"))
+        assertEquals(1, ReadStats.percent("0.8%"))
+        assertEquals(1, ReadStats.percent("0.5%"))
+        assertEquals(8, ReadStats.percent("0.08"))
+        assertEquals(100, ReadStats.percent("100%"))
+        assertEquals(100, ReadStats.percent("1"))
+        assertEquals(100, ReadStats.percent("130%"))
+        assertEquals(-1, ReadStats.percent(""))
+        assertEquals(-1, ReadStats.percent("abc"))
+        assertEquals(-1, ReadStats.percent("%"))
+        assertEquals(-1, ReadStats.percent("-5%"))
+    }
+
+    @Test fun parseTableKeepsLowPercentValues() {
+        val rows = ReadStats.parseTable("章节\t追读\t完读率\n1\t1000\t0.8%\n2\t900\t1%")
+        assertEquals(listOf(1, 1), rows.map { it.completion })
+    }
+
+    @Test fun parseEnglishAndJapaneseHeaders() {
+        val en = ReadStats.parseTable("Chapter,Reads,Completion,Favorites\n1,1000,45%,10\n2,8000,0.4,8")
+        assertEquals(listOf(1, 2), en.map { it.chapter })
+        assertEquals(listOf(45, 40), en.map { it.completion })
+        assertEquals(1000, en[0].reads); assertEquals(10, en[0].favorites)
+        val ja = ReadStats.parseTable("話\t閲覧数\t読了率\tブックマーク\n第1話\t500\t30%\t4")
+        assertEquals(1, ja.size)
+        assertEquals(500, ja[0].reads); assertEquals(30, ja[0].completion); assertEquals(4, ja[0].favorites)
+    }
 }

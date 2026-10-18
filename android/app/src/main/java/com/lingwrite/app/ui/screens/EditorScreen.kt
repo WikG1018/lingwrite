@@ -112,6 +112,8 @@ fun EditorScreen(
     focusWords: Int = 0,
     focusTarget: Int = 2000,
     focusElapsed: String = "",
+    /** 专注开始时间（毫秒）；> 0 时由 [FocusClock] 自己每秒刷新，避免整个编辑器每秒重组。 */
+    focusStartAt: Long = 0L,
     focusPercent: Float = 0f,
     typewriter: Boolean = false,
 ) {
@@ -132,14 +134,22 @@ fun EditorScreen(
                 Spacer(Modifier.weight(1f))
                 Text(tr(R.string.focus_003, focusTarget), style = Ling.type.caption, color = c.onSurfaceVariant)
                 Spacer(Modifier.width(8.dp))
-                Text(focusElapsed, style = Ling.type.caption, color = c.onSurfaceVariant)
+                if (focusStartAt > 0L) FocusClock(focusStartAt) else Text(focusElapsed, style = Ling.type.caption, color = c.onSurfaceVariant)
             }
             Box(Modifier.weight(1f)) {
                 ManuscriptField(value, onValueChange, marks, names, readOnly, Modifier.fillMaxSize(), proofRanges, typewriter)
             }
-            Box(Modifier.fillMaxWidth().height(3.dp).background(c.surfaceContainer)) {
-                Box(Modifier.fillMaxWidth(focusPercent.coerceIn(0f, 1f)).fillMaxHeight().background(c.primary))
-            }
+            // 进度条从左向右生长（motion §13）：只改绘制参数，不改布局。
+            val reduced = Motion.reduced()
+            val grown by androidx.compose.animation.core.animateFloatAsState(
+                focusPercent.coerceIn(0f, 1f),
+                if (reduced) androidx.compose.animation.core.snap() else androidx.compose.animation.core.tween(Motion.Long, easing = Motion.EmphasizedDecelerate),
+                label = "focusProgress",
+            )
+            val bar = c.primary
+            Box(Modifier.fillMaxWidth().height(3.dp).background(c.surfaceContainer).drawBehind {
+                drawRect(bar, size = size.copy(width = size.width * grown))
+            })
         }
     } else {
     WritingWorkspace(toolsOpen && responsive, toolTab == 3, responsive,
@@ -244,7 +254,11 @@ fun ManuscriptField(value: TextFieldValue, onValueChange: (TextFieldValue) -> Un
         val line = l.getLineForOffset(value.selection.end.coerceIn(0, n))
         val top = l.getLineTop(line)
         val vp = scroll.viewportSize
-        if (vp > 0) scroll.scrollTo((top - vp * 0.4f).toInt().coerceIn(0, scroll.maxValue))
+        if (vp <= 0) return@LaunchedEffect
+        val target = (top - vp * 0.4f).toInt().coerceIn(0, scroll.maxValue)
+        // 打字机滚动：偏移超过约一行才滚，并用短动画平滑过去，不再每次按键硬跳。
+        val threshold = (l.getLineBottom(line) - top).toInt().coerceAtLeast(1)
+        if (kotlin.math.abs(target - scroll.value) >= threshold) scroll.animateScrollTo(target, androidx.compose.animation.core.tween(Motion.Short, easing = Motion.Standard))
     }
     BasicTextField(
         value, onValueChange, readOnly = readOnly,
@@ -498,4 +512,17 @@ fun ProofBubble(issue: com.lingwrite.app.data.ProofIssue, onIgnore: () -> Unit, 
             LingButton(tr(R.string.editor_077), BtnKind.Tonal, height = 32.dp, onClick = onAccept)
         }
     }
+}
+
+/** 专注计时：自己每秒刷新，只重组这一小块文字（审查 #9）。 */
+@Composable
+fun FocusClock(startAt: Long, modifier: Modifier = Modifier) {
+    val now by produceState(System.currentTimeMillis(), startAt) {
+        while (true) {
+            value = System.currentTimeMillis()
+            kotlinx.coroutines.delay(1000 - (value - startAt).mod(1000L))
+        }
+    }
+    val sec = ((now - startAt).coerceAtLeast(0) / 1000)
+    Text("%02d:%02d".format(sec / 60, sec % 60), style = Ling.type.caption.copy(fontFeatureSettings = "tnum"), color = Ling.colors.onSurfaceVariant, modifier = modifier)
 }

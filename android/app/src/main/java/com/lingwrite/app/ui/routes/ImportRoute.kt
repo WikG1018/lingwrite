@@ -2,6 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import com.lingwrite.app.ui.theme.Motion
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -91,7 +99,7 @@ fun ImportRoute(nav: NavHostController) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             val p = preview
             if (p == null) {
-                LingCard {
+                LingCard(Modifier.fillMaxWidth().enterStagger(0)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text(tr(R.string.import_021), style = Ling.type.titleSmall, color = c.onSurface)
                         Text(tr(R.string.import_002), style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
@@ -105,9 +113,10 @@ fun ImportRoute(nav: NavHostController) {
                         }
                     }
                 }
-                if (busy) Text(tr(R.string.import_004), style = Ling.type.body, color = c.primary, modifier = Modifier.padding(horizontal = 8.dp))
+                // 解析大文件：超过 150ms 显示骨架（motion §15）。
+                if (busy) { Text(tr(R.string.import_004), style = Ling.type.body, color = c.primary, modifier = Modifier.padding(horizontal = 8.dp)); DelayedSkeleton(true, cards = 2) }
             } else {
-                LingCard {
+                LingCard(Modifier.fillMaxWidth().enterStagger(0)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(tr(R.string.import_013, p.volumes.size, p.chapters.size, Words.grouped(p.totalWords)), style = Ling.type.titleSmall, color = c.onSurface)
                         Text(tr(R.string.import_019, p.encoding), style = Ling.type.caption.copy(lineHeight = 19.sp), color = c.onSurfaceVariant)
@@ -123,7 +132,7 @@ fun ImportRoute(nav: NavHostController) {
                         }
                     }
                 }
-                Text(tr(R.string.import_007), style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 8.dp))
+                Text(tr(R.string.import_007), style = Ling.type.label, color = c.primary, modifier = Modifier.padding(start = 8.dp).enterStagger(1))
                 Segmented(
                     listOf(tr(R.string.import_008), tr(R.string.import_009), tr(R.string.import_010)),
                     when (split) { ImportSplit.Heading -> 0; ImportSplit.Length -> 1; ImportSplit.Single -> 2 },
@@ -132,18 +141,21 @@ fun ImportRoute(nav: NavHostController) {
                     split = mode
                     source?.let { load(it, mode, encoding) }
                 }
-                if (split == ImportSplit.Length) {
+                AnimatedVisibility(split == ImportSplit.Length, enter = fadeIn(tween(Motion.Medium)) + expandVertically(tween(Motion.Medium, easing = Motion.EmphasizedDecelerate)),
+                    exit = fadeOut(tween(Motion.Short)) + shrinkVertically(tween(Motion.Short, easing = Motion.EmphasizedAccelerate))) {
                     LingTextField(
                         length, { length = it.filter(Char::isDigit) },
                         label = tr(R.string.import_011, length.toIntOrNull()?.coerceIn(500, 20_000) ?: 3000),
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
                     )
                 }
-                LingTextField(title, { title = it }, label = tr(R.string.import_014))
-                SectionLabel(tr(R.string.import_012, minOf(20, p.chapters.size)))
-                LingCard {
+                LingTextField(title, { title = it }, label = tr(R.string.import_014), modifier = Modifier.enterStagger(2))
+                SectionLabel(tr(R.string.import_012, minOf(20, p.chapters.size)), Modifier.enterStagger(3))
+                LingCard(Modifier.fillMaxWidth().enterStagger(4)) {
+                    // 重新拆分时预览整体淡入淡出，不跳变。
+                    Crossfade(p, animationSpec = tween(Motion.Medium), label = "importPreview") { pp ->
                     LazyColumn(Modifier.heightIn(max = 340.dp)) {
-                        itemsIndexed(p.chapters.take(20)) { i, ch ->
+                        itemsIndexed(pp.chapters.take(20), key = { i, _ -> i }) { i, ch ->
                             if (i > 0) InsetDivider(16.dp)
                             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text("${i + 1}", Modifier.width(28.dp), style = Ling.type.caption, color = c.onSurfaceVariant)
@@ -155,9 +167,10 @@ fun ImportRoute(nav: NavHostController) {
                                     )
                                     Text(Words.grouped(Words.count(ch.content)) + " " + tr(R.string.work_040), style = Ling.type.caption, color = c.onSurfaceVariant)
                                 }
-                                if (p.volumes.size > 1) Pill(tr(R.string.work_041) + " ${ch.volume + 1}", PillKind.Neutral)
+                                if (pp.volumes.size > 1) Pill(VolumeLabel.short(ch.volume + 1), PillKind.Neutral)
                             }
                         }
+                    }
                     }
                 }
                 if (busy) Text(tr(R.string.import_004), style = Ling.type.body, color = c.primary)

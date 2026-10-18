@@ -90,3 +90,19 @@ fun SkeletonCard(lines: Int = 3, modifier: Modifier = Modifier) {
         }
     }
 }
+
+/**
+ * 页面首屏加载占位：[loading] 超过 150ms 才出现骨架卡（motion §15），数据先到就不显示；
+ * 骨架消失用 Motion.Short 淡出。
+ */
+@Composable
+fun DelayedSkeleton(loading: Boolean, cards: Int = 2, modifier: Modifier = Modifier) {
+    val show = rememberDelayedVisible(loading)
+    androidx.compose.animation.AnimatedVisibility(
+        show && loading, modifier,
+        enter = androidx.compose.animation.fadeIn(tween(Motion.Short)),
+        exit = androidx.compose.animation.fadeOut(tween(Motion.Short)),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) { repeat(cards) { SkeletonCard(3) } }
+    }
+}

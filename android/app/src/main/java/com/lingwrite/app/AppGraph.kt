@@ -18,8 +18,9 @@ object AppGraph {
 
     fun init(context: Context, inMemory: Boolean = false) {
         if (ready && !inMemory) return
-        // Room 打开并迁移之前先留一份原始库快照；失败不阻塞启动。
-        if (!inMemory) com.lingwrite.app.data.UpgradeGuard.snapshotIfNeeded(context.applicationContext)
+        // Room 打开并迁移之前先留一份原始库快照：只在主线程读文件头，复制放后台线程；
+        // Room 第一次拿连接时（查询线程）会等快照完成，界面显示「正在备份数据…」。失败不阻塞启动。
+        if (!inMemory) com.lingwrite.app.data.UpgradeGuard.start(context.applicationContext)
         db = LingDatabase.build(context.applicationContext, inMemory)
         books = BookRepository(db, context.applicationContext.filesDir)
         prefs = com.lingwrite.app.data.Prefs(context.applicationContext)

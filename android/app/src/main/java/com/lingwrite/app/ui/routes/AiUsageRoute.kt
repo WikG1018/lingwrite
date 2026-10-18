@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +41,8 @@ fun AiUsageRoute(bookId: Long, nav: NavHostController) {
     var loading by remember { mutableStateOf(true) }
     var msg by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(bookId) {
-        report = runCatching { AiUsage.report(bookId) }.getOrNull()
+        // 逐章读正文 + 统计标记：放到后台线程，首屏走 150ms 骨架（motion §15）。
+        report = runCatching { withContext(Dispatchers.Default) { AiUsage.report(bookId) } }.getOrNull()
         loading = false
     }
     val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/markdown")) { uri: Uri? ->
@@ -56,35 +59,37 @@ fun AiUsageRoute(bookId: Long, nav: NavHostController) {
     Column(Modifier.fillMaxSize().background(c.background).statusBarsPadding()) {
         LingTopBar(tr(R.string.usage_001), book?.title, onBack = { nav.popBackStack() })
         if (loading) {
-            Text("…", style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+            Column(Modifier.padding(horizontal = 16.dp)) { DelayedSkeleton(true, cards = 3) }
         } else {
             val r = report
             if (r == null) {
-                Text(tr(R.string.usage_011), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+                Text(tr(R.string.usage_011), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp).enterStagger(0))
             } else if (r.totalCalls == 0 && r.chapters.all { it.share.genChars == 0 && it.share.editedChars == 0 }) {
-                Text(tr(R.string.usage_011), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp))
+                Text(tr(R.string.usage_011), style = Ling.type.body, color = c.onSurfaceVariant, modifier = Modifier.padding(24.dp).enterStagger(0))
             } else {
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    item {
-                        LingCard {
+                    item(key = "summary") {
+                        LingCard(Modifier.fillMaxWidth().enterStagger(0)) {
                             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Text(tr(R.string.usage_002), style = Ling.type.label, color = c.primary)
                                 Text(tr(R.string.usage_008, r.totalShare.genPercent, r.totalShare.editedPercent), style = Ling.type.headline, color = c.onSurface)
                                 Text(tr(R.string.usage_009, r.totalShare.totalChars) + " · " + tr(R.string.usage_003) + " ${r.adoptedPercent}%", style = Ling.type.caption, color = c.onSurfaceVariant)
                                 Text(tr(R.string.usage_010, r.totalCalls, r.totalAccepted + r.totalEdited), style = Ling.type.caption, color = c.onSurfaceVariant)
+                                ShareBar(r.totalShare.genPercent, r.totalShare.editedPercent)
+                                if (r.totalCalls >= AiUsage.MAX_LOGS) Text(tr(R.string.usage_015, AiUsage.MAX_LOGS), style = Ling.type.caption, color = c.onSurfaceVariant)
                                 LingButton(tr(R.string.usage_006), BtnKind.Text, height = 34.dp) { saver.launch(book?.title.orEmpty().ifBlank { "ai-usage" } + "-ai-usage.md") }
                                 Text(tr(R.string.usage_007), style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.tertiary)
                             }
                         }
                     }
-                    item { SectionLabel(tr(R.string.usage_004)) }
-                    items(r.chapters.filter { it.share.genChars > 0 || it.share.editedChars > 0 || it.calls > 0 }) { u ->
-                        ChapterRow(u)
+                    item(key = "chHeader") { SectionLabel(tr(R.string.usage_004), Modifier.enterStagger(1)) }
+                    items(r.chapters.filter { it.share.genChars > 0 || it.share.editedChars > 0 || it.calls > 0 }, key = { "c" + it.chapterId }) { u ->
+                        ChapterRow(u, Modifier.enterStagger(2).animateItem())
                     }
                     if (r.tasks.isNotEmpty()) {
-                        item { SectionLabel(tr(R.string.usage_005)) }
-                        items(r.tasks) { t ->
-                            LingCard {
+                        item(key = "taskHeader") { SectionLabel(tr(R.string.usage_005), Modifier.enterStagger(3)) }
+                        items(r.tasks, key = { "t" + it.task }) { t ->
+                            LingCard(Modifier.fillMaxWidth().enterStagger(4).animateItem()) {
                                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Text(com.lingwrite.app.data.taskName(t.task), style = Ling.type.body, color = c.onSurface, modifier = Modifier.weight(1f))
                                     Text(tr(R.string.usage_010, t.calls, t.accepted), style = Ling.type.caption, color = c.onSurfaceVariant)
@@ -92,7 +97,7 @@ fun AiUsageRoute(bookId: Long, nav: NavHostController) {
                             }
                         }
                     }
-                    item { msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(8.dp)) }; Spacer(Modifier.height(24.dp)) }
+                    item(key = "foot") { msg?.let { Text(it, style = Ling.type.body, color = c.primary, modifier = Modifier.padding(8.dp)) }; Spacer(Modifier.height(24.dp)) }
                 }
             }
         }
@@ -100,12 +105,12 @@ fun AiUsageRoute(bookId: Long, nav: NavHostController) {
 }
 
 @Composable
-private fun ChapterRow(u: ChapterUsage) {
+private fun ChapterRow(u: ChapterUsage, modifier: Modifier = Modifier) {
     val c = Ling.colors
-    LingCard {
+    LingCard(modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(tr(R.string.usage_013, u.number) + if (u.title.isNotBlank()) " " + u.title else "", style = Ling.type.body, color = c.onSurface, maxLines = 1)
+                Text(com.lingwrite.app.data.ChapterLabel.full(u.number, u.title), style = Ling.type.body, color = c.onSurface, maxLines = 1)
                 Text(tr(R.string.usage_008, u.share.genPercent, u.share.editedPercent), style = Ling.type.caption, color = c.onSurfaceVariant)
             }
             if (u.share.genPercent + u.share.editedPercent >= 50) Pill("AI ${u.share.genPercent + u.share.editedPercent}%", PillKind.Amber)
@@ -114,16 +119,37 @@ private fun ChapterRow(u: ChapterUsage) {
     }
 }
 
+/** 生成 / 修改占比条：从左向右生长（motion §13），只改绘制参数。 */
+@Composable
+private fun ShareBar(gen: Int, edited: Int) {
+    val c = Ling.colors
+    val reduced = com.lingwrite.app.ui.theme.Motion.reduced()
+    val grow = remember { androidx.compose.animation.core.Animatable(if (reduced) 1f else 0f) }
+    LaunchedEffect(gen, edited) {
+        if (!reduced) { grow.snapTo(0f); grow.animateTo(1f, androidx.compose.animation.core.tween(com.lingwrite.app.ui.theme.Motion.Long * 2, 120, com.lingwrite.app.ui.theme.Motion.EmphasizedDecelerate)) }
+    }
+    val amber = c.amber; val soft = c.amber.copy(alpha = 0.4f)
+    Box(Modifier.padding(top = 4.dp).fillMaxWidth().height(6.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(3.dp)).background(c.surfaceContainer)
+        .drawBehind {
+            val w = size.width * grow.value
+            val g = w * gen / 100f; val e = w * edited / 100f
+            drawRect(amber, size = size.copy(width = g))
+            drawRect(soft, topLeft = androidx.compose.ui.geometry.Offset(g, 0f), size = size.copy(width = e))
+        })
+}
+
+/** 导出报告：按界面语言，章号用 ChapterLabel。 */
 private fun reportText(book: String, r: AiUsageReport): String = buildString {
-    append("# AI 使用体检 · ").append(book.ifBlank { "" }).append('\n')
-    append("AI 标记字符占比：生成 ").append(r.totalShare.genPercent).append("% · 人工修改 ").append(r.totalShare.editedPercent).append("%\n")
-    append("采纳率：").append(r.adoptedPercent).append('%').append('\n')
-    append("调用 ").append(r.totalCalls).append(" 次，采纳 ").append(r.totalAccepted + r.totalEdited).append(" 次\n\n")
-    append("> 仅统计 App 内标记的 AI 段落；手工修改/外部粘贴不计入。不能作为平台判定依据，也不用于规避检测。\n\n")
+    append("# ").append(tr(R.string.usage_001)).append(if (book.isNotBlank()) " · $book" else "").append('\n')
+    append(tr(R.string.usage_002)).append(tr(R.string.pubchk_010)).append(tr(R.string.usage_008, r.totalShare.genPercent, r.totalShare.editedPercent)).append('\n')
+    append(tr(R.string.usage_003)).append(tr(R.string.pubchk_010)).append(r.adoptedPercent).append("%\n")
+    append(tr(R.string.usage_010, r.totalCalls, r.totalAccepted + r.totalEdited)).append("\n\n")
+    append("> ").append(tr(R.string.usage_007)).append("\n\n")
     r.chapters.forEach { u ->
         if (u.share.genChars > 0 || u.share.editedChars > 0 || u.calls > 0) {
-            append("- 第 ").append(u.number).append(" 章：AI ").append(u.share.genPercent).append("% / 修改 ").append(u.share.editedPercent).append("%")
-            if (u.calls > 0) append(" · 调用 ").append(u.calls).append(" 次，采纳 ").append(u.accepted + u.edited)
+            append("- ").append(com.lingwrite.app.data.ChapterLabel.short(u.number)).append(tr(R.string.pubchk_010))
+            append(tr(R.string.usage_008, u.share.genPercent, u.share.editedPercent))
+            if (u.calls > 0) append(" · ").append(tr(R.string.usage_010, u.calls, u.accepted + u.edited))
             append('\n')
         }
     }

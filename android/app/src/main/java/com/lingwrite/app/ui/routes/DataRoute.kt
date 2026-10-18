@@ -158,7 +158,8 @@ fun BackupRoute(nav: NavHostController) {
         if (uri == null || file == null) { snapToExport = null; return@rememberLauncherForActivityResult }
         scope.launch {
             msg = runCatching {
-                withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { out -> file.inputStream().use { it.copyTo(out) } } }
+                // 导出的是脱敏副本：清空 providers.keyCipher（快照原件只留在应用私有目录）。
+                withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)!!.use { out -> UpgradeGuard.exportSanitized(file, out, ctx.cacheDir) } }
                 tr(R.string.data_53)
             }.getOrElse { tr(R.string.data_018, it.message) }
             snapToExport = null
@@ -197,7 +198,7 @@ fun BackupRoute(nav: NavHostController) {
                         if (i > 0) InsetDivider(16.dp)
                         Row(Modifier.fillMaxWidth().rowClick { snapToExport = f; snapSaver.launch(f.name) }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text(f.name.removePrefix("upgrade-").removeSuffix(".zip"), style = Ling.type.body, color = c.onSurface)
+                                Text(UpgradeGuard.label(f), style = Ling.type.body, color = c.onSurface)
                                 Text(tr(R.string.data_50), style = Ling.type.caption, color = c.onSurfaceVariant)
                             }
                             Text("${f.length() / 1024} KB", style = Ling.type.caption, color = c.onSurfaceVariant)

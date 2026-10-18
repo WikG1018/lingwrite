@@ -433,17 +433,22 @@ fun ChapterPlanSheet(bookId: Long, chapterId: Long, inline: Boolean = false, ret
                         proposal?.let { p ->
                             Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(tr(R.string.outline_097), style = Ling.type.caption.copy(fontWeight = FontWeight.SemiBold), color = c.primary)
-                                p.diffs.forEach { d ->
-                                    Text(tr(R.string.outline_109, d.field), style = Ling.type.micro, color = c.onSurfaceVariant)
-                                    Text("- " + d.before, style = Ling.type.caption, color = c.onSurfaceVariant)
-                                    Text("+ " + d.after, style = Ling.type.caption, color = c.onSurface)
+                                p.diffs.forEachIndexed { i, d ->
+                                    // 删除线 + 浅色块表示变化（比「- / +」纯文本更易读），整组错峰淡入。
+                                    Column(Modifier.fillMaxWidth().enterStagger(i), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        Text(PlanSync.fieldLabel(d.field), style = Ling.type.micro, color = c.onSurfaceVariant)
+                                        if (d.before.isNotBlank()) Text(d.before, style = Ling.type.caption.copy(textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough), color = c.onSurfaceVariant,
+                                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(c.error.copy(alpha = if (c.isDark) 0.12f else 0.07f)).padding(horizontal = 8.dp, vertical = 4.dp))
+                                        Text(d.after.ifBlank { "—" }, style = Ling.type.caption, color = c.onSurface,
+                                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(c.good.copy(alpha = if (c.isDark) 0.14f else 0.09f)).padding(horizontal = 8.dp, vertical = 4.dp))
+                                    }
                                 }
                                 Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     LingButton(tr(R.string.sheets_002), BtnKind.Text, height = 32.dp) { proposal = null }
                                     LingButton(tr(R.string.outline_098), BtnKind.Tonal, height = 32.dp) {
                                         scope.launch {
                                             runCatching { persist(); PlanSync.apply(p) }
-                                                .onSuccess { vid -> appliedVersion = vid; usePlan(p.after); loaded = dao.chapterOnce(chapterId); msg = tr(R.string.outline_099); proposal = null }
+                                                .onSuccess { vid -> appliedVersion = vid; val now = dao.chapterOnce(chapterId); now?.let { usePlan(it) }; loaded = now; msg = tr(R.string.outline_099); proposal = null }
                                                 .onFailure { msg = it.message }
                                         }
                                     }

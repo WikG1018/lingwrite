@@ -7296,7 +7296,7 @@
    "DataRoute.kt"
   ],
   "data_50": [
-   "升级前自动保存的原始数据库；只备份，不自动恢复。",
+   "升级前自动保存的原始数据库，只存在本机。导出的副本不含 API Key。",
    0,
    "DataRoute.kt"
   ],
@@ -7716,7 +7716,7 @@
    "ReadStatsRoute.kt"
   ],
   "read_006": [
-   "完读率 %",
+   "完读率",
    0,
    "ReadStatsRoute.kt"
   ],
@@ -7746,7 +7746,7 @@
    "ReadStatsRoute.kt"
   ],
   "read_012": [
-   "把平台后台的表格复制到下面，表头含章/追读/完读率即可。",
+   "把平台后台的表格复制到下面，表头含章/追读/完读率即可（也认 Chapter / Reads / Completion）。",
    0,
    "ReadStatsRoute.kt"
   ],
@@ -8036,7 +8036,7 @@
    "TtsSheet.kt"
   ],
   "tts_005": [
-   "系统语音引擎不可用，或缺少中文语音包。",
+   "系统语音引擎不可用，或缺少这部作品语言的语音数据。",
    0,
    "TtsSheet.kt"
   ],
@@ -8051,7 +8051,7 @@
    "TtsSheet.kt"
   ],
   "tts_008": [
-   "系统语音引擎可能联网，由系统设置决定；灵写不保存音频。",
+   "系统语音引擎是否联网由系统设置决定；灵写不保存音频。关闭面板会停止朗读。",
    0,
    "TtsSheet.kt"
   ],
@@ -8319,6 +8319,311 @@
    "暂无共享卡",
    0,
    "SeriesRoute.kt"
+  ],
+  "upgrade_001": [
+   "正在备份数据…",
+   0,
+   "UpgradeBackupScreen.kt"
+  ],
+  "upgrade_002": [
+   "升级前先给作品留一份副本，通常只要几秒，请不要关闭灵写。",
+   0,
+   "UpgradeBackupScreen.kt"
+  ],
+  "read_020": [
+   "完读率（%）",
+   0,
+   "ReadStatsRoute.kt"
+  ],
+  "series_024": [
+   "未命名系列",
+   0,
+   "Series.kt"
+  ],
+  "series_025": [
+   "系列来源",
+   0,
+   "Series.kt"
+  ],
+  "series_026": [
+   "更多",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_027": [
+   "还没有作品加入这个系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_028": [
+   "移出",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_029": [
+   "重命名系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_030": [
+   "所有作品都已在系列里",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_031": [
+   "移出系列",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_032": [
+   "《%1$s》会移出这个系列。作品本身、已复制到这本书的设定卡都不受影响。",
+   1,
+   "SeriesRoute.kt"
+  ],
+  "series_033": [
+   "《%2$s》里已有同名卡「%1$s」，没有重复复制。",
+   2,
+   "SeriesRoute.kt"
+  ],
+  "series_034": [
+   "复制失败：%1$s",
+   1,
+   "SeriesRoute.kt"
+  ],
+  "series_035": [
+   "书不会被删除，只是移出系列；系列里的共享卡会被删除。已复制到各本书的设定卡不受影响。",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_036": [
+   "编辑共享卡",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_037": [
+   "删除共享卡",
+   0,
+   "SeriesRoute.kt"
+  ],
+  "series_038": [
+   "删除「%1$s」？已复制到各本书的设定卡不受影响。",
+   1,
+   "SeriesRoute.kt"
+  ],
+  "outline_110": [
+   "备注",
+   0,
+   "OutlineRoute.kt"
+  ],
+  "pubchk_001": [
+   "章节正文为空",
+   0,
+   "PublishCheck.kt"
+  ],
+  "pubchk_002": [
+   "章节标题为空",
+   0,
+   "PublishCheck.kt"
+  ],
+  "pubchk_003": [
+   "章节标题超过 40 字",
+   0,
+   "PublishCheck.kt"
+  ],
+  "pubchk_004": [
+   "全书有同名章节",
+   0,
+   "PublishCheck.kt"
+  ],
+  "pubchk_005": [
+   "本章 %1$d 字，低于设定的 %2$d 字",
+   2,
+   "PublishCheck.kt"
+  ],
+  "pubchk_006": [
+   "连续标点",
+   0,
+   "PublishCheck.kt"
+  ],
+  "pubchk_007": [
+   "段首有半角空格",
+   0,
+   "PublishCheck.kt"
+  ],
+  "pubchk_008": [
+   "「%1$s」「%2$s」数量不一致（%3$d/%4$d）",
+   4,
+   "PublishCheck.kt"
+  ],
+  "pubchk_009": [
+   "风险词：%1$s",
+   1,
+   "PublishCheck.kt"
+  ],
+  "pubchk_010": [
+   "：",
+   0,
+   "PublishCheckRoute.kt"
+  ],
+  "imp_001": [
+   "导入作品",
+   0,
+   "Import.kt"
+  ],
+  "imp_002": [
+   "文件里没有可导入的正文",
+   0,
+   "Import.kt"
+  ],
+  "imp_003": [
+   "编码不是 UTF-8，已按 %1$s 读取；如果出现乱码，请重试并指定编码。",
+   1,
+   "Import.kt"
+  ],
+  "imp_004": [
+   "Word 只导入正文段落；图片、批注和脚注不会导入。",
+   0,
+   "Import.kt"
+  ],
+  "imp_005": [
+   "没有识别到章节，整篇作为一章导入。",
+   0,
+   "Import.kt"
+  ],
+  "imp_006": [
+   "章节超过 %1$d 章，建议先拆分文件再导入",
+   1,
+   "Import.kt"
+  ],
+  "imp_007": [
+   "没有识别到至少两个章节标题，已改为按长度拆分；可在预览里切换拆分方式。",
+   0,
+   "Import.kt"
+  ],
+  "imp_008": [
+   "文件没有正文。",
+   0,
+   "Import.kt"
+  ],
+  "imp_009": [
+   "按每章约 %1$d 字拆分，共 %2$d 章；可在预览里切换为「不分章」。",
+   2,
+   "Import.kt"
+  ],
+  "imp_010": [
+   "无法读取文件",
+   0,
+   "Import.kt"
+  ],
+  "imp_011": [
+   "文件超过 20MB，请先拆分再导入",
+   0,
+   "Import.kt"
+  ],
+  "imp_012": [
+   "Word 文档过大",
+   0,
+   "Import.kt"
+  ],
+  "imp_013": [
+   "Word 文档缺少 document.xml",
+   0,
+   "Import.kt"
+  ],
+  "bak_001": [
+   "备份文件过大或已损坏，未导入",
+   0,
+   "Backup.kt"
+  ],
+  "bak_002": [
+   "备份文件条目过多，未导入",
+   0,
+   "Backup.kt"
+  ],
+  "bak_003": [
+   "备份文件过大，未导入",
+   0,
+   "Backup.kt"
+  ],
+  "bak_004": [
+   "不是灵写的备份文件",
+   0,
+   "Backup.kt"
+  ],
+  "bak_005": [
+   "备份来自更新的版本，请先升级灵写",
+   0,
+   "Backup.kt"
+  ],
+  "bak_006": [
+   "备份数据库来自更新的版本，请先升级灵写",
+   0,
+   "Backup.kt"
+  ],
+  "bak_007": [
+   "备份缺少数据表",
+   0,
+   "Backup.kt"
+  ],
+  "bak_008": [
+   "备份缺少 %1$s，未导入",
+   1,
+   "Backup.kt"
+  ],
+  "bak_009": [
+   "备份文件路径无效，未导入",
+   0,
+   "Backup.kt"
+  ],
+  "bak_010": [
+   "分卷引用缺失作品",
+   0,
+   "Backup.kt"
+  ],
+  "bak_011": [
+   "章节引用缺失作品或分卷",
+   0,
+   "Backup.kt"
+  ],
+  "bak_012": [
+   "无法暂存原地图，恢复取消",
+   0,
+   "Backup.kt"
+  ],
+  "bak_013": [
+   "无法恢复地图，恢复取消",
+   0,
+   "Backup.kt"
+  ],
+  "bak_014": [
+   "恢复未完成；原地图保留在 %1$s",
+   1,
+   "Backup.kt"
+  ],
+  "wf_024": [
+   "（计划%1$s回收）",
+   1,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_025": [
+   "%1$s：%2$s",
+   2,
+   "WriteFlowSheet.kt"
+  ],
+  "wf_026": [
+   "开场方向",
+   0,
+   "WriteFlowSheet.kt"
+  ],
+  "usage_015": [
+   "只统计最近 %1$d 次调用",
+   1,
+   "AiUsageRoute.kt"
+  ],
+  "read_021": [
+   "没有识别到数据",
+   0,
+   "ReadStatsRoute.kt"
   ]
  },
  "skipped": [

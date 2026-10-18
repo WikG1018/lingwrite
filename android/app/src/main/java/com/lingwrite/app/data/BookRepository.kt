@@ -304,15 +304,19 @@ class BookRepository(private val db: LingDatabase, private val filesDir: java.io
     suspend fun restoreChapter(id: Long) = lock(id).withLock {
         val c = ch.get(id) ?: return@withLock
         if (c.deletedAt == 0L) return@withLock
-        val visible = ch.chaptersOnce(c.bookId).filter { it.id != id }
-        val index = resolveRestoreIndex(c, visible) ?: visible.count { it.number < c.number }
-        // 先把插入点之后的章节整体后移一位，再把本章放回该位置，最后统一重排章号。
-        visible.filter { it.number >= index + 1 }.forEach { ch.position(it.id, it.number + 1, it.volumeId) }
-        ch.setDeleted(id, 0)
-        ch.position(id, index + 1, c.volumeId)
+        // 后移、取消删除、放回、重排章号必须在一个事务里：中途进程被杀也不会留下重复章号（审查 #4）。
+        db.withTransaction {
+            val visible = ch.chaptersOnce(c.bookId).filter { it.id != id }
+            val index = resolveRestoreIndex(c, visible) ?: visible.count { it.number < c.number }
+            // 先把插入点之后的章节整体后移一位，再把本章放回该位置，最后统一重排章号。
+            visible.filter { it.number >= index + 1 }.forEach { ch.position(it.id, it.number + 1, it.volumeId) }
+            ch.setDeleted(id, 0)
+            ch.position(id, index + 1, c.volumeId)
+            renumber(c.bookId)
+            books.touch(c.bookId)
+        }
+        // 锚点在 SharedPreferences 里，事务提交后再删。
         RestoreHints.remove(id)
-        renumber(c.bookId)
-        books.touch(c.bookId)
     }
 
     /**

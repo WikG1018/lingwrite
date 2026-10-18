@@ -35,7 +35,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             val prefs by AppGraph.prefs.flow.collectAsState(initial = null)
             val dark = when (prefs?.theme) { "light" -> false; "dark" -> true; else -> androidx.compose.foundation.isSystemInDarkTheme() }
-            LingTheme(dark, prefs?.reduceMotion) { LingWriteApp() }
+            // 升级后首次启动：快照在后台进行，期间不组合主界面（Room 打开也会等它，见 UpgradeGuard）。
+            val backingUp by com.lingwrite.app.data.UpgradeGuard.busy.collectAsState()
+            LingTheme(dark, prefs?.reduceMotion) {
+                androidx.compose.animation.Crossfade(backingUp, animationSpec = androidx.compose.animation.core.tween(com.lingwrite.app.ui.theme.Motion.Medium), label = "upgradeGate") { busy ->
+                    if (busy) com.lingwrite.app.ui.screens.UpgradeBackupScreen() else LingWriteApp()
+                }
+            }
         }
     }
 

@@ -30,6 +30,13 @@ data class ReadInsight(
 object ReadStats {
     private val chapterNum = Regex("""(\d{1,5})""")
 
+    private val chapterKeys = listOf("章", "Chapter", "Episode", "話", "チャプター")
+    private val readsKeys = listOf("追读", "阅读", "UV", "PV", "reads", "views", "readers", "閲覧", "読者")
+    private val completionKeys = listOf("完读", "读完", "completion", "complete", "finish", "読了", "完読")
+    private val favoriteKeys = listOf("收藏", "加书架", "favorite", "bookmark", "follow", "お気に入り", "ブックマーク")
+    private val commentKeys = listOf("评论", "comment", "コメント", "感想")
+    private val platformKeys = listOf("平台", "platform", "プラットフォーム", "サイト")
+
     /** 章节号：优先「第 12 章」，其次「12 标题」，最后第一个数字。 */
     fun chapterOf(cell: String): Int? {
         val s = cell.trim()
@@ -38,11 +45,16 @@ object ReadStats {
         return chapterNum.find(s)?.groupValues?.get(1)?.toIntOrNull()
     }
 
-    /** 百分比：12.3% / 0.123 / 12.3 都转成 0–100 的整数；空或非法返回 -1。 */
+    /**
+     * 百分比：12.3% / 0.123 / 12.3 都转成 0–100 的整数；空或非法返回 -1。
+     * 带 % / ％ 的值本身就是百分数（"0.8%" → 1，不能再乘 100）；不带的 ≤ 1 视为小数比例（"0.45" → 45）。
+     */
     fun percent(cell: String): Int {
-        val s = cell.trim().trimEnd('%', '％')
-        val d = s.toDoubleOrNull() ?: return -1
-        val v = if (s.contains('%') || d > 1.0) d else d * 100.0
+        val raw = cell.trim()
+        val hasPct = raw.endsWith('%') || raw.endsWith('％')
+        val s = raw.trimEnd('%', '％').trim()
+        val d = s.toDoubleOrNull()?.takeIf { it.isFinite() && it >= 0 } ?: return -1
+        val v = if (hasPct || d > 1.0) d else d * 100.0
         return v.roundToInt().coerceIn(0, 100)
     }
 
@@ -67,13 +79,15 @@ object ReadStats {
             return parts.map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { line.split(Regex("\\s+")) }
         }
         val header = cells(lines.first())
-        val hasHeader = header.any { it.contains("章") } && header.any { it.contains("追读") || it.contains("阅读") || it.contains("完读") }
+        fun has(h: String, keys: List<String>) = keys.any { h.contains(it, ignoreCase = true) }
+        // 表头同时认中文、英文、日文（平台后台导出的表头语言不一）。
+        val hasHeader = header.any { has(it, chapterKeys) } && header.any { has(it, readsKeys + completionKeys) }
         val idx = if (hasHeader) {
-            fun find(vararg keys: String) = header.indexOfFirst { h -> keys.any { h.contains(it, ignoreCase = true) } }
+            fun find(keys: List<String>) = header.indexOfFirst { h -> has(h, keys) }
             mapOf(
-                "chapter" to find("章", "Chapter"), "reads" to find("追读", "阅读", "UV", "reads"),
-                "completion" to find("完读", "读完", "completion"), "favorites" to find("收藏", "加书架", "favorites"),
-                "comments" to find("评论", "comments"), "platform" to find("平台", "platform"),
+                "chapter" to find(chapterKeys), "reads" to find(readsKeys),
+                "completion" to find(completionKeys), "favorites" to find(favoriteKeys),
+                "comments" to find(commentKeys), "platform" to find(platformKeys),
             )
         } else mapOf("chapter" to 0, "reads" to 1, "completion" to 2, "favorites" to 3, "comments" to 4)
         val start = if (hasHeader) 1 else 0
@@ -102,11 +116,13 @@ object ReadStats {
         val latest = latest(rows)
         val comps = latest.map { it.completion }.filter { it >= 0 }.sorted()
         val median = if (comps.isEmpty()) -1 else comps[comps.size / 2]
+        // 章号 → 章节 id 的反向表：避免每行线性查找（2000 章时 O(n²)）。
+        val idByNumber = HashMap<Int, Long>(chapterNumbers.size * 2).also { m -> chapterNumbers.forEach { (id, n) -> m.putIfAbsent(n, id) } }
         return latest.mapIndexedNotNull { i, m ->
             if (m.completion < 0) return@mapIndexedNotNull null
             val prev = latest.getOrNull(i - 1)?.completion ?: -1
             val drop = if (prev > 0) ((prev - m.completion) * 100.0 / prev).roundToInt() else 0
-            val plan = chapterNumbers.entries.firstOrNull { it.value == m.chapterNumber }?.key?.let { plans[it] }
+            val plan = idByNumber[m.chapterNumber]?.let { plans[it] }
             val words = chapterWords[m.chapterNumber] ?: 0
             ReadInsight(
                 chapter = m.chapterNumber,

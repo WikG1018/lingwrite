@@ -1244,7 +1244,7 @@ private fun part4(m: HashMap<String, Int>) {
     m["包含全部历史版本（文件更大）"] = R.string.data_47
     m["默认只备份每章最近 3 个自动版本；手动、回滚和 AI 快照全部保留。"] = R.string.data_48
     m["升级前数据库快照"] = R.string.data_49
-    m["升级前自动保存的原始数据库；只备份，不自动恢复。"] = R.string.data_50
+    m["升级前自动保存的原始数据库，只存在本机。导出的副本不含 API Key。"] = R.string.data_50
     m["导出快照"] = R.string.data_51
     m["删除快照"] = R.string.data_52
     m["升级快照已导出"] = R.string.data_53
@@ -1330,13 +1330,13 @@ private fun part5(m: HashMap<String, Int>) {
     m["手动录入"] = R.string.read_003
     m["章号"] = R.string.read_004
     m["追读"] = R.string.read_005
-    m["完读率 %"] = R.string.read_006
+    m["完读率"] = R.string.read_006
     m["收藏"] = R.string.read_007
     m["评论"] = R.string.read_008
     m["导入"] = R.string.read_009
     m["保存"] = R.string.read_010
     m["暂无追读数据。平台数据需要手动粘贴；灵写不抓取后台。"] = R.string.read_011
-    m["把平台后台的表格复制到下面，表头含章/追读/完读率即可。"] = R.string.read_012
+    m["把平台后台的表格复制到下面，表头含章/追读/完读率即可（也认 Chapter / Reads / Completion）。"] = R.string.read_012
     m["解析失败：%1\$s"] = R.string.read_013
     m["已导入 %1\$d 行"] = R.string.read_014
     m["完读率曲线"] = R.string.read_015
@@ -1394,10 +1394,10 @@ private fun part5(m: HashMap<String, Int>) {
     m["播放"] = R.string.tts_002
     m["停止"] = R.string.tts_003
     m["语速"] = R.string.tts_004
-    m["系统语音引擎不可用，或缺少中文语音包。"] = R.string.tts_005
+    m["系统语音引擎不可用，或缺少这部作品语言的语音数据。"] = R.string.tts_005
     m["正在初始化语音…"] = R.string.tts_006
     m["从当前段开始"] = R.string.tts_007
-    m["系统语音引擎可能联网，由系统设置决定；灵写不保存音频。"] = R.string.tts_008
+    m["系统语音引擎是否联网由系统设置决定；灵写不保存音频。关闭面板会停止朗读。"] = R.string.tts_008
     m["写这一章"] = R.string.wf_001
     m["写前"] = R.string.wf_002
     m["写中"] = R.string.wf_003
@@ -1451,8 +1451,54 @@ private fun part5(m: HashMap<String, Int>) {
     m["删除系列"] = R.string.series_021
     m["已删除"] = R.string.series_022
     m["暂无共享卡"] = R.string.series_023
+    m["正在备份数据…"] = R.string.upgrade_001
+    m["升级前先给作品留一份副本，通常只要几秒，请不要关闭灵写。"] = R.string.upgrade_002
+    m["完读率（%）"] = R.string.read_020
+    m["未命名系列"] = R.string.series_024
+    m["系列来源"] = R.string.series_025
+    m["更多"] = R.string.series_026
+    m["还没有作品加入这个系列"] = R.string.series_027
+    m["移出"] = R.string.series_028
+    m["重命名系列"] = R.string.series_029
+    m["所有作品都已在系列里"] = R.string.series_030
+    m["移出系列"] = R.string.series_031
+    m["书不会被删除，只是移出系列；系列里的共享卡会被删除。已复制到各本书的设定卡不受影响。"] = R.string.series_035
+    m["编辑共享卡"] = R.string.series_036
+    m["删除共享卡"] = R.string.series_037
+    m["备注"] = R.string.outline_110
+    m["章节正文为空"] = R.string.pubchk_001
+    m["章节标题为空"] = R.string.pubchk_002
+    m["章节标题超过 40 字"] = R.string.pubchk_003
+    m["全书有同名章节"] = R.string.pubchk_004
+    m["连续标点"] = R.string.pubchk_006
+    m["段首有半角空格"] = R.string.pubchk_007
+    m["："] = R.string.pubchk_010
+    m["导入作品"] = R.string.imp_001
+    m["文件里没有可导入的正文"] = R.string.imp_002
+    m["Word 只导入正文段落；图片、批注和脚注不会导入。"] = R.string.imp_004
+    m["没有识别到章节，整篇作为一章导入。"] = R.string.imp_005
+    m["没有识别到至少两个章节标题，已改为按长度拆分；可在预览里切换拆分方式。"] = R.string.imp_007
+    m["文件没有正文。"] = R.string.imp_008
+    m["无法读取文件"] = R.string.imp_010
+    m["文件超过 20MB，请先拆分再导入"] = R.string.imp_011
+    m["Word 文档过大"] = R.string.imp_012
+    m["Word 文档缺少 document.xml"] = R.string.imp_013
+    m["备份文件过大或已损坏，未导入"] = R.string.bak_001
+    m["备份文件条目过多，未导入"] = R.string.bak_002
+    m["备份文件过大，未导入"] = R.string.bak_003
+    m["不是灵写的备份文件"] = R.string.bak_004
+    m["备份来自更新的版本，请先升级灵写"] = R.string.bak_005
+    m["备份数据库来自更新的版本，请先升级灵写"] = R.string.bak_006
+    m["备份缺少数据表"] = R.string.bak_007
+    m["备份文件路径无效，未导入"] = R.string.bak_009
+    m["分卷引用缺失作品"] = R.string.bak_010
+    m["章节引用缺失作品或分卷"] = R.string.bak_011
+    m["无法暂存原地图，恢复取消"] = R.string.bak_012
+    m["无法恢复地图，恢复取消"] = R.string.bak_013
+    m["开场方向"] = R.string.wf_026
+    m["没有识别到数据"] = R.string.read_021
 }
-private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2870).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
+private val zhToRes: HashMap<String, Int> by lazy { HashMap<String, Int>(2962).also { m -> part0(m); part1(m); part2(m); part3(m); part4(m); part5(m) } }
 
 /** 把中文原文（数据层标签、内部 id）翻译成当前界面语言；查不到就原样返回。 */
 fun trText(zh: String): String = zhToRes[zh]?.let { runCatching { tr(it) }.getOrNull() } ?: zh

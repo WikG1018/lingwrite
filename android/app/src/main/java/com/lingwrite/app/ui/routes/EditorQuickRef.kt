@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.lingwrite.app.ui.routes
 
+import com.lingwrite.app.i18n.trText
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -66,16 +68,16 @@ fun EditorQuickRef(
         }
         when (tab) {
             0 -> if (cards.isEmpty()) Empty(tr(R.string.quick_007)) else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 460.dp).padding(horizontal = 20.dp)) {
-                items(cards) { hit ->
-                    Column(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+                itemsIndexed(cards, key = { _, h -> "c" + h.card.id }) { i, hit ->
+                    Column(Modifier.fillMaxWidth().animateItem().enterStagger(i.coerceAtMost(8)).padding(vertical = 10.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(hit.card.name, style = Ling.type.bodyLarge.copy(fontWeight = FontWeight.Medium), color = c.onSurface)
                             Spacer(Modifier.width(8.dp))
-                            Pill(LoreType.of(hit.card.type).label, PillKind.Neutral)
+                            Pill(trText(LoreType.of(hit.card.type).label), PillKind.Neutral)
                         }
                         if (hit.fields.isNotEmpty()) {
                             Text(
-                                hit.fields.joinToString(" · ") { "${it.k}：${it.v}" },
+                                hit.fields.joinToString(" · ") { tr(R.string.wf_025, trText(it.k), it.v) },
                                 style = Ling.type.caption.copy(lineHeight = 18.sp), color = c.onSurfaceVariant,
                             )
                         }
@@ -83,8 +85,8 @@ fun EditorQuickRef(
                 }
             }
             1 -> if (foreshadows.isEmpty()) Empty(tr(R.string.quick_007)) else LazyColumn(Modifier.fillMaxWidth().heightIn(max = 460.dp).padding(horizontal = 20.dp)) {
-                items(foreshadows) { f ->
-                    Column(Modifier.fillMaxWidth().padding(vertical = 10.dp)) {
+                itemsIndexed(foreshadows, key = { _, f -> "f" + f.id }) { i, f ->
+                    Column(Modifier.fillMaxWidth().animateItem().enterStagger(i.coerceAtMost(8)).padding(vertical = 10.dp)) {
                         Text(f.content, style = Ling.type.body, color = c.onSurface, maxLines = 3, overflow = TextOverflow.Ellipsis)
                         Text(
                             if (f.payoff != null) tr(R.string.quick_013, f.plantNumber, f.payoff!!) else tr(R.string.quick_014),
@@ -95,16 +97,16 @@ fun EditorQuickRef(
             }
             2 -> LazyColumn(Modifier.fillMaxWidth().heightIn(max = 460.dp).padding(horizontal = 20.dp)) {
                 volumeSummary?.text?.takeIf { it.isNotBlank() }?.let { v ->
-                    item {
-                        Column(Modifier.padding(vertical = 8.dp)) {
+                    item(key = "vol") {
+                        Column(Modifier.enterStagger(0).padding(vertical = 8.dp)) {
                             Text(tr(R.string.quick_009), style = Ling.type.label, color = c.primary)
                             Text(v, style = Ling.type.body, color = c.onSurfaceVariant, maxLines = 6, overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
-                if (summaries.isEmpty()) item { Empty(tr(R.string.quick_008)) }
-                items(summaries) { s ->
-                    Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                if (summaries.isEmpty()) item(key = "empty") { Empty(tr(R.string.quick_008)) }
+                itemsIndexed(summaries, key = { _, s -> "s" + s.number }) { i, s ->
+                    Column(Modifier.fillMaxWidth().animateItem().enterStagger((i + 1).coerceAtMost(8)).padding(vertical = 8.dp)) {
                         Text(ChapterLabel.short(s.number), style = Ling.type.caption, color = c.primary)
                         Text(s.text, style = Ling.type.body, color = c.onSurface, maxLines = 4, overflow = TextOverflow.Ellipsis)
                     }
@@ -112,11 +114,12 @@ fun EditorQuickRef(
             }
             else -> Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
                 LingTextField(query, { query = it }, label = tr(R.string.quick_005), placeholder = tr(R.string.quick_006))
-                if (searching) Text(tr(R.string.quick_010), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+                // 首次搜索会建索引：超过 150ms 显示骨架，而不是只有一行字。
+                if (searching) { Text(tr(R.string.quick_010), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp)); DelayedSkeleton(true, cards = 2, modifier = Modifier.padding(top = 8.dp)) }
                 else if (query.isNotBlank() && hits.isEmpty()) Text(tr(R.string.quick_011), style = Ling.type.caption, color = c.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
                 LazyColumn(Modifier.fillMaxWidth().heightIn(max = 400.dp)) {
-                    items(hits) { hit ->
-                        Column(Modifier.fillMaxWidth().rowClick { onOpenHit(hit) }.padding(vertical = 10.dp)) {
+                    itemsIndexed(hits, key = { _, h -> "h" + h.id }) { i, hit ->
+                        Column(Modifier.fillMaxWidth().animateItem().enterStagger(i.coerceAtMost(8)).rowClick { onOpenHit(hit) }.padding(vertical = 10.dp)) {
                             Text(ChapterLabel.full(hit.number, ""), style = Ling.type.caption, color = c.primary)
                             Text(hit.text, style = Ling.type.body, color = c.onSurface, maxLines = 3, overflow = TextOverflow.Ellipsis)
                         }

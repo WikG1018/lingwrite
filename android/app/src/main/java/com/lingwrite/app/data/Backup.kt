@@ -6,6 +6,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import com.lingwrite.app.AppGraph
+import com.lingwrite.app.R
+import com.lingwrite.app.i18n.trOr
 import kotlinx.serialization.json.*
 import java.io.File
 import java.io.InputStream
@@ -50,7 +52,7 @@ object Backup {
         TableSpec("series_lore", "id", mapOf("seriesId" to "series")),
     )
 
-    private val nullableFks = setOf("map_marks.cardId", "foreshadows.chapterId", "foreshadows.cardId", "lore_suggestions.cardId", "ideas.bookId", "ideas.chapterId", "call_logs.bookId", "call_logs.chapterId", "breakdowns.bookId")
+    private val nullableFks = setOf("map_marks.cardId", "foreshadows.chapterId", "foreshadows.cardId", "lore_suggestions.cardId", "books.seriesId", "ideas.bookId", "ideas.chapterId", "call_logs.bookId", "call_logs.chapterId", "breakdowns.bookId")
 
     private fun value(c: Cursor, i: Int): JsonElement = when (c.getType(i)) {
         Cursor.FIELD_TYPE_NULL -> JsonNull
@@ -101,7 +103,7 @@ object Backup {
     data class Archive(val json: JsonObject, val files: Map<String, ByteArray>) {
         val tables get() = json["tables"]!!.jsonObject
         fun count(t: String) = tables[t]?.jsonArray?.size ?: 0
-        val bookTitles get() = tables["books"]?.jsonArray?.map { it.jsonObject.str("title").ifBlank { "未命名" } }.orEmpty()
+        val bookTitles get() = tables["books"]?.jsonArray?.map { it.jsonObject.str("title").ifBlank { trOr(R.string.book_ai_010, "未命名") } }.orEmpty()
         val exportedAt get() = json["exportedAt"]?.jsonPrimitive?.longOrNull ?: 0
     }
 
@@ -118,7 +120,7 @@ object Backup {
             val k = z.read(buf)
             if (k < 0) break
             total += k
-            if (total > max) error("备份文件过大或已损坏，未导入")
+            if (total > max) error(trOr(R.string.bak_001, "备份文件过大或已损坏，未导入"))
             bos.write(buf, 0, k)
         }
         return bos.toByteArray()
@@ -132,36 +134,36 @@ object Backup {
         ZipInputStream(input).use { z ->
             while (true) {
                 val e = z.nextEntry ?: break
-                if (++entries > MAX_ENTRIES) error("备份文件条目过多，未导入")
+                if (++entries > MAX_ENTRIES) error(trOr(R.string.bak_002, "备份文件条目过多，未导入"))
                 val bytes = readLimited(z, MAX_ENTRY_BYTES)
                 total += bytes.size
-                if (total > MAX_TOTAL_BYTES) error("备份文件过大，未导入")
+                if (total > MAX_TOTAL_BYTES) error(trOr(R.string.bak_003, "备份文件过大，未导入"))
                 if (e.name == "lingwrite.json") json = LingJson.parseToJsonElement(bytes.decodeToString()).jsonObject
                 else if ((e.name.startsWith("maps/") || e.name.startsWith("covers/")) && !e.name.contains("..")) files[e.name] = bytes
             }
         }
-        val j = json ?: error("不是灵写的备份文件")
-        if (j.str("app") != "lingwrite") error("不是灵写的备份文件")
-        if ((j["format"]?.jsonPrimitive?.intOrNull ?: 0) > FORMAT) error("备份来自更新的版本，请先升级灵写")
-        if ((j["schema"]?.jsonPrimitive?.intOrNull ?: 1) > com.lingwrite.app.data.db.DB_VERSION) error("备份数据库来自更新的版本，请先升级灵写")
+        val j = json ?: error(trOr(R.string.bak_004, "不是灵写的备份文件"))
+        if (j.str("app") != "lingwrite") error(trOr(R.string.bak_004, "不是灵写的备份文件"))
+        if ((j["format"]?.jsonPrimitive?.intOrNull ?: 0) > FORMAT) error(trOr(R.string.bak_005, "备份来自更新的版本，请先升级灵写"))
+        if ((j["schema"]?.jsonPrimitive?.intOrNull ?: 1) > com.lingwrite.app.data.db.DB_VERSION) error(trOr(R.string.bak_006, "备份数据库来自更新的版本，请先升级灵写"))
         return Archive(j, files).also(::validate)
     }
 
     /** 空库备份仍有基本表；不能把残缺 JSON 当成可覆盖的空库。旧版新增表可缺省。 */
     fun validate(a: Archive) {
-        val t = a.json["tables"] as? JsonObject ?: error("备份缺少数据表")
-        listOf("books", "volumes", "chapters", "chapter_versions").forEach { require(t[it] is JsonArray) { "备份缺少 $it，未导入" } }
+        val t = a.json["tables"] as? JsonObject ?: error(trOr(R.string.bak_007, "备份缺少数据表"))
+        listOf("books", "volumes", "chapters", "chapter_versions").forEach { require(t[it] is JsonArray) { trOr(R.string.bak_008, "备份缺少 $it，未导入", it) } }
         a.files.keys.forEach { n ->
             val leaf = n.substringAfter('/', "")
             val mapOk = n.startsWith("maps/") && leaf.isNotBlank() && leaf != "." && !leaf.contains('/') && !leaf.contains('\\') && !leaf.contains(':') && !leaf.contains("..")
             val coverOk = n.startsWith("covers/") && leaf.matches(Regex("[0-9]+\\.png"))
-            require(mapOk || coverOk) { "备份文件路径无效，未导入" }
+            require(mapOk || coverOk) { trOr(R.string.bak_009, "备份文件路径无效，未导入") }
         }
         val books = t["books"]!!.jsonArray.map { it.jsonObject["id"]!!.jsonPrimitive.long }.toSet()
         val volumes = t["volumes"]!!.jsonArray.map { it.jsonObject["id"]!!.jsonPrimitive.long }.toSet()
-        t["volumes"]!!.jsonArray.forEach { require(it.jsonObject["bookId"]!!.jsonPrimitive.long in books) { "分卷引用缺失作品" } }
+        t["volumes"]!!.jsonArray.forEach { require(it.jsonObject["bookId"]!!.jsonPrimitive.long in books) { trOr(R.string.bak_010, "分卷引用缺失作品") } }
         t["chapters"]!!.jsonArray.forEach { c ->
-            require(c.jsonObject["bookId"]!!.jsonPrimitive.long in books && c.jsonObject["volumeId"]!!.jsonPrimitive.long in volumes) { "章节引用缺失作品或分卷" }
+            require(c.jsonObject["bookId"]!!.jsonPrimitive.long in books && c.jsonObject["volumeId"]!!.jsonPrimitive.long in volumes) { trOr(R.string.bak_011, "章节引用缺失作品或分卷") }
         }
     }
 
@@ -212,11 +214,27 @@ object Backup {
         var success = false
         try {
             val skipBooks = mutableSetOf<Long>()
+            val reuseSeries = mutableMapOf<Long, Long>()
+            val skipSeries = mutableSetOf<Long>()
             if (overwrite) {
                 (tables.reversed().map { it.name } + listOf("passages_fts", "passages", "chapter_index")).forEach { db.execSQL("DELETE FROM $it") }
             } else {
                 val existing = db.query("SELECT title, createdAt FROM books").use { c -> buildSet { while (c.moveToNext()) add(c.getString(0) + "|" + c.getLong(1)) } }
                 a.tables["books"]?.jsonArray?.forEach { b -> val o = b.jsonObject; if (o.str("title") + "|" + o["createdAt"]!!.jsonPrimitive.long in existing) skipBooks += o["id"]!!.jsonPrimitive.long }
+                // 系列去重（审查 #21）：同名同创建时间的系列复用本机已有的，不再重复导入它的共享卡；
+                // 备份里引用某系列的书全部被跳过时，这个系列也跳过。
+                val haveSeries = db.query("SELECT id, name, createdAt FROM series").use { c -> buildMap { while (c.moveToNext()) put(c.getString(1) + "|" + c.getLong(2), c.getLong(0)) } }
+                val bookRows = a.tables["books"]?.jsonArray.orEmpty().map { it.jsonObject }
+                a.tables["series"]?.jsonArray?.forEach { r ->
+                    val o = r.jsonObject
+                    val oldId = o["id"]?.jsonPrimitive?.longOrNull ?: return@forEach
+                    val key = o.str("name") + "|" + (o["createdAt"]?.jsonPrimitive?.longOrNull ?: 0L)
+                    val refs = bookRows.filter { it["seriesId"]?.jsonPrimitive?.longOrNull == oldId }.mapNotNull { it["id"]?.jsonPrimitive?.longOrNull }
+                    when {
+                        key in haveSeries -> reuseSeries[oldId] = haveSeries.getValue(key)
+                        refs.isNotEmpty() && refs.all { it in skipBooks } -> skipSeries += oldId
+                    }
+                }
             }
             for (spec in tables) {
                 val cols = columns(spec.name)
@@ -226,6 +244,15 @@ object Backup {
                     if (spec.name == "lore_cards" && o.str("type") == "concept") o = JsonObject(o + ("type" to JsonPrimitive("term")))
                     val bookRef = if (spec.name == "books") o["id"]?.jsonPrimitive?.longOrNull else o["bookId"]?.jsonPrimitive?.longOrNull
                     if (bookRef != null && bookRef in skipBooks) continue@rows
+                    if (!overwrite && spec.name == "series") {
+                        val old = o["id"]?.jsonPrimitive?.longOrNull
+                        if (old != null && old in reuseSeries) { map[old] = reuseSeries.getValue(old); continue@rows }
+                        if (old != null && old in skipSeries) continue@rows
+                    }
+                    if (!overwrite && spec.name == "series_lore") {
+                        val sid = o["seriesId"]?.jsonPrimitive?.longOrNull
+                        if (sid != null && (sid in reuseSeries || sid in skipSeries)) continue@rows
+                    }
                     if (!overwrite) {
                         val m = o.toMutableMap()
                         for ((col, target) in spec.fks) {
@@ -269,9 +296,9 @@ object Backup {
             a.files.filterKeys { it.startsWith("maps/") }.forEach { (n, _) ->
                 val name = n.removePrefix("maps/"); val target = File(dir, name)
                 if (overwrite || !target.exists()) {
-                    val original = if (target.exists()) File(originals, name).also { check(target.renameTo(it)) { "无法暂存原地图，恢复取消" } } else null
+                    val original = if (target.exists()) File(originals, name).also { check(target.renameTo(it)) { trOr(R.string.bak_012, "无法暂存原地图，恢复取消") } } else null
                     changed += target to original
-                    check(File(incoming, name).renameTo(target)) { "无法恢复地图，恢复取消" }
+                    check(File(incoming, name).renameTo(target)) { trOr(R.string.bak_013, "无法恢复地图，恢复取消") }
                 }
             }
             db.setTransactionSuccessful(); success = true
@@ -280,8 +307,8 @@ object Backup {
             try { db.endTransaction(); committed = success }
             finally {
                 if (!committed) changed.asReversed().forEach { (target, original) ->
-                    if (target.exists()) check(target.delete()) { "恢复未完成；原地图保留在 $staging" }
-                    if (original != null) check(original.renameTo(target)) { "恢复未完成；原地图保留在 $staging" }
+                    if (target.exists()) check(target.delete()) { trOr(R.string.bak_014, "恢复未完成；原地图保留在 $staging", staging.path) }
+                    if (original != null) check(original.renameTo(target)) { trOr(R.string.bak_014, "恢复未完成；原地图保留在 $staging", staging.path) }
                 }
                 staging.deleteRecursively()
             }
@@ -297,8 +324,8 @@ object Backup {
             }
         }
         AppGraph.db.invalidationTracker.refreshVersionsAsync()
-        // 合并导入会重映射章节 id，旧的恢复位置锚点会指错章节，直接清空（回退到章号推断）。
-        if (!overwrite) RestoreHints.clear()
+        // 合并导入会重映射章节 id，覆盖导入后旧锚点的 id 也可能对上新库里另一章：都清空（回退到章号推断）。
+        if (success) RestoreHints.clear()
         return imported
     }
 

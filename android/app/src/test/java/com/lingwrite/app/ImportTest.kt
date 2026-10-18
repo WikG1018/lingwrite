@@ -72,6 +72,24 @@ class ImportTest {
         assertEquals(listOf("起风", "落雨"), b.chapters.map { it.title })
     }
 
+    @Test fun markdownBookTitleAndHashVolumesAreRecognized() = runBlocking {
+        val uri = file("md.md", "# 长夜行\n\n## 第一卷 山门\n\n### 第一章 入门\n正文一\n\n### 第二章 雨夜\n正文二\n\n## 第二卷 大比\n\n### 第三章 擂台\n正文三\n")
+        val p = Importer.parse(ctx, uri)
+        assertEquals("长夜行", p.bookTitle)
+        assertEquals(2, p.volumes.size)
+        assertEquals(listOf("入门", "雨夜", "擂台"), p.chapters.map { it.title })
+        assertTrue(p.chapters.none { it.content.contains("长夜行") || it.content.contains("第一卷") })
+    }
+
+    @Test fun partHeadingIsVolumeOnlyWhenChaptersExist() = runBlocking {
+        val withChapters = Importer.parse(ctx, file("p1.txt", "第一部 少年\n第一章 起\n正文一\n第二章 承\n正文二\n第二部 青年\n第三章 转\n正文三\n"))
+        assertEquals(listOf("少年", "青年"), withChapters.volumes.map { it.title })
+        assertEquals(3, withChapters.chapters.size)
+        val partsOnly = Importer.parse(ctx, file("p2.txt", "第一篇 春\n正文一\n\n第二篇 夏\n正文二\n"))
+        assertTrue(partsOnly.volumes.all { it.title.isBlank() })
+        assertEquals(2, partsOnly.chapters.size)
+    }
+
     @Test fun docxParagraphsAreExtracted() = runBlocking {
         val uri = docx("sample.docx", listOf("第一章 初见", "第一段", "第二段", "第二章 再会", "第三段"))
         val p = Importer.parse(ctx, uri)

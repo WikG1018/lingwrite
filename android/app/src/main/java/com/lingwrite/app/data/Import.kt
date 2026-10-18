@@ -7,6 +7,8 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.room.withTransaction
 import com.lingwrite.app.AppGraph
+import com.lingwrite.app.R
+import com.lingwrite.app.i18n.trOr
 import com.lingwrite.app.data.db.BookEntity
 import com.lingwrite.app.data.db.ChapterEntity
 import com.lingwrite.app.data.db.VolumeEntity
@@ -58,29 +60,33 @@ object Importer {
 
     private val volumeRe = Regex("""^第\s*[0-9零〇一二三四五六七八九十百千万两]+\s*卷(?:\s*[·:：\-—]?\s*.*)?$""")
     private val chapterRe = Regex("""^第\s*[0-9零〇一二三四五六七八九十百千万两]+\s*[章回节集部篇](?:\s*[·:：\-—]?\s*.*)?$""")
+    /** 「第X部 / 第X篇」：很多作者用来表示卷；只有全文另有「章 / 回 / 节」标题时才当卷，否则仍当章。 */
+    private val partRe = Regex("""^第\s*[0-9零〇一二三四五六七八九十百千万两]+\s*[部篇](?:\s*[·:：\-—]?\s*.*)?$""")
+    private val partPrefix = Regex("""^第\s*[0-9零〇一二三四五六七八九十百千万两]+\s*[部篇]\s*[·:：\-—]?\s*""")
+    private val strictChapterRe = Regex("""^第\s*[0-9零〇一二三四五六七八九十百千万两]+\s*[章回节](?:\s*[·:：\-—]?\s*.*)?$""")
     private val englishRe = Regex("""^Chapter\s+\d+\b.*$""", RegexOption.IGNORE_CASE)
     private val markdownRe = Regex("""^#{1,3}\s+\S.*$""")
 
     suspend fun parse(ctx: Context, uri: Uri, options: ImportOptions = ImportOptions()): ImportPreview = withContext(Dispatchers.IO) {
         val bytes = readLimited(ctx, uri)
-        val name = displayName(ctx, uri).ifBlank { "导入作品" }
+        val name = displayName(ctx, uri).ifBlank { defaultTitle() }
         val lower = name.lowercase()
         val isDocx = lower.endsWith(".docx")
         val decoded = if (isDocx) Decoded(DocxText.extract(bytes), Charsets.UTF_8, false) else decode(bytes, options.encoding)
         val raw = decoded.text.trim()
-        require(raw.isNotBlank()) { "文件里没有可导入的正文" }
-        val baseTitle = name.substringBeforeLast('.').ifBlank { "导入作品" }
+        require(raw.isNotBlank()) { trOr(R.string.imp_002, "文件里没有可导入的正文") }
+        val baseTitle = name.substringBeforeLast('.').ifBlank { defaultTitle() }
         val warnings = mutableListOf<String>()
-        if (decoded.fellBack) warnings += "编码不是 UTF-8，已按 ${decoded.charset} 读取；如果出现乱码，请重试并指定编码。"
-        if (isDocx) warnings += "Word 只导入正文段落；图片、批注和脚注不会导入。"
+        if (decoded.fellBack) warnings += trOr(R.string.imp_003, "编码不是 UTF-8，已按 ${decoded.charset} 读取；如果出现乱码，请重试并指定编码。", decoded.charset.name())
+        if (isDocx) warnings += trOr(R.string.imp_004, "Word 只导入正文段落；图片、批注和脚注不会导入。")
 
         var preview = split(raw, baseTitle, options, warnings)
             .copy(encoding = decoded.charset.name(), inputBytes = bytes.size)
         if (preview.chapters.isEmpty()) {
             preview = ImportPreview(baseTitle, listOf(ImportVolume("")),
-                listOf(ImportChapter("", 0, raw)), warnings + "没有识别到章节，整篇作为一章导入。", decoded.charset.name(), bytes.size)
+                listOf(ImportChapter("", 0, raw)), warnings + trOr(R.string.imp_005, "没有识别到章节，整篇作为一章导入。"), decoded.charset.name(), bytes.size)
         }
-        if (preview.chapters.size > MAX_CHAPTERS) error("章节超过 $MAX_CHAPTERS 章，建议先拆分文件再导入")
+        if (preview.chapters.size > MAX_CHAPTERS) error(trOr(R.string.imp_006, "章节超过 $MAX_CHAPTERS 章，建议先拆分文件再导入", MAX_CHAPTERS))
         preview.copy(warnings = preview.warnings.distinct())
     }
 
@@ -88,7 +94,7 @@ object Importer {
         val db = AppGraph.db
         db.withTransaction {
             val bookId = db.books().insert(BookEntity(
-                title = title.trim().ifBlank { preview.bookTitle.ifBlank { "导入作品" } },
+                title = title.trim().ifBlank { preview.bookTitle.ifBlank { defaultTitle() } },
                 status = "draft",
             ))
             val vols = preview.volumes.ifEmpty { listOf(ImportVolume("")) }
@@ -110,6 +116,11 @@ object Importer {
             bookId
         }
     }
+
+    private fun defaultTitle() = trOr(R.string.imp_001, "导入作品")
+
+    /** Markdown 标题去掉前导 #，再判断是卷还是章（「## 第一卷 xxx」是卷，不是章）。 */
+    private fun bare(t: String): String = if (markdownRe.matches(t)) t.trimStart('#').trim() else t
 
     private fun split(text: String, baseTitle: String, options: ImportOptions, warnings: MutableList<String>): ImportPreview {
         if (options.split == ImportSplit.Single) {
@@ -134,33 +145,50 @@ object Importer {
                 sb = StringBuilder()
             }
         }
-        for (line in text.lines()) {
-            val t = line.trim()
-            if (isVolumeHeading(t)) {
+        var lines = text.lines()
+        // 第一行是「# 书名」（只有这一个一级标题，且本身不是章 / 卷标题）时作为书名，不当成一章。
+        var bookTitle = baseTitle
+        val first = lines.indexOfFirst { it.isNotBlank() }
+        if (first >= 0) {
+            val f = lines[first].trim()
+            val h1 = Regex("""^#\s+\S.*$""")
+            if (h1.matches(f) && lines.count { h1.matches(it.trim()) } == 1) {
+                val b = bare(f)
+                if (!volumeRe.matches(b) && !chapterRe.matches(b) && !englishRe.matches(b)) {
+                    bookTitle = b.take(MAX_HEADING)
+                    lines = lines.toMutableList().also { it.removeAt(first) }
+                }
+            }
+        }
+        val partsAreVolumes = lines.any { val b = bare(it.trim()); strictChapterRe.matches(b) || englishRe.matches(b) }
+        for (line in lines) {
+            val raw = line.trim()
+            val t = bare(raw)
+            if (isVolumeHeading(t) || (partsAreVolumes && t.length in 2..MAX_HEADING && partRe.matches(t) && !t.endsWithPunctuation())) {
                 flush()
-                volumes += ImportVolume(Naming.stripVolume(t))
+                volumes += ImportVolume(Naming.stripVolume(t).replace(partPrefix, "").trim())
                 volume = volumes.lastIndex
                 title = ""
                 continue
             }
-            if (isChapterHeading(t)) {
+            if (isChapterHeading(raw)) {
                 flush()
                 seenChapter = true
-                title = headingTitle(t)
+                title = headingTitle(raw)
                 continue
             }
             if (!seenChapter && chapters.isEmpty()) preface.appendLine(line) else sb.appendLine(line)
         }
         flush()
         if (!seenChapter || chapters.size < 2) {
-            warnings += "没有识别到至少两个章节标题，已改为按长度拆分；可在预览里切换拆分方式。"
+            warnings += trOr(R.string.imp_007, "没有识别到至少两个章节标题，已改为按长度拆分；可在预览里切换拆分方式。")
             return byLength(text, baseTitle, options.fallbackLength, warnings)
         }
         if (preface.isNotBlank()) {
             if (volumes.isEmpty()) volumes += ImportVolume("")
-            chapters.add(0, ImportChapter("序", 0, preface.toString().trim('\n')))
+            chapters.add(0, ImportChapter(trOr(R.string.import_024, "序"), 0, preface.toString().trim('\n')))
         }
-        return ImportPreview(baseTitle, volumes, chapters, warnings, "UTF-8", text.toByteArray().size)
+        return ImportPreview(bookTitle, volumes, chapters, warnings, "UTF-8", text.toByteArray().size)
     }
 
     private fun byLength(text: String, baseTitle: String, length: Int, warnings: MutableList<String>): ImportPreview {
@@ -175,8 +203,8 @@ object Importer {
             if (sb.length >= target) flush()
         }
         flush()
-        if (chapters.isEmpty()) warnings += "文件没有正文。"
-        else warnings += "按每章约 $target 字拆分，共 ${chapters.size} 章；可在预览里切换为「不分章」。"
+        if (chapters.isEmpty()) warnings += trOr(R.string.imp_008, "文件没有正文。")
+        else warnings += trOr(R.string.imp_009, "按每章约 $target 字拆分，共 ${chapters.size} 章；可在预览里切换为「不分章」。", target, chapters.size)
         return ImportPreview(baseTitle, listOf(ImportVolume("")), chapters, warnings, "UTF-8", text.toByteArray().size)
     }
 
@@ -207,7 +235,7 @@ object Importer {
     }
 
     private fun readLimited(ctx: Context, uri: Uri): ByteArray {
-        val input = ctx.contentResolver.openInputStream(uri) ?: error("无法读取文件")
+        val input = ctx.contentResolver.openInputStream(uri) ?: error(trOr(R.string.imp_010, "无法读取文件"))
         input.use {
             val out = ByteArrayOutputStream()
             val buf = ByteArray(64 * 1024)
@@ -216,7 +244,7 @@ object Importer {
                 val n = it.read(buf)
                 if (n < 0) break
                 total += n
-                require(total <= MAX_BYTES) { "文件超过 20MB，请先拆分再导入" }
+                require(total <= MAX_BYTES) { trOr(R.string.imp_011, "文件超过 20MB，请先拆分再导入") }
                 out.write(buf, 0, n)
             }
             return out.toByteArray()
@@ -262,14 +290,14 @@ private object DocxText {
                         val n = z.read(buf)
                         if (n < 0) break
                         total += n
-                        require(total <= Importer.MAX_BYTES) { "Word 文档过大" }
+                        require(total <= Importer.MAX_BYTES) { trOr(R.string.imp_012, "Word 文档过大") }
                         out.write(buf, 0, n)
                     }
                     return parse(out.toByteArray())
                 }
             }
         }
-        error("Word 文档缺少 document.xml")
+        error(trOr(R.string.imp_013, "Word 文档缺少 document.xml"))
     }
 
     private fun parse(xml: ByteArray): String {

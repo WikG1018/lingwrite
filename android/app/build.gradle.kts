@@ -63,8 +63,8 @@ android {
         applicationId = "com.lingwrite.app"
         minSdk = 31
         targetSdk = 37
-        versionCode = 18
-        versionName = "0.6.0"
+        versionCode = 19
+        versionName = "0.6.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("boolean", "HAS_MISANS", hasMiSans.toString())
     }

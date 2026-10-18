@@ -303,8 +303,10 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
 
     fun accept(text: String, edited: Boolean) {
         if (s.accepting) return
-        scope.launch {
-            s.accepting = true
+        // 同步置位再 launch：rememberCoroutineScope 不是立即调度，同一帧连点两下都能过检查（审查 #5）。
+        s.accepting = true
+        // ATOMIC：即使开始前就被取消也会进入 try，finally 一定把 accepting 复位。
+        scope.launch(start = kotlinx.coroutines.CoroutineStart.ATOMIC) {
             try {
                 // 辅助类输出（给方向）绝不写进正文：存便签（MD1 红线，adoptTo 与测试共用同一套判断）
                 val to = AiAdopt.adoptTo(s.tool?.id ?: "", s.target != null)
@@ -339,8 +341,9 @@ private fun ColumnScope.AiPanel(st: EditorState, open: MutableState<Boolean>) {
     fun acceptCandidate() {
         val cand = s.cands.getOrNull(s.selected) ?: return
         if (s.accepting) return
-        scope.launch {
-            s.accepting = true
+        s.accepting = true
+        // ATOMIC：即使开始前就被取消也会进入 try，finally 一定把 accepting 复位。
+        scope.launch(start = kotlinx.coroutines.CoroutineStart.ATOMIC) {
             try {
                 AppGraph.books.saveContent(st.chapter.id, st.value.text)
                 AppGraph.books.snapshot(st.chapter.id, "ai", tr(R.string.editor_ai_032))

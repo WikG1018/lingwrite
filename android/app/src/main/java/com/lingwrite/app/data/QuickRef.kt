@@ -34,7 +34,7 @@ object QuickRef {
         return db.checks().foreshadowsOnce(bookId).filter { it.status == "open" && !it.pending && it.plantNumber < chapterNumber }
             .filter { f ->
                 (f.payoff?.let { it - chapterNumber in -50..5 } == true) ||
-                    (f.cardId != null && cards[f.cardId]?.allNames()?.any { text.contains(it) } == true)
+                    (f.cardId != null && cards[f.cardId]?.allNames()?.filter { it.isNotBlank() }?.any { text.contains(it) } == true)
             }
             .sortedBy { it.payoff ?: Int.MAX_VALUE }
             .take(30)
