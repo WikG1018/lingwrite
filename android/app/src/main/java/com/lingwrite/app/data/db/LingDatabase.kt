@@ -245,6 +245,8 @@ abstract class LingDatabase : RoomDatabase() {
             // v0.1.0 起 schema 以 version 1 为基线（schemas/1.json）。之后每次改表：version + 1，
             // 在 MIGRATIONS 里补一个显式 Migration，并提交新导出的 schema。不再允许破坏性重建。
             b.addMigrations(*MIGRATIONS)
+            // 升级快照在后台线程进行；第一次打开（随后迁移）前等它完成，见 UpgradeGuard。
+            if (!inMemory) b.openHelperFactory(com.lingwrite.app.data.UpgradeGuard.gate(androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory()))
             // 只对开发版：旧开发库的版本号（≤8）高于基线，降级时重建，避免装 debug 包的机器打不开。
             if (com.lingwrite.app.BuildConfig.DEBUG) b.fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
             return b.build()

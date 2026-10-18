@@ -172,7 +172,7 @@ fun ToneCard(
     }
 }
 
-/** 辅助模式的便签卡：primary 竖条、要点列表、再来一次 / 复制 / 存到便签（ui-spec §1）。 */
+/** 辅助模式的便签卡：浅底 + 细描边（不用左侧竖条）、要点列表、再来一次 / 复制 / 存到便签（ui-spec §1）。 */
 @Composable
 fun AiNoteCard(
     title: String,

@@ -1461,7 +1461,7 @@
     <string name="data_47">包含全部历史版本（文件更大）</string>
     <string name="data_48">默认只备份每章最近 3 个自动版本；手动、回滚和 AI 快照全部保留。</string>
     <string name="data_49">升级前数据库快照</string>
-    <string name="data_50">升级前自动保存的原始数据库；只备份，不自动恢复。</string>
+    <string name="data_50">升级前自动保存的原始数据库，只存在本机。导出的副本不含 API Key。</string>
     <string name="data_51">导出快照</string>
     <string name="data_52">删除快照</string>
     <string name="data_53">升级快照已导出</string>
@@ -1545,13 +1545,13 @@
     <string name="read_003">手动录入</string>
     <string name="read_004">章号</string>
     <string name="read_005">追读</string>
-    <string name="read_006" formatted="false">完读率 %</string>
+    <string name="read_006">完读率</string>
     <string name="read_007">收藏</string>
     <string name="read_008">评论</string>
     <string name="read_009">导入</string>
     <string name="read_010">保存</string>
     <string name="read_011">暂无追读数据。平台数据需要手动粘贴；灵写不抓取后台。</string>
-    <string name="read_012">把平台后台的表格复制到下面，表头含章/追读/完读率即可。</string>
+    <string name="read_012">把平台后台的表格复制到下面，表头含章/追读/完读率即可（也认 Chapter / Reads / Completion）。</string>
     <string name="read_013" formatted="false">解析失败：%1$s</string>
     <string name="read_014" formatted="false">已导入 %1$d 行</string>
     <string name="read_015">完读率曲线</string>
@@ -1666,4 +1666,7 @@
     <string name="series_021">删除系列</string>
     <string name="series_022">已删除</string>
     <string name="series_023">暂无共享卡</string>
+    <string name="upgrade_001">正在备份数据…</string>
+    <string name="upgrade_002">升级前先给作品留一份副本，通常只要几秒，请不要关闭灵写。</string>
+    <string name="read_020" formatted="false">完读率（%）</string>
 </resources>
