@@ -131,7 +131,7 @@ fun ReadStatsRoute(bookId: Long, nav: NavHostController) {
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             LingTextField(addChapter, { addChapter = it.filter(Char::isDigit) }, label = tr(R.string.read_004), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
             LingTextField(addReads, { addReads = it.filter(Char::isDigit) }, label = tr(R.string.read_005), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
-            LingTextField(addCompletion, { addCompletion = it.filter(Char::isDigit) }, label = tr(R.string.read_006), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+            LingTextField(addCompletion, { addCompletion = it.filter(Char::isDigit) }, label = tr(R.string.read_020), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
             LingTextField(addFavorites, { addFavorites = it.filter(Char::isDigit) }, label = tr(R.string.read_007), keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
             LingButton(tr(R.string.read_010), enabled = addChapter.isNotBlank() && addCompletion.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), height = 48.dp) {
                 scope.launch {
