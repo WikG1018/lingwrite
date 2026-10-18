@@ -48,7 +48,7 @@ abstract class RouteShotBase {
 
     open suspend fun extraSeed(bookId: Long) {}
 
-    protected fun shoot(name: String, paper: Boolean = false, content: @Composable () -> Unit) {
+    protected fun shoot(name: String, paper: Boolean = false, screen: Boolean = false, content: @Composable () -> Unit) {
         val darkState = androidx.compose.runtime.mutableStateOf(false)
         compose.setContent {
             val nav = rememberNavController()
@@ -59,7 +59,9 @@ abstract class RouteShotBase {
         for (dark in listOf(false, true)) {
             darkState.value = dark
             repeat(6) { Thread.sleep(150); compose.mainClock.advanceTimeBy(500); compose.waitForIdle() }
-            compose.onRoot().captureRoboImage(File(dir, "$name-${if (dark) "dark" else "light"}.png").path)
+            val out = File(dir, "$name-${if (dark) "dark" else "light"}.png").path
+            // 面板（Sheet）挂在独立窗口上：整屏截取，才能把底下页面和面板一起拍进去。
+            if (screen) com.github.takahirom.roborazzi.captureScreenRoboImage(out) else compose.onRoot().captureRoboImage(out)
         }
     }
 
